@@ -1,0 +1,290 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Multiple Ship-To Addresses</title>
+<link rel="stylesheet" href="style.css" type="text/css" />
+<link rel="stylesheet" href="menu.css" type="text/css" />
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js" type="text/javascript"></script>
+<script src="back_to_top.min.js" type="text/javascript"></script>
+<script type="text/javascript">
+$(document).ready(function(){
+BackToTop({
+text : 'Back to Top',
+autoShow : true,
+timeEffect : 750
+});
+});
+</script> 
+</head>
+
+<body>
+<div id="top">
+  <h1 id="title">Multiple Ship-To Addresses for Zen Cart v1.5.1/v1.5.2 &mdash; <span class="smaller">Version 1.0.0, BETA 1</span></h1>
+  <ul id="menu">
+    <li><a href="#introduction" class="drop">Introduction</a>
+      <div class="dropdown_1column">
+        <div class="col_1">
+          <p><a href="#credits">Credits</a></p>
+        </div>
+        <div class="col_1">
+          <p><a href="#unotes">Usage Notes</a></p>  
+        </div>
+    </li>
+    
+    <li><a href="#overview">Overview</a></li>
+      
+    <li><a href="#zcai">Zen Cart Admin Interfaces</a>
+      <div class="dropdown_2columns">
+        <div class="col_2">
+          <p><a href="#orders">Customers-&gt;Orders</a></p>
+        </div>
+        <div class="col_2">
+          <p class="sub_level"><a href="#o_listing">Identifying Orders With Multiple Ship-to Addresses</a></p>
+        </div>
+      </div>
+    </li>
+       
+    <li><a href="#zcai">Zen Cart Customer Interfaces</a>
+      <div class="dropdown_2columns">
+        <div class="col_2">
+          <p><a href="#checkout">During the Checkout Process</a></p>
+        </div>
+        <div class="col_2">
+          <p class="sub_level"><a href="#cc_offer">Initial Offer for Multiple Ship-To Addresses</a></p>
+        </div>
+        <div class="col_2">
+          <p class="sub_level"><a href="#cc_choose">Choose Multiple Shipping Addresses</a></p>
+        </div>
+        <div class="col_2">
+          <p class="sub_level"><a href="#cc_confirm">Confirming Multiple Ship-To Addresses</a></p>  
+        </div>
+        <div class="col_2 top_sep">
+          <p><a href="#account">Account &mdash; Reviewing Order History</a></p>
+        </div>
+      </div>
+    </li>
+    
+    <li><a href="#iaui">Install and Un-install Instructions</a>
+      <div class="dropdown_2columns">
+        <div class="col_1">
+          <p><a href="#install">Installation</a></p>
+        </div>
+        <div class="col_1">
+          <p><a href="#uninstall">Uninstall</a></p>  
+        </div>
+      </div>
+    </li>
+    
+    <li><a href="#vach">Version and Change History</a>
+      <div class="dropdown_2columns">
+        <div class="col_2">
+          <p><a href="#history">Version History</a></p>
+        </div>
+        <div class="col_2">
+          <p><a href="#changes">File/Database Changes by Version</a></p>  
+        </div>
+      </div>
+    </li>   
+  </ul>
+</div>
+
+<h1 class="the_head" id="introduction">Introduction</h1>
+<div class="the_content">
+  <h2 id="credits">Credits</h2>
+  <div class="sub-content">
+    <p>Copyright &copy; 2014, <a href="http://vinosdefrutastropicales.com" target="_blank" rel="noreferrer">Vinos de Frutas Tropicales</a> (lat9).  Current Support Thread at Zen Cart Forums: <a href="http://www.zen-cart.com/showthread.php?211914-Multiple-Ship-To-Addresses-Support-Thread" target="_blank">http://www.zen-cart.com/showthread.php?211914-Multiple-Ship-To-Addresses-Support-Thread</a></p>
+  </div>
+  <h2 id="usage">Usage Notes</h2>
+  <div class="sub-content">
+    <ol>
+      <li>This plugin is currently a <strong>beta</strong> release; please don't install it on a live store!</li>
+      <li>The following features have not yet been implemented, but will be prior to the plugin's <em>first non-beta</em> release:<ol>
+        <li>Updates, especially a reduction of a product's quantity, to the shopping cart after the customer has selected multiple ship-to addresses.</li>
+        <li>The handling of virtual and mixed (i.e. virtual and physical products in the same cart) carts.</li>
+        <li>Updating and maintaining different orders_status values for the different ship-to address &quot;sub-orders&quot;.</li>
+      </ol></li>
+      <li>Because this plugin makes modifications to the Zen Cart order process, it is not compatible with other plugins that also make order-related modifications including (but not limited to):<ul>
+        <li>Edit Orders</li>
+        <li>Super Orders</li>
+        <li>Ty Package Tracker</li>
+        <li>USPS Click-and-Ship</li>
+      </ul></li>
+    </ol>
+  </div>
+</div>
+  
+<h1 class="the_head" id="overview">Overview</h1>
+<div class="the_content">
+  <div class="sub-content no-border">
+    <p>This plugin enables your store to offer your customers multiple shipping addresses on a single order, <em>so long as the currently-selected payment method supports shipping to multiple addresses</em>!  Many payment modules will not provide a store-owner with seller protection if a customer's products are shipped to an unvetted address.</p>
+    <p>For the initial release of the plugin, only the <b>moneyorder</b> payment method has been updated to provide this support.  The intent with this plugin's release is to provide a basic framework that can be tested (and otherwise improved) by the Zen Cart community and within which other, more intricate, payment methods can also support multiple ship-to addresses.</p>
+    <p>Every effort has been made to reduce the <span class="corefile">core-file</span> changes required.  Where possible, the change has been limited to the insertion of one or more Zen Cart <em>notifiers</em> at significant points.  When it was not possible, the changes are spanned by comments indicating the beginning (<code>//-bof-multiship</code>) and end (<code>//-eof-multiship</code>) of the code-fragments.</p>
+  </div>
+</div>
+
+<h1 class="the_head" id="zcai">Zen Cart Admin Interfaces</h1>
+<div class="the_content">
+  <div class="sub-content no-border">
+    <p>The first time an admin signs into (or refreshes the screen of) your Zen Cart admin after you have installed the files for <em>Multiple Ship-to Addresses</em>, an initialization script runs that creates new tables in your Zen Cart database:</p>
+    <ol>
+      <li><b>orders_multiship</b>. This table holds the information that identifies the delivery address for a multiship order.</li>
+      <li><b>orders_multiship_totals</b>.  This table holds the order total's values associated with a multiship order.</li>
+    </ol>
+    <p>and modifies your <em>orders_products</em> table to add a field to provide the correlation to the multiship order id for each product.</p>
+  </div>
+ 
+  <h2 id="orders" class="innerLink">Customers-&gt;Orders</h2>
+  <div class="sub-content">
+    <h4 id="o_listing">Identifying Orders With Multiple Shipping Addresses</h4>
+    <p>When you view the orders for your Zen Cart, the orders' listing display identifies those orders that have multiple ship-to addresses using a blue dot, as shown by the following screenshot:</p>
+    <img class="bigimg" src="admin_orders_listing.jpg" title="Sample output" alt="Sample output" />
+  </div>
+</div>
+
+<h1 class="the_head" id="zcci">Zen Cart Customer Interfaces</h1>
+<div class="the_content">
+  <div class="sub-content no-border">
+    <p>This plugin modifies the interfaces presented to your customers during the checkout process and, if an order is shipped to multiple addresses, their account history display.</p>
+  </div>
+ 
+  <h2 id="checkout" class="innerLink">During the Checkout Process</h2>
+  <div class="sub-content">
+    <h4 id="cc_offer">Initial Offer for Multiple Ship-To Addresses</h4>
+    <img class="smallimg back" src="checkout_confirmation_offer.jpg" title="Sample output" alt="Sample output" />
+    <p>When a customer's current order qualifies for multiple ship-to addresses, a new link, as shown by the screenshot to the left, is displayed on your store's <em>Checkout Confirmation</em> page.  If the customer clicks that link, they're taken to the <em>Choose Multiple Shipping Addresses</em> (checkout_multiship) page.</p>
+    <div class="clear"></div>
+    
+    <h4 id="cc_choose">Choose Multiple Shipping Addresses</h4>
+    <img class="smallimg back" src="checkout_multiship.jpg" title="Sample output" alt="Sample output" />
+    <div id="cc_choose_div">
+      <p>The <code>checkout_multiship</code> page is presented to the customer when they click the link presented in the <code>checkout_confirmation</code> page.  This page's processing breaks down the customer's order into a collection of single-quantity line items so that the customer can choose the ship-to address for each item in their cart.</p><p><strong>Note:</strong> The processing for this page automatically disables the left and right sidebox display, to provide sufficient display width for the dropdown address menus.</p> 
+      <p>This page operates as follows:</p>
+      <ul>
+        <li>Initially, all items ship to the customer's current delivery address (as selected on the <code>checkout_shipping</code> page).</li>
+        <li>The customer can change the currently-selected shipping method by clicking the &quot;Edit&quot; button at the top of the page.</li>
+        <li>The customer uses the dropdown list of addresses &mdash; created from their current address book &mdash; to choose the address to which each individual item is to ship.</li>
+        <li>An item (and its associated ship-to information) is removed by setting its quantity box to 0 and clicking the <em>Update</em> button.</li>
+        <li>Clicking the &quot;Enter a new shipping address&quot; link will take the customer to their address book, where they can create a new address if needed.</li>
+        <li>Once the customer has chosen the send-to addresses for each item in their cart, they click the <em>Continue Checkout</em> button to return to the <em>Checkout Confirmation</em> page. If any address chosen is not compatible with the currently-selected shipping method, the customer will be returned to the <code>checkout_multiship</code> page to correct the problem.</li>
+      </ul>
+    </div>
+    <div class="clear"></div>
+    
+    <h4 id="cc_confirm">Confirming Multiple Ship-To Addresses</h4>
+    <img class="smallimg back" src="confirmation_review.jpg" title="Sample output" alt="Sample output" />
+    <div id="cc_confirm_div">
+      <p>Once the customer has chosen multiple ship-to addresses, the display of the <em>Checkout Confirmation</em> page changes to show the customer the order's breakdown by address.</p>
+      <p>This page operates as follows:</p>
+      <ul>
+        <li>Clicking the &quot;Edit&quot; button associated with the <b>Delivery/Shipping Information</b> returns the customer to the <code>checkout_multiship</code> page.</li>
+        <li>The <b>Shopping Cart Contents</b> section is broken down by ship-to address.</li>
+        <li>The <em>Grand Total</em>, the total amount charged for the order, is displayed at the bottom of the page.</li>
+        <li>Clicking the &quot;Confirm the Order&quot; button will result in the order being processed.</li>
+      </ul>
+    </div>
+    <div class="clear"></div>
+  </div>
+  
+  <h2 id="account" class="innerLink">Account &mdash; Reviewing Order History</h2>
+  <div class="sub-content">
+    <p>When a customer has placed an order with <em>Multiple Ship-To Addresses</em>, that order's display within the customer's account-related pages changes to reflect the multiple addresses:</p><ol>
+      <li>On the main <em>My Account</em> page, the <b>Ship To</b> column of the <b>Previous Orders</b> table shows &quot;Multiple Addresses&quot;.</li>
+      <li>On the <em>My Account :: History</em> page, the <b>Shipped To</b> field shows &quot;Multiple Addresses&quot;.</li>
+      <li>On the <em>Order Information</em> page, the <b>Delivery Address</b> shows &quot;Multiple Addresses&quot; and the order's details are broken out by ship-to address (using a layout similar to that described in <a href="#cc_confirm">Confirming Multiple Ship-To Addresses</a>).</li>
+    </ol>
+  </div>
+  
+</div>
+
+<h1 class="the_head" id="iaui">Install and Un-install Instructions</h1>
+<div class="the_content">
+  <h2 id="install" class="inner">Installation</h2>
+  <div class="sub-content">
+    <p>There are <span class="corefile">core-file overwrites</span> in this plugin; you should <strong>always</strong> backup your cart's database and files prior to making any changes. Unzip the plugin's package file and then:</p>
+    <ol>
+      <li>Rename the YOUR_ADMIN folder to match the name of your Zen Cart's admin folder.</li>
+      <li>Rename the YOUR_TEMPLATE folders (3 of them) to match the name of your Zen Cart's custom template:<ol>
+        <li>/includes/languages/english/YOUR_TEMPLATE</li>
+        <li>/includes/languages/english/extra_definitions/YOUR_TEMPLATE</li>
+        <li>/includes/templates/YOUR_TEMPLATE</li>
+      </ol></li>
+      <li>If you have previously made changes to the <span class="corefile">core</span> or <span class="almostcore">template-override</span> files, merge the current file with the one provided by this plugin; otherwise, copy the plugin's files to your store's folder structure:<ol>
+        <li><span class="corefile">/includes/classes/class.base.php</span> (this is the Zen Cart v1.5.2 version of the file)</li>
+        <li><span class="corefile">/includes/classes/order.php</span></li>
+        <li><span class="corefile">/includes/modules/payment/moneyorder.php</span></li>
+        <li><span class="corefile">/YOUR_ADMIN/orders.php</span></li>
+        <li><span class="corefile">/YOUR_ADMIN/includes/classes/order.php</span></li>
+        <li><span class="corefile">/YOUR_ADMIN/includes/functions/general.php</span></li>
+      </ol></li>
+      <li>Template override files:<ol>
+        <li><span class="almostcore">/includes/templates/YOUR_TEMPLATE/templates/tpl_address_book_default.php</span></li>
+        <li><span class="almostcore">/includes/templates/YOUR_TEMPLATE/templates/tpl_checkout_confirmation_default.php</span></li>
+      </ol></li>
+      <li>Sign into your Zen Cart's admin panel.</li>
+      <li>Copy the new files, introduced by this plugin, to your store's folder structure:<ol>
+        <li>/includes/auto_loaders/config.multiship.php</li>
+        <li>/includes/classes/class.multiship.php</li>
+        <li>/includes/classes/observers/class.multiship_observer.php</li>
+        <li>/includes/extra_datafiles/multiship_file_database_names.php</li>
+        <li>/includes/languages/english/extra_definitions/YOUR_TEMPLATE/multiship_common.php</li>
+        <li>/includes/languages/english/YOUR_TEMPLATE/checkout_multiship.php</li>
+        <li>/includes/modules/pages/account/header_php_account_multiship.php</li>
+        <li>/includes/modules/pages/account_history/header_php_account_history_multiship.php</li>
+        <li>/includes/modules/pages/account_history_info/header_php_account_history_info_multiship.php</li>
+        <li>/includes/modules/pages/account_history_info/main_template_vars.php</li>
+        <li>/includes/modules/pages/checkout_confirmation/header_php_checkout_confirmation_multiship.php</li>
+        <li>/includes/modules/pages/checkout_multiship/header_php.php</li>
+        <li>/includes/modules/payment/moneyorder.php</li>
+        <li>/includes/templates/YOUR_TEMPLATE/css/account_history_info.css</li>
+        <li>/includes/templates/YOUR_TEMPLATE/css/checkout_confirmation.css</li>
+        <li>/includes/templates/YOUR_TEMPLATE/css/checkout_multiship.css</li>
+        <li>/includes/templates/YOUR_TEMPLATE/images/icons/multiship_noship.png</li>
+        <li>/includes/templates/YOUR_TEMPLATE/templates/tpl_account_history_info_multiship.php</li>
+        <li>/includes/templates/YOUR_TEMPLATE/templates/tpl_checkout_multiship_default.php</li>
+        <li>/includes/templates/YOUR_TEMPLATE/templates/tpl_modules_multiship.php</li>
+        <li>/YOUR_ADMIN/images/icon_status_blue.gif</li>
+        <li>/YOUR_ADMIN/includes/auto_loaders/config.multiship_admin.php</li>
+        <li>/YOUR_ADMIN/includes/classes/observers/class.multiship_admin_observer.php</li>
+        <li>/YOUR_ADMIN/includes/classes/observers/index.html</li>
+        <li>/YOUR_ADMIN/includes/extra_datafiles/multiship_admin_database_names.php</li>
+        <li>/YOUR_ADMIN/includes/init_includes/init_multiship.php</li>
+        <li>/YOUR_ADMIN/includes/languages/english/orders_multiship.php</li>
+       </ol></li>
+      <li>Click the &quot;Admin Home&quot; link in your Zen Cart's top admin menu.  This action will cause the plugin's installation script to run.</li>
+    </ol>
+  </div>
+  <div class="sub-content"><p><strong>Note:</strong> All changes to <span class="corefile">core</span> and <span class="almostcore">template-override</span> files are notated with the characters <strong>multiship</strong> to make the changes easy to locate!</p></div>
+  
+  <h2 id="uninstall" class="inner">Uninstall</h2>
+  <div class="sub-content">
+    <p>First, delete the files that were copied to your zen-cart installation's folders (restoring the prior contents of the <span class="corefile">core</span> and <span class="almostcore">template-override</span> files) then use your admin's <em>Tools-&gt;Run SQL Patches</em> to run the file <b>uninstall_multiship.sql</b> that ships with this plugin.</p>
+  </div>
+</div>
+
+<h1 class="the_head" id="vach">Version and Change History</h1>
+<div class="the_content">
+  <h2 id="history" class="inner">Version History</h2>
+  <div class="sub-content">
+    <ul>
+      <li>v1.0.0 BETA 1, 2014-01-xx, Initial release.</li>
+    </ul>
+  </div>
+  
+  <h2 id="changes" class="inner">File/Database Changes by Version</h2>
+  <div class="sub-content">
+    <p>Legend for the <b>File Changes</b>: Changed &mdash; <span class="added">Added</span> &mdash; <span class="removed">Removed</span></p>
+    <table>
+      <tr class="o">
+        <th width="5%" class="c1">Version</th>
+        <th width="50%">Files Changed/Added</th>
+        <th width="45%">Database Changes</th>
+      </tr>
+           
+    </table>
+  </div>
+</div>
+  <p id="back-top"><a href="#top"><span></span>Back to Top</a></p>
+</div>
+</body>
+</html>
