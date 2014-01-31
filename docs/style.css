@@ -6,7 +6,7 @@ code {font-family:"Courier New",Courier;}
 em { font-style: italic; }
 img { margin: 0.5% 0 0.25% 0.5%; width: 98%; max-width: 98%; border: 1px solid #666; }
 ol, ul { list-style-position: outside; margin-left: 1.5%; }
-#cc_confirm_div ul, #cc_choose_div ul { list-style-position: inside; }
+#cc_confirm_div ul, #cc_choose_div ul, #cc_offer_div ol { list-style-position: inside; }
 ol li, ul li { margin-left: 1%; padding-top: 0.5%; }
 p { padding-top: 0.5%; }
 p:first-child: { padding-top: 0; }
@@ -39,6 +39,7 @@ th, td { padding: 1%; border: 1px solid #3333ff; }
 .forward { float: right; }
 .clear { clear: both; }
 .smallimg.back { margin-right: 10px; }
+.bitalic { font-weight: bold; font-style: italic; color: blue; }
 #header { width: 100%; }
 #title { font-size: 20px; padding-top: 1%; padding-bottom: 1%; text-align: center; }
 h3, h4 { font-size: 12px; padding: 0.5% 0 0.5% 1%; border: 1px solid #5D90A7; background-color: #9ECED3; font-weight: bold; font-style: italic; margin-top: 0.5%; }

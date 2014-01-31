@@ -20,7 +20,7 @@ timeEffect : 750
 
 <body>
 <div id="top">
-  <h1 id="title">Multiple Ship-To Addresses for Zen Cart v1.5.1/v1.5.2 &mdash; <span class="smaller">Version 1.0.0, BETA 1</span></h1>
+  <h1 id="title">Multiple Ship-To Addresses for Zen Cart v1.5.1/v1.5.2 &mdash; <span class="smaller">Version 1.0.0, BETA 2</span></h1>
   <ul id="menu">
     <li><a href="#introduction" class="drop">Introduction</a>
       <div class="dropdown_1column">
@@ -101,11 +101,13 @@ timeEffect : 750
       <li>This plugin is currently a <strong>beta</strong> release; please don't install it on a live store!</li>
       <li>The following features have not yet been implemented, but will be prior to the plugin's <em>first non-beta</em> release:<ol>
         <li>Updates, especially a reduction of a product's quantity, to the shopping cart after the customer has selected multiple ship-to addresses.</li>
-        <li>The handling of virtual and mixed (i.e. virtual and physical products in the same cart) carts.</li>
+        <li><span style="text-decoration: line-through;">The handling of virtual and mixed (i.e. virtual and physical products in the same cart) carts.</span> <span style="font-size: smaller;">(incorporated in BETA2)</span></li>
         <li>Updating and maintaining different orders_status values for the different ship-to address &quot;sub-orders&quot;.</li>
       </ol></li>
       <li>Because this plugin makes modifications to the Zen Cart order process, it is not compatible with other plugins that also make order-related modifications including (but not limited to):<ul>
+        <li>Checkout Without Account (COWOA)</li>
         <li>Edit Orders</li>
+        <li>Fast and Easy Checkout</li>
         <li>Super Orders</li>
         <li>Ty Package Tracker</li>
         <li>USPS Click-and-Ship</li>
@@ -145,20 +147,27 @@ timeEffect : 750
 <h1 class="the_head" id="zcci">Zen Cart Customer Interfaces</h1>
 <div class="the_content">
   <div class="sub-content no-border">
-    <p>This plugin modifies the interfaces presented to your customers during the checkout process and, if an order is shipped to multiple addresses, their account history display.</p>
+    <p>This plugin modifies the interfaces presented to your customers during the checkout process and, if an order is shipped to multiple addresses, their account history display for that order.</p>
   </div>
  
   <h2 id="checkout" class="innerLink">During the Checkout Process</h2>
   <div class="sub-content">
     <h4 id="cc_offer">Initial Offer for Multiple Ship-To Addresses</h4>
     <img class="smallimg back" src="checkout_confirmation_offer.jpg" title="Sample output" alt="Sample output" />
-    <p>When a customer's current order qualifies for multiple ship-to addresses, a new link, as shown by the screenshot to the left, is displayed on your store's <em>Checkout Confirmation</em> page.  If the customer clicks that link, they're taken to the <em>Choose Multiple Shipping Addresses</em> (checkout_multiship) page.</p>
+    <div id="cc_offer_div">
+      <p>When a customer's current order <span class="bitalic">qualifies</span> for multiple ship-to addresses, a new link, as shown by the screenshot to the left, is displayed on your store's <em>Checkout Confirmation</em> page.  If the customer clicks that link, they're taken to the <em>Choose Multiple Shipping Addresses</em> (checkout_multiship) page. An order <span class="bitalic">qualifies</span> for multiple ship-to addresses if:</p>
+      <ol>
+        <li>The payment method that the customer chose supports multiple ship-to addresses and that payment method is enabled to provide such support.</li>
+        <li>There is one or more <b>physical</b> item present in the customer's cart.</li>
+        <li>The  customer is not using a guest checkout (either COWOA or PayPal Express Checkout).</li>
+      </ol>
+    </div>
     <div class="clear"></div>
     
     <h4 id="cc_choose">Choose Multiple Shipping Addresses</h4>
     <img class="smallimg back" src="checkout_multiship.jpg" title="Sample output" alt="Sample output" />
     <div id="cc_choose_div">
-      <p>The <code>checkout_multiship</code> page is presented to the customer when they click the link presented in the <code>checkout_confirmation</code> page.  This page's processing breaks down the customer's order into a collection of single-quantity line items so that the customer can choose the ship-to address for each item in their cart.</p><p><strong>Note:</strong> The processing for this page automatically disables the left and right sidebox display, to provide sufficient display width for the dropdown address menus.</p> 
+      <p>The <code>checkout_multiship</code> page is presented to the customer when they click the <span class="bitalic">Ship to multiple addresses?</span> link presented in the <code>checkout_confirmation</code> page.  This page's processing breaks down the customer's order into a collection of single-quantity line items so that the customer can choose the ship-to address for each item in their cart.</p><p><strong>Note:</strong> The processing for this page automatically disables the left and right sidebox display, to provide sufficient display width for the dropdown address menus.</p> 
       <p>This page operates as follows:</p>
       <ul>
         <li>Initially, all items ship to the customer's current delivery address (as selected on the <code>checkout_shipping</code> page).</li>
@@ -166,7 +175,8 @@ timeEffect : 750
         <li>The customer uses the dropdown list of addresses &mdash; created from their current address book &mdash; to choose the address to which each individual item is to ship.</li>
         <li>An item (and its associated ship-to information) is removed by setting its quantity box to 0 and clicking the <em>Update</em> button.</li>
         <li>Clicking the &quot;Enter a new shipping address&quot; link will take the customer to their address book, where they can create a new address if needed.</li>
-        <li>Once the customer has chosen the send-to addresses for each item in their cart, they click the <em>Continue Checkout</em> button to return to the <em>Checkout Confirmation</em> page. If any address chosen is not compatible with the currently-selected shipping method, the customer will be returned to the <code>checkout_multiship</code> page to correct the problem.</li>
+        <li>Any <em>virtual</em> products in the customer's cart are not listed on this page, since a virtual product has no ship-to address.  All virtual products in a &quot;mixed&quot; (i.e. having a combination of physical and virtual products) cart will be associated with either the customer's default address (if one or more physical items is being shipped to that address) or the the address that has the lowest <code>address_id</code>.  If the customer chooses to send all items to a single address, then all virtual products are also &quot;sent&quot; to that address.</li>
+        <li>Once the customer has chosen the send-to addresses for each item in their cart, they click the <em>Continue Checkout</em> button to return to the <em>Checkout Confirmation</em> page. If any address chosen is not compatible with the currently-selected shipping method, the customer will be returned to the <code>checkout_multiship</code> page to correct the problem (as displayed by the screenshot to the left).</li>
       </ul>
     </div>
     <div class="clear"></div>
@@ -267,7 +277,10 @@ timeEffect : 750
   <h2 id="history" class="inner">Version History</h2>
   <div class="sub-content">
     <ul>
-      <li>v1.0.0 BETA 1, 2014-01-xx, Initial release.</li>
+      <li>v1.0.0 BETA 1, 2014-01-28, Initial release.</li>
+      <li>v1.0.0 BETA 2, 2014-xx-yy<ol>
+        <li>Incorporated handling of virtual products in the customer's order.</li>
+      </ol></li>
     </ul>
   </div>
   
@@ -280,7 +293,19 @@ timeEffect : 750
         <th width="50%">Files Changed/Added</th>
         <th width="45%">Database Changes</th>
       </tr>
-           
+      
+       <tr>
+        <td class="c1">v1.0.0 BETA2</td>
+        <td><ol>
+          <li>/includes/classes/class.multiship.php</li>
+          <li>/includes/languages/english/YOUR_TEMPLATE/checkout_multiship.php</li>
+          <li>/includes/modules/pages/checkout_multiship/header_php.php</li>
+          <li>/includes/templates/YOUR_TEMPLATE/css/checkout_multiship.css</li>
+          <li>/includes/templates/YOUR_TEMPLATE/templates/tpl_checkout_multiship_default.php</li>
+        </ol></td>
+        <td class="c3">&mdash;</td>
+      </tr>   
+      
     </table>
   </div>
 </div>

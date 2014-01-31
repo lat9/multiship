@@ -1,4 +1,4 @@
-#checkoutMultishipNewAddress, #onetime_charges, #checkoutMultishipShipping { padding-top: 5px; padding-bottom: 5px; }
+#checkoutMultishipNewAddress, #onetime_charges, #checkoutMultishipShipping { padding-top: 10px; padding-bottom: 5px; }
 #checkoutMultishipShipping { border-bottom: 1px solid #414141; margin-bottom: 5px; }
 #multishipTable { display: table; width: 100%; }
 #multishipTableHeading, .multishipTableItem { display: table-row; }
@@ -8,3 +8,4 @@
 .even { background-color: #e8e8e8; }
 .odd { background-color: #f0f0f0; }
 .onetime_charge, #onetime_charges { color: red; }
+.virtual { display: none; }

@@ -32,6 +32,13 @@ class multiship extends base {
   // to send their order to more than one shipping address ... and multiship is selected.  The address/prid
   // array is saved within the class data for processing on the checkout_confirmation page.
   //
+  // Note that the processing above is slightly modified when there is a mixture of physical and virtual
+  // products in the customer's cart.  This function/process won't be called if the entire cart is virtual
+  // since there's no shipping required!  If the cart is "mixed", then need to make sure that the 
+  // current shipping arrangement doesn't have all virtual products going to an address separate from
+  // the physical products.  If so, move the virtual products to be associated with one of the physical
+  // ship-to addresses.
+  //
   // The function returns a binary flag that indicates whether or not multiple shipping addresses have
   // been selected.
   // 
@@ -47,24 +54,73 @@ class multiship extends base {
         $this->selected = true;
         $address = $currentAddress;
       }
+      
       $prid = $prid_array[$i];
-      if (isset($multiship_values[$address][$prid])) {
-        $multiship_values[$address][$prid]++;
+      
+      if (isset($multiship_values[$address])) {
+        $multiship_values[$address]['has_physical'] |= $this->cart_item_is_physical ($prid);
         
       } else {
-        if (!isset($multiship_values[$address])) {
-          $multiship_values[$address] = array();
-        }
-        $multiship_values[$address][$prid] = 1;
+        $multiship_values[$address] = array();
+        $multiship_values[$address]['has_physical'] = $this->cart_item_is_physical ($prid);
+        
       }
-    }
+      
+      if (isset($multiship_values[$address][$prid])) {
+        $multiship_values[$address][$prid]++;
+         
+      } else {
+        $multiship_values[$address][$prid] = 1;
+        
+      }
+      
+    }  // END foreach inspecting each address/prid pair
+    
     if ($this->selected) {
-      $this->cart = $multiship_values;
+      if ($_SESSION['cart']->get_content_type() == 'mixed') {
+        $num_physical_addresses = 0;
+        foreach ($multiship_values as $address_id => $productInfo) {
+          if ($productInfo['has_physical']) {
+            $num_physical_addresses++;
+            if (!isset($physical_product_address_id)) {
+              $physical_product_address_id = $address_id;
+            }
+          } else {
+            $virtual_product_address_id = $address_id;
+          }
+        }
+        if (isset($virtual_product_address_id) && $num_physical_addresses == 1) {
+          $virtual_products = $multiship_values[$virtual_product_address_id];
+          unset ($virtual_products['has_physical'], $multiship_values[$virtual_product_address_id]);
+          if (isset($multiship_values[$_SESSION['customer_default_address_id']])) {
+            $physical_product_address_id = $_SESSION['customer_default_address_id'];
+          }
+          if (sizeof($multiship_values) == 1) {
+            $_SESSION['sendto'] = $physical_product_address_id;
+            $this->selected = false;
+            unset($this->cart);
+            
+          } else {
+            $multiship_values[$physical_product_address_id] = array_merge ($multiship_values[$physical_product_address_id], $virtual_products);
+            $this->cart = $multiship_values;
+            
+          }
+          
+        } else {
+          $this->cart = $multiship_values;
+          
+        }
+        
+      } else {
+        $this->cart = $multiship_values;
+
+      }
       
     } else {
       unset ($this->cart);
       
     }
+    
     return $this->selected;
   }
   
@@ -121,6 +177,33 @@ class multiship extends base {
   function get_noship_image($address_id = '') {
     global $template, $current_page_base;
     return ($address_id === '' || (isset($this->noship_address_id) && $address_id === $this->noship_address_id)) ? zen_image($template->get_template_dir(ICON_MULTISHIP_NOSHIP, DIR_WS_TEMPLATE, $current_page_base, 'images/icons') . '/' . ICON_MULTISHIP_NOSHIP, ICON_MULTISHIP_NOSHIP_ALT) : '';
+  }
+    
+  // -----
+  // Returns a boolean flag to indicate whether or not an item presently in the cart is a physical item.
+  //
+  function cart_item_is_physical ($prid) {
+    global $db;
+    $is_physical = false;
+    if (isset($_SESSION['cart']->contents[$prid])) {
+      $pID = (int)zen_get_prid ($prid);
+      $virtual_check = $db->Execute("SELECT products_virtual FROM " . TABLE_PRODUCTS . " WHERE products_id = $pID LIMIT 1");
+      $is_physical = ($virtual_check->fields['products_virtual'] == 0);
+      if ($is_physical && isset($_SESSION['cart']->contents[$prid]['attributes']) && is_array($_SESSION['cart']->contents[$prid]['attributes'])) {
+        foreach ($_SESSION['cart']->contents[$prid]['attributes'] as $option_id => $value_id) {
+          $download_count = $db->Execute("SELECT count(*) as total FROM " . TABLE_PRODUCTS_ATTRIBUTES . " pa, " . TABLE_PRODUCTS_ATTRIBUTES_DOWNLOAD . " pad
+                                           WHERE pa.products_id = $pID
+                                             AND pa.options_values_id = $value_id
+                                             AND pa.products_attributes_id = pad.products_attributes_id");
+          if ($download_count->fields['total'] > 0) {
+            $is_physical = false;
+            break;
+          }
+        }  // END per-attribute foreach
+      }
+    }
+    
+    return $is_physical;
   }
   
   // --------------------------------------------------------------------------
@@ -197,7 +280,7 @@ class multiship extends base {
   //
   function _createOrderFixupTotal ($orders_totals_array) {
     global $db, $currencies;
-    if (is_array($this->totals) && array_key_exists ($orders_totals_array['class'], $this->totals)) {
+    if (is_array($this->totals) && isset($this->totals[$orders_totals_array['class']])) {
       $this->_debugLog('_createOrderFixupTotal: start', array ('in' => $orders_totals_array, 'totals' => $this->totals));
       $currentTotal = $this->totals[$orders_totals_array['class']];
       $insert_id = $db->Insert_ID();
@@ -355,6 +438,23 @@ class multiship extends base {
       $email_order .= EMAIL_SEPARATOR . "\n" . TEXT_GRAND_TOTAL . $this->totals['ot_total'] . "\n\n"; 
     }
   }
+ 
+  // -----
+  // Called by the _prepare function, below, to count the number of PHYSICAL products present in the
+  // current session's cart.
+  //
+  function _cart_physical_items() {
+    $num_physical_items = 0;
+    foreach ($_SESSION['cart']->contents as $prid => $current_product) {     
+      if ($this->cart_item_is_physical($prid)) {
+        $num_physical_items += $current_product['qty'];
+      }
+      
+    }  // END per-product foreach
+    
+    return $num_physical_items;
+    
+  }
   
   // -----
   // Called by the multiship_observer class upon receipt of NOTIFY_HEADER_END_CHECKOUT_CONFIRMATION
@@ -369,12 +469,12 @@ class multiship extends base {
     // This selection is offered if all of the following are true:
     //
     // 1) The current payment method supports multiple shipping addresses and the shop-owner has enabled multiple shipping addresses.
-    // 2) There is more than one item in the customer's cart.
+    // 2) There is more than one "physical" item in the customer's cart.
     // 3) The current customer is not checking out via COWOA.
     // 4) The current customer is not checking out via a PayPal Express Checkout guest account.
     //
     $this->offer = ( method_exists($$_SESSION['payment'], 'multiple_shipping_addresses') && $$_SESSION['payment']->multiple_shipping_addresses() && 
-                     $_SESSION['cart']->count_contents() > 1 &&
+                     $this->_cart_physical_items() > 1 &&
                      !(isset($_SESSION['COWOA']) && $_SESSION['COWOA'] == 1) && 
                      !isset($_SESSION['customer_guest_id']) );
     
@@ -492,7 +592,7 @@ class multiship extends base {
               $currentTotal['text'] = $currencies->format($currentTotal['value'], true, $order->info['currency'], $order->info['currency_value']);
               $currentTotal['title'] = $shipping_method;
             }
-            if (!array_key_exists($code, $this->totals)) {
+            if (!isset($this->totals[$code])) {
               $this->totals[$code] = 0;
             }
             $this->totals[$code] += $currentTotal['value'];

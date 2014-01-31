@@ -196,8 +196,9 @@ $multiship_details = $_SESSION['multiship']->get_cart();
 for ($i = 0, $n = sizeof($productsArray); $i < $n; $i++) {
   $productsArray[$i]['sendto'] = $_SESSION['sendto'];
   $prid = $productsArray[$i]['id'];
+  $productsArray[$i]['is_physical'] = $_SESSION['multiship']->cart_item_is_physical($prid);
   foreach ($multiship_details as $address_id => &$currentProducts) {
-    if (array_key_exists($prid, $currentProducts) && $currentProducts[$prid] > 0) {
+    if (isset($currentProducts[$prid]) && $currentProducts[$prid] > 0) {
       $productsArray[$i]['sendto'] = $address_id;
       $currentProducts[$prid]--;
       break;

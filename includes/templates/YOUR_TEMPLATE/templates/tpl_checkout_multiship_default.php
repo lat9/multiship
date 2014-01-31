@@ -27,7 +27,7 @@
 $even_odd = ' even';
 foreach ($productsArray as $currentProduct) {
 ?>
-    <div class="multishipTableItem<?php echo $even_odd; ?>">
+    <div class="multishipTableItem<?php echo $even_odd . (($currentProduct['is_physical']) ? '' : ' virtual'); ?>">
       <div class="item">
         <div class="msipItemName"><?php echo $currentProduct['name'] . zen_draw_hidden_field('prid[]', $currentProduct['id']); ?></div>
 <?php
