@@ -345,8 +345,8 @@ class multiship extends base {
             $this->details[$address_id]['products_ordered_text'] .= "$product_qty x $product_name$product_model = $product_price";
             $this->details[$address_id]['products_ordered_html'] .= 
               "<tr>\n" .
-                "<td class=\"product-details\" align=\"right\" valign=\"top\" width=\"30\">$products_qty&nbsp;x</td>\n" .
-                '<td class="product-details" valign="top">' . nl2br($product_name) . nl2br($products_model) . "\n<small><em>%s</em></small></td>\n" .
+                "<td class=\"product-details\" align=\"right\" valign=\"top\" width=\"30\">$product_qty&nbsp;x</td>\n" .
+                '<td class="product-details" valign="top">' . nl2br($product_name) . nl2br($product_model) . "\n<small><em>%s</em></small></td>\n" .
                 "<td class=\"product-details-num\" valign=\"top\" align=\"right\">$product_price</td></tr>\n";
             if ($product_onetime != 0) {
               $this->details[$address_id]['products_ordered_text'] .= "\n" . TEXT_ONETIME_CHARGES_EMAIL . $currencies->display_price($product_onetime, $product_tax, 1);
