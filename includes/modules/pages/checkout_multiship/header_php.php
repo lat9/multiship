@@ -51,21 +51,6 @@ if (isset($_SESSION['shipping']['id']) && $_SESSION['shipping']['id'] == 'free_f
   zen_redirect(zen_href_link(FILENAME_CHECKOUT_SHIPPING, '', 'SSL'));
 }
 
-// Stock Check
-$flagAnyOutOfStock = false;
-$stock_check = array();
-if (STOCK_CHECK == 'true') {
-  for ($i=0, $n=sizeof($order->products); $i<$n; $i++) {
-    if ($stock_check[$i] = zen_check_stock($order->products[$i]['id'], $order->products[$i]['qty'])) {
-      $flagAnyOutOfStock = true;
-    }
-  }
-  // Out of Stock
-  if ( (STOCK_ALLOW_CHECKOUT != 'true') && ($flagAnyOutOfStock == true) ) {
-    zen_redirect(zen_href_link(FILENAME_SHOPPING_CART));
-  }
-}
-
 // -----
 // If the page's form has been posted, see what the customer wants to do.  The form can be posted either by
 //
@@ -171,12 +156,11 @@ for ($i = 0, $productsArray = array(), $n = sizeof($products); $i < $n; $i++) {
       $attributes_values = $db->Execute($attributes);
 
       if ($value == PRODUCTS_OPTIONS_VALUES_TEXT_ID) {
-        $attributeHiddenField .= zen_draw_hidden_field('id[' . $products[$i]['id'] . '][' . TEXT_PREFIX . $option . ']',  $products[$i]['attributes_values'][$option]);
         $attr_value = htmlspecialchars($products[$i]['attributes_values'][$option], ENT_COMPAT, CHARSET, TRUE);
         
       } else {
-        $attributeHiddenField .= zen_draw_hidden_field('id[' . $products[$i]['id'] . '][' . $option . ']', $value);
         $attr_value = $attributes_values->fields['products_options_values_name'];
+        
       }
 
       $currentProduct['attributes'][$attributes_values->fields['products_options_name']] = $attr_value;
