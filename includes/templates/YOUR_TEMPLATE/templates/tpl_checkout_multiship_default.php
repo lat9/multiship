@@ -48,8 +48,8 @@ foreach ($productsArray as $currentProduct) {
 ?>
       </div>
       <div class="msipPrice"><?php echo $currentProduct['price']; ?></div>
-      <div class="qty"><?php echo zen_draw_input_field('qty[]', 1); ?></div>
-      <div class="sendto"><?php echo zen_draw_pull_down_menu('address[]', $multishipAddresses, $currentProduct['sendto'], 'onchange="this.form.submit();"') . ' ' . $_SESSION['multiship']->get_noship_image($currentProduct['sendto']); ?></div>
+      <div class="qty"><?php echo zen_draw_input_field('qty[]', 1, 'onchange="notok2leave();"'); ?></div>
+      <div class="sendto"><?php echo zen_draw_pull_down_menu('address[]', $multishipAddresses, $currentProduct['sendto'], 'onchange="ok2leave(); this.form.submit();"') . ' ' . $_SESSION['multiship']->get_noship_image($currentProduct['sendto']); ?></div>
     </div>
 <?php
   $even_odd = ($even_odd == ' even') ? ' odd' : ' even';
@@ -64,7 +64,7 @@ if ($products_onetime_charges) {
 }
 ?>
 
-  <div class="buttonRow back"><?php echo zen_image_submit(BUTTON_IMAGE_UPDATE, BUTTON_UPDATE_ALT, 'name="update"'); ?></div>
+  <div class="buttonRow back"><?php echo zen_image_submit(BUTTON_IMAGE_UPDATE, BUTTON_UPDATE_ALT, 'name="update" onclick="ok2leave();"'); ?></div>
   <div class="buttonRow forward"><a href="<?php echo zen_href_link(FILENAME_CHECKOUT_CONFIRMATION, '', 'SSL'); ?>"><?php echo zen_image_button(BUTTON_IMAGE_CONTINUE_CHECKOUT, TEXT_RETURN_TO_CONFIRMATION); ?></a></div>
   </form>
 </div>
