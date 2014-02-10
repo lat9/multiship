@@ -457,6 +457,18 @@ class multiship extends base {
   }
   
   // -----
+  // Called by the multiship_observer class upon receipt of NOTIFY_HEADER_START_CHECKOUT_CONFIRMATION.
+  // If the order currently contains multiple ship-to addresses, then the quantities might have changed
+  // and, thus, the shopping cart's cartID value.  Need the cart's value to match that in the session
+  // or the customer will be redirected back to the checkout_shipping page.
+  //
+  function _fixCartID() {
+    if ($this->selected) {
+      $_SESSION['cartID'] = $_SESSION['cart']->cartID;
+    }
+  }
+  
+  // -----
   // Called by the multiship_observer class upon receipt of NOTIFY_HEADER_END_CHECKOUT_CONFIRMATION
   // (issued by the header_php.php file for the checkout_confirmation page).
   //
@@ -527,6 +539,9 @@ class multiship extends base {
         $multiship_info[$address_id]['address'] = zen_address_label($_SESSION['customer_id'], $address_id, false, '', ', ');
         $_SESSION['cart']->contents = array();
         foreach ($products as $prid => $qty) {
+          if ($prid == 'has_physical') {
+            continue;
+          }
           $_SESSION['cart']->contents[$prid] = array( 'qty' => $qty );
           if (isset($saved_cart_contents[$prid]['attributes'])) {
             $_SESSION['cart']->contents[$prid]['attributes'] = $saved_cart_contents[$prid]['attributes'];
@@ -610,6 +625,65 @@ class multiship extends base {
     }  // Customer has chosen multiple ship-to addresses
     
     $this->_debugLog('_prepare: end', $this);
+    
+  }
+  
+  // -----
+  // Called at the start of the shopping_cart class' "remove" processing.  Removes all references to the
+  // specified prid from the multiship session data.  Since this action is invoked from the shopping_cart
+  // page and the customer will need to re-enter the checkout_confirmation page to continue, just clear
+  // out any multiship details that were previously calculated since the confirmation page's re-entry
+  // will result in a recalculation anyway.
+  //
+  function _removeProduct ($prid) {
+    // -----
+    // First, remove all multiship class elements associated with the ship-to details.
+    //
+    unset ($this->details, $this->totals, $this->text_email);
+    
+    // -----
+    // Next, go throught the multiship "cart" contents, removing all references to the product.  If, after
+    // removing the product, an address contains only one reference (the physical/virtual flag) then remove
+    // that address as well.
+    //
+    if (isset ($this->cart)) {
+      foreach ($this->cart as $address_id => $itemInfo) {
+        unset ($this->cart[$address_id][$prid]);
+        if (sizeof ($this->cart[$address_id]) == 1) {
+          unset ($this->cart[$address_id]);
+        }
+      }
+    }
+     
+    // -----
+    // Finally, if the multiship "cart" is either empty or only has one ship-to address,
+    // then multiship is no longer selected.
+    //
+    if (isset($this->cart) && sizeof($this->cart) < 2) {
+      $this->_cleanup();
+    }
+    
+  }
+  
+  // -----
+  // Called at the start of the shopping_cart function update_product to update the quantity (either up or down)
+  // for a product that's presently in the cart.  This processing happens either from the shopping_cart or
+  // checkout_multiship page; in either case, the customer must return to the checkout_confirmation page prior to
+  // checkout completion and the multship shipping calculations will be performed there ... so remove all ship-to
+  // details as part of the processing.
+  //
+  // If the new quantity is 0 or the 
+  //
+  function _updateProduct ($prid, $new_quantity, $attributes) {
+    // -----
+    // If the update request did not happen on the checkout_multiship page ...
+    //
+    if (!empty($new_quantity) && isset($_GET['main_page']) && $_GET['main_page'] != FILENAME_CHECKOUT_MULTISHIP) {
+      if ($new_quantity < $_SESSION['cart']->get_quantity($prid)) {
+        $this->_removeProduct ($prid);
+        
+      }
+    }
     
   }
   

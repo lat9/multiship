@@ -12,8 +12,10 @@ class multiship_observer extends base {
   function multiship_observer() {
     $this->attach($this, array( /* order.php class */ 
                                 'NOTIFY_ORDER_DURING_CREATE_ADDED_ORDER_HEADER', 'NOTIFY_ORDER_DURING_CREATE_ADDED_ORDERTOTAL_LINE_ITEM', 'NOTIFY_ORDER_DURING_CREATE_ADDED_PRODUCT_LINE_ITEM', 'NOTIFY_ORDER_DURING_CREATE_ADDED_ATTRIBUTE_LINE_ITEM', 'NOTIFY_ORDER_INVOICE_CONTENT_READY_TO_SEND2', 'NOTIFY_ORDER_EMAIL_BEFORE_PRODUCTS', 'NOTIFY_ORDER_PROCESSING_ONE_TIME_CHARGES_BEGIN',
+                                /* shopping_cart.php class */
+                                'NOTIFIER_CART_REMOVE_START', 'NOTIFIER_CART_UPDATE_QUANTITY_START',
                                 /* page header_php.php's */ 
-                                'NOTIFY_HEADER_END_CHECKOUT_CONFIRMATION', 'NOTIFY_HEADER_END_CHECKOUT_PROCESS'));
+                                'NOTIFY_HEADER_START_CHECKOUT_CONFIRMATION', 'NOTIFY_HEADER_END_CHECKOUT_CONFIRMATION', 'NOTIFY_HEADER_END_CHECKOUT_PROCESS'));
   }
   
   function update(&$class, $eventID, $p1a, &$p2, &$p3, &$p4, &$p5, &$p6, &$p7, &$p8, &$p9) {
@@ -37,6 +39,10 @@ class multiship_observer extends base {
         $_SESSION['multiship']->_createOrderAddAttributes($p1a);
         break;
       }
+      case 'NOTIFY_HEADER_START_CHECKOUT_CONFIRMATION': {
+        $_SESSION['multiship']->_fixCartID();
+        break;
+      }
       case 'NOTIFY_HEADER_END_CHECKOUT_CONFIRMATION': {
         $_SESSION['multiship']->_prepare();
         break;
@@ -55,6 +61,14 @@ class multiship_observer extends base {
       }
       case 'NOTIFY_ORDER_PROCESSING_ONE_TIME_CHARGES_BEGIN': {
         $_SESSION['multiship']->_insertAttributesText($class);
+        break;
+      }
+      case 'NOTIFIER_CART_REMOVE_START': {
+        $_SESSION['multiship']->_removeProduct($p2);
+        break;
+      }
+      case 'NOTIFIER_CART_UPDATE_QUANTITY_START': {
+        $_SESSION['multiship']->_updateProduct($p2, $p3, $p4);
         break;
       }
       default: {
