@@ -7,14 +7,21 @@
 // @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
 // ---------------------------------------------------------------------------
 
-$autoLoadConfig[0][]   = array ('autoType' => 'class',
-                                'loadFile' => 'class.multiship.php');
-$autoLoadConfig[200][] = array ('autoType'=>'class',
+// -----
+// Needs to be instantiated before the init_cart_handler (at checkpoint 140).
+//
+$autoLoadConfig[131][] = array ('autoType'=>'class',
                                 'loadFile'=>'observers/class.multiship_observer.php');
-$autoLoadConfig[200][] = array ('autoType'=>'classInstantiate',
+$autoLoadConfig[131][] = array ('autoType'=>'classInstantiate',
                                 'className'=>'multiship_observer',
                                 'objectName'=>'multiship_observer');
-$autoLoadConfig[200][] = array ('autoType' => 'classInstantiate',
+// -----
+// Needs to be instantiated after the messageStack but before the multiship_observer, since
+// the observer calls functions in this class.
+//
+$autoLoadConfig[0][]   = array ('autoType' => 'class',
+                                'loadFile' => 'class.multiship.php');
+$autoLoadConfig[130][] = array ('autoType' => 'classInstantiate',
                                 'className' => 'multiship',
                                 'objectName' => 'multiship',
                                 'checkInstantiated' => true,
