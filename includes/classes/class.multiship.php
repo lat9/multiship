@@ -668,21 +668,28 @@ class multiship extends base {
   // -----
   // Called at the start of the shopping_cart function update_product to update the quantity (either up or down)
   // for a product that's presently in the cart.  This processing happens either from the shopping_cart or
-  // checkout_multiship page; in either case, the customer must return to the checkout_confirmation page prior to
-  // checkout completion and the multship shipping calculations will be performed there ... so remove all ship-to
+  // checkout_multiship page; in either case, the customer must (eventually) return to the checkout_confirmation page
+  // prior to checkout completion and the multiship shipping calculations will be performed there ... so remove all ship-to
   // details as part of the processing.
   //
-  // If the new quantity is 0 or the 
-  //
   function _updateProduct ($prid, $new_quantity, $attributes) {
-    // -----
-    // If the update request did not happen on the checkout_multiship page ...
-    //
-    if (!empty($new_quantity) && isset($_GET['main_page']) && $_GET['main_page'] != FILENAME_CHECKOUT_MULTISHIP) {
-      if ($new_quantity < $_SESSION['cart']->get_quantity($prid)) {
-        $this->_removeProduct ($prid);
-        
+
+    if (!empty($new_quantity)) {
+      unset ($this->details, $this->totals, $this->text_email);
+      
+      // -----    
+      // If the update request did not happen on the checkout_multiship page and the to-be-updated
+      // quantity is less than that currently in the cart, remove all references to this product
+      // from the multiship 'cart'; shipping for all remaining instances of the product will
+      // default to the customer's current shipping address.
+      //
+      if (isset($_GET['main_page']) && $_GET['main_page'] != FILENAME_CHECKOUT_MULTISHIP) {
+        if ($new_quantity < $_SESSION['cart']->get_quantity($prid)) {
+          $this->_removeProduct ($prid);
+          
+        }
       }
+      
     }
     
   }
