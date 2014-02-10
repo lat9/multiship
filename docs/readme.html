@@ -20,7 +20,7 @@ timeEffect : 750
 
 <body>
 <div id="top">
-  <h1 id="title">Multiple Ship-To Addresses for Zen Cart v1.5.1/v1.5.2 &mdash; <span class="smaller">Version 1.0.0, BETA 2</span></h1>
+  <h1 id="title">Multiple Ship-To Addresses for Zen Cart v1.5.1/v1.5.2 &mdash; <span class="smaller">Version 1.0.0, BETA 3</span></h1>
   <ul id="menu">
     <li><a href="#introduction" class="drop">Introduction</a>
       <div class="dropdown_1column">
@@ -100,7 +100,7 @@ timeEffect : 750
     <ol>
       <li>This plugin is currently a <strong>beta</strong> release; please don't install it on a live store!</li>
       <li>The following features have not yet been implemented, but will be prior to the plugin's <em>first non-beta</em> release:<ol>
-        <li>Updates, especially a reduction of a product's quantity, to the shopping cart after the customer has selected multiple ship-to addresses.</li>
+        <li><span style="text-decoration: line-through;">Updates, especially a reduction of a product's quantity, to the shopping cart after the customer has selected multiple ship-to addresses.</span> <span style="font-size: smaller;">(incorporated in BETA3)</span></li>
         <li><span style="text-decoration: line-through;">The handling of virtual and mixed (i.e. virtual and physical products in the same cart) carts.</span> <span style="font-size: smaller;">(incorporated in BETA2)</span></li>
         <li>Updating and maintaining different orders_status values for the different ship-to address &quot;sub-orders&quot;.</li>
       </ol></li>
@@ -283,12 +283,13 @@ timeEffect : 750
       <li>v1.0.0 BETA 2, 2014-02-01:<ol>
         <li>Incorporated handling of virtual products in the customer's order.</li>
       </ol></li>
-      <li>v1.0.0 BETA3, 2014-02-xx:<ol>
+      <li>v1.0.0 BETA3, 2014-02-10:<ol>
         <li>BUGFIX: Introduced in BETA2, stray entry in checkout_confirmation page when multiple ship-to addresses are selected.</li>
         <li>BUGFIX: Unneeded/unwanted code in checkout_multiship header causing PHP warnings.</li>
         <li>BUGFIX: HTML emails for multiple ship-to address orders missing quantity and model number.</li>
         <li>BUGFIX: Need to display shopping_cart messages on the checkout_multiship page, just in case the quantity was reduced based on stock.</li>
         <li>BUGFIX: Changes in quantity on checkout_multiship without intervening update click are lost if the continue checkout button is pressed.</li>
+        <li>BUGFIX: Customer redirected to checkout_shipping if quantities were changed on the checkout_multiship page.</li>
         <li>Add observers for shopping cart updates and removals.</li>
       </ol></li>
     </ul>
