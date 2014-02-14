@@ -290,7 +290,7 @@ class multiship extends base {
   
   // -----
   // Called by the multiship_observer class upon receipt of NOTIFY_ORDER_DURING_CREATE_ADDED_PRODUCT_LINE_ITEM
-  // (issued by the order class).
+  // (issued by the order class).  This is called once for each product in the current session's cart.
   //
   function _createOrderAddProducts ($orders_products_array) {
     global $db, $currencies;
@@ -308,7 +308,7 @@ class multiship extends base {
       $initial_modification = false;
       $this->orders_multiship_ids = array();
       foreach ($this->details as $address_id => $currentInfo) {
-        if (!isset($this->details[$address_id]['products_text'])) {
+        if (!isset($this->details[$address_id]['products_ordered_text'])) {
           $this->details[$address_id]['products_ordered_text'] = '';
           $this->details[$address_id]['products_ordered_html'] = '';
         }
@@ -402,13 +402,15 @@ class multiship extends base {
   // fix-ups required for the text and HTML email contents.
   //
   function _fixupOrderEmail($order, $parmArray, &$email_order, &$html_email) {
+    global $currencies;
+    
     if ($this->selected) {
       // -----
-      // Lead in with the billing address and payment method information.
+      // Lead in with the billing address and payment method information for the text emails.
       //
       $email_order = $this->text_email . "\n" . EMAIL_TEXT_BILLING_ADDRESS . "\n" . EMAIL_SEPARATOR . "\n" . zen_address_label($_SESSION['customer_id'], $_SESSION['billto'], 0, '', "\n") . "\n\n";
       if (is_object($GLOBALS[$_SESSION['payment']])) {
-        $cc_num_display = (isset($order->info['cc_number']) && $order->info['cc_number'] != '') ? /*substr($this->info['cc_number'], 0, 4) . */ str_repeat('X', (strlen($order->info['cc_number']) - 8)) . substr($order->info['cc_number'], -4) . "\n\n" : '';
+        $cc_num_display = (isset($order->info['cc_number']) && $order->info['cc_number'] != '') ? str_repeat('X', (strlen($order->info['cc_number']) - 8)) . substr($order->info['cc_number'], -4) . "\n\n" : '';
         $email_order .= EMAIL_TEXT_PAYMENT_METHOD . "\n" . EMAIL_SEPARATOR . "\n";
         $payment_class = $_SESSION['payment'];
         $email_order .= $GLOBALS[$payment_class]->title . "\n\n";
@@ -423,19 +425,40 @@ class multiship extends base {
       // -----
       // Format a separate section for each ship-to address and its associated products and prices.
       //
+      $table_format = '<table border="0" width="100%%" cellspacing="0" cellpadding="2">%s</table>';
+      $order_totals_format = '<tr><td class="order-totals-text" align="right" width="100%%">%s</td><td class="order-totals-num" align="right">%s</td></tr>' . "\n";
+      
+      $products_html = '';
       foreach ($this->details as $address_id => $currentInfo) {
-        $email_order .= EMAIL_SEPARATOR . "\n" . TEXT_SHIPPING_TO . $currentInfo['address'] . "\n" . EMAIL_SEPARATOR . "\n";
+        $shipping_to = TEXT_SHIPPING_TO . $currentInfo['address'];
+        $email_order .= EMAIL_SEPARATOR . "\n" . $shipping_to . "\n" . EMAIL_SEPARATOR . "\n";
+        $shipping_to = "<tr><td><div class=\"content-line\">$shipping_to</div></td></tr>";
+        $products_html .= '<hr /><table class="order-shipto" border="0" width="100%" cellspacing="0" cellpadding="2">' . "\n" . '<tr><td>' . sprintf ($table_format, $shipping_to) . "</td></tr>\n";
+        
         $email_order .= EMAIL_TEXT_PRODUCTS . "\n" . EMAIL_SEPARATOR . "\n" . $currentInfo['products_ordered_text'] . EMAIL_SEPARATOR . "\n";
+        $products_html .= '<tr><td><div class="content-line">' . EMAIL_TEXT_PRODUCTS . '</div>' . sprintf ($table_format, $currentInfo['products_ordered_html']) . "</td></tr>\n";
+        
        //order totals area
-        $html_ot = '<tr><td class="order-totals-text" align="right" width="100%">' . '&nbsp;' . '</td> ' . "\n" . '<td class="order-totals-num" align="right" nowrap="nowrap">' . '---------' .'</td> </tr>' . "\n";
+        $html_ot = '<tr><td class="order-totals-text" align="right" width="100%">&nbsp;</td>' . "\n" . '<td class="order-totals-num" align="right" nowrap="nowrap">---------</td></tr>' . "\n";
         foreach ($this->details[$address_id]['totals'] as $currentTotal) {
           $email_order .= strip_tags($currentTotal['title']) . ' ' . strip_tags($currentTotal['text']) . "\n";
-          $html_ot .= '<tr><td class="order-totals-text" align="right" width="100%">' . $currentTotal['title'] . '</td> ' . "\n" . '<td class="order-totals-num" align="right" nowrap="nowrap">' . $currentTotal['text'] . '</td> </tr>' . "\n";
+          $html_ot .= '<tr><td class="order-totals-text" align="right" width="100%">' . $currentTotal['title'] . '</td>' . "\n" . '<td class="order-totals-num" align="right">' . $currentTotal['text'] . '</td></tr>' . "\n";
         }
+        
         $email_order .= "\n\n";
+        $products_html .= sprintf ($table_format, $html_ot) . "</table>\n";
+        
       }
       
-      $email_order .= EMAIL_SEPARATOR . "\n" . TEXT_GRAND_TOTAL . $this->totals['ot_total'] . "\n\n"; 
+      $html_email['PRODUCTS_TITLE'] = SHIPPING_TO_MULTIPLE_ADDRESSES;
+      $html_email['PRODUCTS_DETAIL'] = $products_html; 
+      
+      $grand_total = $currencies->format ($this->totals['ot_total']);
+      $html_email['ORDER_TOTALS'] = '<hr />' . sprintf ($table_format, sprintf ($order_totals_format, TEXT_GRAND_TOTAL, $grand_total));
+      $email_order .= EMAIL_SEPARATOR . "\n" . TEXT_GRAND_TOTAL . ' ' . $grand_total . "\n\n";
+      
+      $html_email['ADDRESS_DELIVERY_DETAIL'] = MULTISHIP_MULTIPLE_ADDRESSES;
+      
     }
   }
  
