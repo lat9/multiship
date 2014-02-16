@@ -616,7 +616,7 @@ function couponpopupWindow(url) {
             <td class="dataTableContent" valign="top" align="right"><?php echo $product_qty; ?>&nbsp;x</td>
             <td class="dataTableContent" valign="top"><?php echo $currentProduct['name']; ?>
 <?php
-          if (array_key_exists('attributes', $currentProduct) && sizeof($currentProduct['attributes']) > 0) {
+          if (isset($currentProduct['attributes']) && sizeof($currentProduct['attributes']) > 0) {
             foreach ($currentProduct['attributes'] as $currentAttribute) {
 ?>
               <br /><span class="nobreak"><small>&nbsp;<i> - <?php echo $currentAttribute['option'] . ': ' . nl2br(zen_output_string_protected($currentAttribute['value'])); ?>
