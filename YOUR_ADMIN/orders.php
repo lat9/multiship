@@ -129,7 +129,7 @@
             $multiship_id = (int)$multiship_id;
             $multiship_status = (int)$multiship_status;
             if (isset ($_POST['multiship_current_status'][$multiship_id]) && $multiship_status != ((int)$_POST['multiship_current_status'][$multiship_id])) {
-              $comments .= (($comments == '') ? '' : "\n") . sprintf (MULTISHIP_SUBORDER_STATUS_CHANGED, zen_db_prepare_input ($_POST['multiship_shipping_name'][$multiship_id]), $orders_status_array[$multiship_status]);
+              $comments .= (($comments == '') ? '' : "\n") . sprintf (MULTISHIP_SUBORDER_STATUS_CHANGED, zen_db_prepare_input ($_POST['multiship_shipping_name'][$multiship_id]), $orders_status_array[(int)$_POST['multiship_current_status'][$multiship_id]], $orders_status_array[$multiship_status]);
               
               $db->Execute ("UPDATE " . TABLE_ORDERS_MULTISHIP . "
                                 SET orders_status = $multiship_status,

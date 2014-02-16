@@ -13,4 +13,6 @@ define('MULTISHIP_SHIPPED_TO', 'Shipping To: ');
 define('MULTISHIP_GRAND_TOTALS', 'Grand Totals');
 define('MULTISHIP_OVERALL_STATUS', 'Overall Order Status: ');
 define('MULTISHIP_SUBORDER_STATUS', 'Status for sub-order shipping to <strong>%s</strong>: ');
-define('MULTISHIP_SUBORDER_STATUS_CHANGED', '{The status for the sub-order shipping to "%1$s" was changed to %2$s.}');
+
+// 1st parameter: sub-order ship name, 2nd parameter: previous order-status, 3rd parameter: current order-status
+define('MULTISHIP_SUBORDER_STATUS_CHANGED', '{The status for the sub-order shipping to "%1$s" was changed from %2$s to %3$s.}');
