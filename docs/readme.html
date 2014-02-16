@@ -20,7 +20,7 @@ timeEffect : 750
 
 <body>
 <div id="top">
-  <h1 id="title">Multiple Ship-To Addresses for Zen Cart v1.5.1/v1.5.2 &mdash; <span class="smaller">Version 1.0.0, BETA 3</span></h1>
+  <h1 id="title">Multiple Ship-To Addresses for Zen Cart v1.5.1/v1.5.2 &mdash; <span class="smaller">Version 1.0.0, BETA 4</span></h1>
   <ul id="menu">
     <li><a href="#introduction" class="drop">Introduction</a>
       <div class="dropdown_1column">
@@ -41,6 +41,15 @@ timeEffect : 750
         </div>
         <div class="col_2">
           <p class="sub_level"><a href="#o_listing">Identifying Orders With Multiple Ship-to Addresses</a></p>
+        </div>
+        <div class="col_2">
+          <p class="sub_level"><a href="#o_edit">Editing Orders With Multiple Shipping Addresses</a></p>
+        </div>
+        <div class="col_2">
+          <p class="sub_level"><a href="#o_invoice">Invoices For Orders With Multiple Shipping Addresses</a></p>
+        </div>
+        <div class="col_2">
+          <p class="sub_level"><a href="#o_slip">Packing Slips For Orders With Multiple Shipping Addresses</a></p>
         </div>
       </div>
     </li>
@@ -133,7 +142,7 @@ timeEffect : 750
       <li><b>orders_multiship</b>. This table holds the information that identifies the delivery address for a multiship order.</li>
       <li><b>orders_multiship_totals</b>.  This table holds the order total's values associated with a multiship order.</li>
     </ol>
-    <p>and modifies your <em>orders_products</em> table to add a field to provide the correlation to the multiship order id for each product.</p>
+    <p>and modifies your <em>orders_products</em> table to add a field to provide the correlation to the multiship order id for each product.  Entries are created in the <code>admin_pages</code> table to support the use of the <code>invoice_multiship</code> and <code>packingslip_multiship</code> pages.</p>
   </div>
  
   <h2 id="orders" class="innerLink">Customers-&gt;Orders</h2>
@@ -141,6 +150,37 @@ timeEffect : 750
     <h4 id="o_listing">Identifying Orders With Multiple Shipping Addresses</h4>
     <p>When you view the orders for your Zen Cart, the orders' listing display identifies those orders that have multiple ship-to addresses using a blue dot, as shown by the following screenshot:</p>
     <img class="bigimg" src="admin_orders_listing.jpg" title="Sample output" alt="Sample output" />
+    <p>If you click either the <b>invoice</b> or <b>packing slip</b> buttons, the page's navigation takes you to different admin pages depending on whether or not the order has been shipped to multiple addresses &mdash; <code>invoice_multiship.php</code> and <code>packingslip_multiship.php</code> or <code>invoice.php</code> and <code>packingslip.php</code>, respectively.  This allowed the restructuring of the invoice and packing-slip printouts without modifying (yet another) <span class="corefile">core file</span>.</p>
+    
+    <h4 id="o_edit">Editing Orders With Multiple Shipping Addresses</h4>
+    <p>When you click the <b>edit</b> button for an order that has multiple ship-to addresses, the information is displayed as shown by the screenshot that follows. If you click either the <b>invoice</b> or <b>packing slip</b> buttons, the page's navigation takes you to different admin pages depending on whether or not the order has been shipped to multiple addresses &mdash; <code>invoice_multiship.php</code> and <code>packingslip_multiship.php</code> or <code>invoice.php</code> and <code>packingslip.php</code>, respectively.  This allowed the restructuring of the invoice and packing-slip printouts without modifying (yet another) <span class="corefile">core file</span>.</p>
+    <p>There are a couple of differences between this display and that provided for a product that ships to a single address.</p>
+    <ol>
+      <li>The <b>Shipping Address:</b> field displays <em>Shipping to multiple addresses, see below.</em></li>
+      <li>The <b>Products</b> and order-totals are split out for each shipped-to address.</li>
+      <li>A <b>Grand Total:</b> section is inserted to identify the overall billed amounts.</li>
+      <li>The orders-status for each sub-order and for the overall order can be separately viewed and changed.</li>
+      <li>If a sub-order's status is changed, the change is recorded in an orders_status_history record for the order.</li>
+    </ol>
+    <img class="bigimg" src="admin_orders_edit.jpg" title="Sample output" alt="Sample output" />
+    
+    <h4 id="o_invoice">Invoices For Orders With Multiple Shipping Addresses</h4>
+    <p>When you click the <b>invoice</b> button for an order that has multiple ship-to addresses, the information is displayed as shown by the screenshot that follows.  There are a couple of differences between this display and that provided for a product that ships to a single address:</p>
+    <ol>
+      <li>The <b>Shipping Address:</b> field displays <em>Shipping to multiple addresses, see below.</em></li>
+      <li>The <b>Products</b> and order-totals are split out for each shipped-to address.</li>
+      <li>A <b>Grand Total:</b> section is inserted to identify the overall billed amounts.</li>
+    </ol>
+    <img class="bigimg" src="admin_invoice.jpg" title="Sample output" alt="Sample output" />
+    
+    <h4 id="o_slip">Packing Slips For Orders With Multiple Shipping Addresses</h4>
+    <p>When you click the <b>packing slip</b> button for an order that has multiple ship-to addresses, the information is displayed as shown by the screenshot that follows.  There are a couple of differences between this display and that provided for a product that ships to a single address:</p>
+    <ol>
+      <li>The information is broken out by each <b>Ship To:</b> address.</li>
+      <li>A page-break is inserted between each sub-order's information, so an order that ships to two addresses will have two packing slips.</em></li>
+    </ol>
+    <img class="bigimg" src="admin_packingslip.jpg" title="Sample output" alt="Sample output" />   
+    
   </div>
 </div>
 
@@ -255,13 +295,18 @@ timeEffect : 750
         <li>/includes/templates/YOUR_TEMPLATE/templates/tpl_account_history_info_multiship.php</li>
         <li>/includes/templates/YOUR_TEMPLATE/templates/tpl_checkout_multiship_default.php</li>
         <li>/includes/templates/YOUR_TEMPLATE/templates/tpl_modules_multiship.php</li>
+        <li>/YOUR_ADMIN/invoice_multiship.php</li>
+        <li>/YOUR_ADMIN/packingslip_multiship.php</li>
         <li>/YOUR_ADMIN/images/icon_status_blue.gif</li>
         <li>/YOUR_ADMIN/includes/auto_loaders/config.multiship_admin.php</li>
         <li>/YOUR_ADMIN/includes/classes/observers/class.multiship_admin_observer.php</li>
         <li>/YOUR_ADMIN/includes/classes/observers/index.html</li>
         <li>/YOUR_ADMIN/includes/extra_datafiles/multiship_admin_database_names.php</li>
         <li>/YOUR_ADMIN/includes/init_includes/init_multiship.php</li>
+        <li>/YOUR_ADMIN/includes/languages/english/extra_definitions/multiship_names.php</li>
+        <li>/YOUR_ADMIN/includes/languages/english/invoice_multiship.php</li>
         <li>/YOUR_ADMIN/includes/languages/english/orders_multiship.php</li>
+        <li>/YOUR_ADMIN/includes/languages/english/packingslip_multiship.php</li>
        </ol></li>
       <li>Click the &quot;Admin Home&quot; link in your Zen Cart's top admin menu.  This action will cause the plugin's installation script to run.</li>
     </ol>
@@ -291,6 +336,13 @@ timeEffect : 750
         <li>BUGFIX: Changes in quantity on checkout_multiship without intervening update click are lost if the continue checkout button is pressed.</li>
         <li>BUGFIX: Customer redirected to checkout_shipping if quantities were changed on the checkout_multiship page.</li>
         <li>Add observers for shopping cart updates and removals.</li>
+      </ol></li>
+      <li>v1.0.0 BETA4, 2014-02-xx<ol>
+        <li>BUGFIX: Email issues.  The grand-total was not properly formatted for TEXT emails and the HTML emails required major rework.</li>
+        <li>BUGFIX: Variable misspelling in /YOUR_ADMIN/orders.php.</li>
+        <li>BUGFIX: Customers-&gt;Orders shows a tax percentage value even though no tax was collected for the sub-order.</li>
+        <li>Support multiple order-status values: one for the overall order and one per multiple ship-to sub-order.</li>
+        <li>Admin invoice and packingslip pages require change for orders with multiple ship-to addresses.</li>
       </ol></li>
     </ul>
   </div>
@@ -331,7 +383,24 @@ timeEffect : 750
           <li>/includes/templates/YOUR_TEMPLATE/templates/tpl_checkout_multiship_default.php</li>
         </ol></td>
         <td class="c3">&mdash;</td>
-      </tr>        
+      </tr>
+       
+      <tr>
+        <td class="c1">v1.0.0 BETA4</td>
+        <td><ol>
+          <li>/includes/classes/class.multiship.php</li>
+          <li><span class="added">/YOUR_ADMIN/invoice_multiship.php</li>
+          <li><span class="corefile">/YOUR_ADMIN/orders.php</li>
+          <li><span class="added">/YOUR_ADMIN/packingslip_multiship.php</li>
+          <li>/YOUR_ADMIN/includes/extra_datafiles/multiship_admin_database_names.php</li>
+          <li>/YOUR_ADMIN/includes/init_includes/init_multiship.php</li>
+          <li><span class="added">/YOUR_ADMIN/includes/languages/english/extra_datafiles/multiship_names.php</span></li>
+          <li><span class="added">/YOUR_ADMIN/includes/languages/english/invoice_multiship.php</span></li>
+          <li><span class="added">/YOUR_ADMIN/includes/languages/english/packingslip_multiship.php</span></li>
+        </ol></td>
+        <td class="c3">Added <em>admin_pages</em> for invoice_multiship and packingslip_multiship pages.</td>
+      </tr>
+      
     </table>
   </div>
 </div>
