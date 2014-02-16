@@ -10,8 +10,9 @@
 if (!defined('IS_ADMIN_FLAG')) {
     die('Illegal Access');
 }
-define('MULTISHIP_CURRENT_VERSION', '0.0.1');
-define('MULTISHIP_UPDATE_DATE', '2014-01-xx');
+
+define('MULTISHIP_CURRENT_VERSION', '1.0.0 BETA4');
+define('MULTISHIP_UPDATE_DATE', '2014-02-xx');
 
 if (!defined('MODULE_MULTISHIP_VERSION')) {
   //----
@@ -60,4 +61,26 @@ if (!defined('MODULE_MULTISHIP_VERSION')) {
   define ('MODULE_MULTISHIP_VERSION', MULTISHIP_CURRENT_VERSION);
   define ('MODULE_MULTISHIP_RELEASE_DATE', MULTISHIP_UPDATE_DATE);
 
+}
+
+// -----
+// Update the configuration table to reflect the current version, if it's not already set.
+//
+if (MODULE_MULTISHIP_VERSION != MULTISHIP_CURRENT_VERSION) {
+  $db->Execute ("UPDATE " . TABLE_CONFIGURATION . " SET configuration_value = '" . MULTISHIP_CURRENT_VERSION . "' WHERE configuration_key = 'MODULE_MULTISHIP_VERSION'");
+  $db->Execute ("UPDATE " . TABLE_CONFIGURATION . " SET configuration_value = '" . MULTISHIP_UPDATE_DATE . "' WHERE configuration_key = 'MODULE_MULTISHIP_RELEASE_DATE'");
+}
+
+// -----
+// If not already present, record the multiship versions of the invoice and packing-slip pages in the admin_pages.
+//
+$next_sort_info = $db->Execute('SELECT MAX(sort_order) as max_sort FROM ' . TABLE_ADMIN_PAGES . " WHERE menu_key='customers'");
+$next_sort = $next_sort_info->fields['max_sort'] + 1;
+
+if (!zen_page_key_exists('customersInvoiceMultiship')) {
+  zen_register_admin_page('customersInvoiceMultiship', 'BOX_CUSTOMERS_INVOICE_MULTISHIP', 'FILENAME_INVOICE_MULTISHIP', '', 'customers', 'N', $next_sort);
+}
+
+if (!zen_page_key_exists('customersPackingslipMultiship')) {
+  zen_register_admin_page('customersPackingslipMultiship', 'BOX_CUSTOMERS_PACKINGSLIP_MULTISHIP', 'FILENAME_PACKINGSLIP_MULTISHIP', '', 'customers', 'N', $next_sort+1);
 }

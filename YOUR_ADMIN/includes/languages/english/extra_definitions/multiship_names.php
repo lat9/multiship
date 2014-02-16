@@ -7,12 +7,5 @@
 // @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
 // ---------------------------------------------------------------------------
 //
-if (!defined('IS_ADMIN_FLAG')) {
-  die('Illegal Access');
-}
-
-define ('FILENAME_INVOICE_MULTISHIP', 'invoice_multiship');
-define ('FILENAME_PACKINGSLIP_MULTISHIP', 'packingslip_multiship');
-
-define ('TABLE_ORDERS_MULTISHIP', DB_PREFIX . 'orders_multiship');
-define ('TABLE_ORDERS_MULTISHIP_TOTAL', DB_PREFIX . 'orders_multiship_total');
+define ('BOX_CUSTOMERS_INVOICE_MULTISHIP', 'Invoice - Multiple Ship-to');
+define ('BOX_CUSTOMERS_PACKINGSLIP_MULTISHIP', 'Packing Slip - Multiple Ship-to');
