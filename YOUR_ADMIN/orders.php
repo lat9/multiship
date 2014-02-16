@@ -15,9 +15,9 @@
   require(DIR_WS_CLASSES . 'currencies.php');
   $currencies = new currencies();
   
-//-bof-multiship-1/9
+//-bof-multiship-1/11
   include(DIR_WS_LANGUAGES . $_SESSION['language'] . '/orders_multiship.php');
-//-eof-multiship-1/9
+//-eof-multiship-1/11
 
   if (isset($_GET['oID'])) $_GET['oID'] = (int)$_GET['oID'];
   if (isset($_GET['download_reset_on'])) $_GET['download_reset_on'] = (int)$_GET['download_reset_on'];
@@ -123,7 +123,7 @@
 
         $order_updated = false;
         
-//-bof-multiship-2/9
+//-bof-multiship-2/11
         if (isset ($_POST['multiship_status']) && is_array ($_POST['multiship_status']) && is_array ($_POST['multiship_current_status'])) {
           foreach ($_POST['multiship_status'] as $multiship_id => $multiship_status) {
             $multiship_id = (int)$multiship_id;
@@ -140,7 +140,7 @@
             }
           }
         }
-//-eof-multiship-2/9
+//-eof-multiship-2/11
 
         $check_status = $db->Execute("select customers_name, customers_email_address, orders_status,
                                       date_purchased from " . TABLE_ORDERS . "
@@ -488,7 +488,7 @@ function couponpopupWindow(url) {
               <tr>
                 <td class="main" valign="top"><strong><?php echo ENTRY_SHIPPING_ADDRESS; ?></strong></td>
 <?php
-//-bof-multiship-3/9
+//-bof-multiship-3/11
     if ($order->info['is_multiship_order']) {
 ?>
                 <td class="main"><?php echo MULTISHIP_MULTIPLE_ADDRESSES; ?></td>
@@ -498,7 +498,7 @@ function couponpopupWindow(url) {
                 <td class="main"><?php echo zen_address_format($order->delivery['format_id'], $order->delivery, 1, '', '<br />'); ?></td>
 <?php
     }
-//-eof-multiship-3/9
+//-eof-multiship-3/11
 ?>
               </tr>
             </table></td>
@@ -575,7 +575,7 @@ function couponpopupWindow(url) {
 <?php
     }
     
-//-bof-multiship-4/9
+//-bof-multiship-4/11
     if ($order->info['is_multiship_order']) {
       foreach ($order->multiship_info as $multiship_id => $multiship_info) {
 ?>
@@ -686,7 +686,7 @@ function couponpopupWindow(url) {
       </tr>
 <?php
     } else {
-//-eof-multiship-4/9
+//-eof-multiship-4/11
 ?>
       <tr>
         <td><table border="0" width="100%" cellspacing="0" cellpadding="2">
@@ -763,9 +763,9 @@ function couponpopupWindow(url) {
   require(DIR_WS_MODULES . 'orders_download.php');
 ?>
 <?php
-//-bof-multiship-5/9
+//-bof-multiship-5/11
     }  // END non-multiship order processing
-//-eof-multiship-5/9
+//-eof-multiship-5/11
 ?>
 
       <tr>
@@ -827,7 +827,7 @@ function couponpopupWindow(url) {
           <tr>
             <td><table border="0" cellspacing="0" cellpadding="2">
 <?php
-//-bof-multiship-6/9
+//-bof-multiship-6/11
     if ($order->info['is_multiship_order']) {
       foreach ($order->multiship_info as $multiship_id => $multiship_info) {
 ?>
@@ -837,10 +837,10 @@ function couponpopupWindow(url) {
 <?php
       }
     }
-//-eof-multiship-6/9
+//-eof-multiship-6/11
 ?>
               <tr>
-                <td class="main"><strong><?php echo ($order->info['is_multiship_order']) ? MULTISHIP_OVERALL_STATUS : ENTRY_STATUS; //-multiship-7/9 ?></strong> <?php echo zen_draw_pull_down_menu('status', $orders_statuses, $order->info['orders_status']); ?></td>
+                <td class="main"><strong><?php echo ($order->info['is_multiship_order']) ? MULTISHIP_OVERALL_STATUS : ENTRY_STATUS; //-multiship-7/11 ?></strong> <?php echo zen_draw_pull_down_menu('status', $orders_statuses, $order->info['orders_status']); ?></td>
               </tr>
               <tr>
                 <td class="main"><strong><?php echo ENTRY_NOTIFY_CUSTOMER; ?></strong> [<?php echo zen_draw_radio_field('notify', '1', true) . '-' . TEXT_EMAIL . ' ' . zen_draw_radio_field('notify', '0', FALSE) . '-' . TEXT_NOEMAIL . ' ' . zen_draw_radio_field('notify', '-1', FALSE) . '-' . TEXT_HIDE; ?>]&nbsp;&nbsp;&nbsp;</td>
@@ -853,7 +853,22 @@ function couponpopupWindow(url) {
         </table></td>
       </form></tr>
       <tr>
-        <td colspan="2" align="right" class="noprint"><?php echo '<a href="' . zen_href_link(FILENAME_ORDERS_INVOICE, 'oID=' . $_GET['oID']) . '" TARGET="_blank">' . zen_image_button('button_invoice.gif', IMAGE_ORDERS_INVOICE) . '</a> <a href="' . zen_href_link(FILENAME_ORDERS_PACKINGSLIP, 'oID=' . $_GET['oID']) . '" TARGET="_blank">' . zen_image_button('button_packingslip.gif', IMAGE_ORDERS_PACKINGSLIP) . '</a> <a href="' . zen_href_link(FILENAME_ORDERS, zen_get_all_get_params(array('action'))) . '">' . zen_image_button('button_orders.gif', IMAGE_ORDERS) . '</a>'; ?></td>
+<?php
+//-bof-multiship-8/11
+    if ($order->info['is_multiship_order']) {
+      $invoice_filename = FILENAME_INVOICE_MULTISHIP;
+      $packingslip_filename = FILENAME_PACKINGSLIP_MULTISHIP;
+      
+    } else {
+      $invoice_filename = FILENAME_ORDERS_INVOICE;
+      $packingslip_filename = FILENAME_ORDERS_PACKINGSLIP;
+      
+    }
+?>
+        <td colspan="2" align="right" class="noprint"><?php echo '<a href="' . zen_href_link($invoice_filename, 'oID=' . $_GET['oID']) . '" TARGET="_blank">' . zen_image_button('button_invoice.gif', IMAGE_ORDERS_INVOICE) . '</a> <a href="' . zen_href_link($packingslip_filename, 'oID=' . $_GET['oID']) . '" TARGET="_blank">' . zen_image_button('button_packingslip.gif', IMAGE_ORDERS_PACKINGSLIP) . '</a> <a href="' . zen_href_link(FILENAME_ORDERS, zen_get_all_get_params(array('action'))) . '">' . zen_image_button('button_orders.gif', IMAGE_ORDERS) . '</a>'; ?></td>
+<?php
+//-eof-multiship-8/11
+?>
       </tr>
 <?php
 // check if order has open gv
@@ -896,7 +911,7 @@ function couponpopupWindow(url) {
       <tr>
         <td><table border="0" width="100%" cellspacing="0" cellpadding="0">
           <tr>
-            <td class="smallText"><?php echo TEXT_LEGEND . ' ' . zen_image(DIR_WS_IMAGES . 'icon_status_red.gif', TEXT_BILLING_SHIPPING_MISMATCH, 10, 10) . ' ' . TEXT_BILLING_SHIPPING_MISMATCH /*-bof-multiship-8/9-*/ . ' ' . zen_image(DIR_WS_IMAGES . 'icon_status_blue.gif', TEXT_MULTISHIP_ORDER, 10, 10) . ' ' . TEXT_MULTISHIP_ORDER /*-eof-multiship-8/9-*/; ?>
+            <td class="smallText"><?php echo TEXT_LEGEND . ' ' . zen_image(DIR_WS_IMAGES . 'icon_status_red.gif', TEXT_BILLING_SHIPPING_MISMATCH, 10, 10) . ' ' . TEXT_BILLING_SHIPPING_MISMATCH /*-bof-multiship-9/11-*/ . ' ' . zen_image(DIR_WS_IMAGES . 'icon_status_blue.gif', TEXT_MULTISHIP_ORDER, 10, 10) . ' ' . TEXT_MULTISHIP_ORDER /*-eof-multiship-9/11-*/; ?>
           </td>
           <tr>
             <td valign="top"><table border="0" width="100%" cellspacing="0" cellpadding="2">
@@ -1033,7 +1048,7 @@ if (($_GET['page'] == '' or $_GET['page'] <= 1) and $_GET['oID'] != '') {
     $orders_split = new splitPageResults($_GET['page'], MAX_DISPLAY_SEARCH_RESULTS_ORDERS, $orders_query_raw, $orders_query_numrows);
     $orders = $db->Execute($orders_query_raw);
     while (!$orders->EOF) {
-    if ((!isset($_GET['oID']) || (isset($_GET['oID']) && ($_GET['oID'] == $orders->fields['orders_id']))) && !isset($oInfo)) {
+      if ((!isset($_GET['oID']) || (isset($_GET['oID']) && ($_GET['oID'] == $orders->fields['orders_id']))) && !isset($oInfo)) {
         $oInfo = new objectInfo($orders->fields);
       }
 
@@ -1050,11 +1065,11 @@ if (($_GET['page'] == '' or $_GET['page'] <= 1) and $_GET['oID'] != '') {
       if (($orders->fields['delivery_street_address'] != $orders->fields['billing_street_address'] and $orders->fields['delivery_street_address'] != '')) {
         $show_difference = zen_image(DIR_WS_IMAGES . 'icon_status_red.gif', TEXT_BILLING_SHIPPING_MISMATCH, 10, 10) . '&nbsp;';
       }
-//-bof-multiship-9/9
+//-bof-multiship-10/11
       if ($multiship_observer->is_multiship_order($orders->fields['orders_id'])) {
         $show_difference .= zen_image(DIR_WS_IMAGES . 'icon_status_blue.gif', TEXT_MULTISHIP_ORDER, 10, 10) . '&nbsp;';
       }
-//-eof-multiship-9/9
+//-eof-multiship-10/11
       $show_payment_type = $orders->fields['payment_module_code'] . '<br />' . $orders->fields['shipping_module_code'];
 ?>
                 <td class="dataTableContent" align="right"><?php echo $show_difference . $orders->fields['orders_id']; ?></td>
@@ -1116,7 +1131,18 @@ if (($_GET['page'] == '' or $_GET['page'] <= 1) and $_GET['oID'] != '') {
         $heading[] = array('text' => '<strong>[' . $oInfo->orders_id . ']&nbsp;&nbsp;' . zen_datetime_short($oInfo->date_purchased) . '</strong>');
 
         $contents[] = array('align' => 'center', 'text' => '<a href="' . zen_href_link(FILENAME_ORDERS, zen_get_all_get_params(array('oID', 'action')) . 'oID=' . $oInfo->orders_id . '&action=edit', 'NONSSL') . '">' . zen_image_button('button_edit.gif', IMAGE_EDIT) . '</a> <a href="' . zen_href_link(FILENAME_ORDERS, zen_get_all_get_params(array('oID', 'action')) . 'oID=' . $oInfo->orders_id . '&action=delete', 'NONSSL') . '">' . zen_image_button('button_delete.gif', IMAGE_DELETE) . '</a>');
-        $contents[] = array('align' => 'center', 'text' => '<a href="' . zen_href_link(FILENAME_ORDERS_INVOICE, 'oID=' . $oInfo->orders_id) . '" TARGET="_blank">' . zen_image_button('button_invoice.gif', IMAGE_ORDERS_INVOICE) . '</a> <a href="' . zen_href_link(FILENAME_ORDERS_PACKINGSLIP, 'oID=' . $oInfo->orders_id) . '" TARGET="_blank">' . zen_image_button('button_packingslip.gif', IMAGE_ORDERS_PACKINGSLIP) . '</a>');
+//-bof-multiship-11/11
+        if ($multiship_observer->is_multiship_order($oInfo->orders_id)) {
+          $invoice_filename = FILENAME_INVOICE_MULTISHIP;
+          $packingslip_filename = FILENAME_PACKINGSLIP_MULTISHIP;
+          
+        } else {
+          $invoice_filename = FILENAME_ORDERS_INVOICE;
+          $packingslip_filename = FILENAME_ORDERS_PACKINGSLIP;
+          
+        }
+        $contents[] = array('align' => 'center', 'text' => '<a href="' . zen_href_link($invoice_filename, 'oID=' . $oInfo->orders_id) . '" target="_blank">' . zen_image_button('button_invoice.gif', IMAGE_ORDERS_INVOICE) . '</a> <a href="' . zen_href_link($packingslip_filename, 'oID=' . $oInfo->orders_id) . '" target="_blank">' . zen_image_button('button_packingslip.gif', IMAGE_ORDERS_PACKINGSLIP) . '</a>');
+//-eof-multiship-11/11
         $contents[] = array('text' => '<br />' . TEXT_DATE_ORDER_CREATED . ' ' . zen_date_short($oInfo->date_purchased));
         $contents[] = array('text' => '<br />' . $oInfo->customers_email_address);
         $contents[] = array('text' => TEXT_INFO_IP_ADDRESS . ' ' . $oInfo->ip_address);
