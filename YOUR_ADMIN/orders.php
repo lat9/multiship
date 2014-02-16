@@ -578,6 +578,11 @@ function couponpopupWindow(url) {
 //-bof-multiship-4/11
     if ($order->info['is_multiship_order']) {
       foreach ($order->multiship_info as $multiship_id => $multiship_info) {
+        $taxable_check = $db->Execute ("SELECT `value` FROM " . TABLE_ORDERS_MULTISHIP_TOTAL . "
+                                         WHERE orders_id = $oID
+                                           AND orders_multiship_id = $multiship_id
+                                           AND class = 'ot_tax' LIMIT 1");
+        $no_tax_collected = ($taxable_check->EOF || $taxable_check->fields['value'] == 0);
 ?>
       <tr class="dataTableHeadingRow">
         <td><?php echo MULTISHIP_SHIPPED_TO . zen_address_format($multiship_info['info']['address_format_id'], $multiship_info['info'], false, '', ', '); ?></td>
@@ -602,7 +607,7 @@ function couponpopupWindow(url) {
             continue;
           }
           $product_price = $currentProduct['final_price'];
-          $product_tax = $currentProduct['tax'];
+          $product_tax = ($no_tax_collected) ? 0 : $currentProduct['tax'];
           $product_qty = $currentProduct['qty'];
           $product_onetime = $currentProduct['onetime_charges'];
           

@@ -67,21 +67,7 @@ function couponpopupWindow(url) {
       </tr>
 
 <?php
-      $order_check = $db->Execute("select cc_cvv, customers_name, customers_company, customers_street_address,
-                                    customers_suburb, customers_city, customers_postcode,
-                                    customers_state, customers_country, customers_telephone,
-                                    customers_email_address, customers_address_format_id, delivery_name,
-                                    delivery_company, delivery_street_address, delivery_suburb,
-                                    delivery_city, delivery_postcode, delivery_state, delivery_country,
-                                    delivery_address_format_id, billing_name, billing_company,
-                                    billing_street_address, billing_suburb, billing_city, billing_postcode,
-                                    billing_state, billing_country, billing_address_format_id,
-                                    payment_method, cc_type, cc_owner, cc_number, cc_expires, currency,
-                                    currency_value, date_purchased, orders_status, last_modified
-                             from " . TABLE_ORDERS . "
-                             where orders_id = $oID");
-                             
-  if ($order_check->fields['billing_name'] != $order_check->fields['delivery_name'] || $order_check->fields['billing_street_address'] != $order_check->fields['delivery_street_address']) {
+  if ($order->billing['name'] != $order->delivery['name'] || $order->billing['street_address'] != $order->delivery['street_address']) {
 ?>
       <tr>
         <td class="main"><b><?php echo ENTRY_CUSTOMER; ?></b></td>
@@ -147,6 +133,11 @@ function couponpopupWindow(url) {
   $currency_value = $order->info['currency_value'];
   $decimal_places = $currencies->get_decimal_places($currency);
   foreach ($order->multiship_info as $multiship_id => $multiship_info) {
+    $taxable_check = $db->Execute ("SELECT `value` FROM " . TABLE_ORDERS_MULTISHIP_TOTAL . "
+                                     WHERE orders_id = $oID
+                                       AND orders_multiship_id = $multiship_id
+                                       AND class = 'ot_tax' LIMIT 1");
+    $no_tax_collected = ($taxable_check->EOF || $taxable_check->fields['value'] == 0);
 ?>
   <tr class="dataTableHeadingRow">
     <td class="separator-row"><?php echo MULTISHIP_SHIPPED_TO . zen_address_format($multiship_info['info']['address_format_id'], $multiship_info['info'], false, '', ', '); ?></td>
@@ -169,7 +160,7 @@ function couponpopupWindow(url) {
         continue;
       }
       $product_price = $currentProduct['final_price'];
-      $product_tax = $currentProduct['tax'];
+      $product_tax = ($no_tax_collected) ? 0 : $currentProduct['tax'];
       $product_qty = $currentProduct['qty'];
       $product_onetime = $currentProduct['onetime_charges'];
       
