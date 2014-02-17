@@ -326,6 +326,7 @@ class multiship extends base {
               $initial_modification = true;
               $db->Execute("UPDATE " . TABLE_ORDERS_PRODUCTS . " 
                                SET products_quantity = " . $product_qty . ",
+                                   products_tax = " . $currentProduct['tax'] . ",
                                    orders_multiship_id = " . $this->address2multiship[$address_id] . "
                              WHERE orders_products_id = $orders_products_id");
                              
