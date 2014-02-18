@@ -11,8 +11,8 @@ if (!defined('IS_ADMIN_FLAG')) {
     die('Illegal Access');
 }
 
-define('MULTISHIP_CURRENT_VERSION', '1.0.0 BETA4');
-define('MULTISHIP_UPDATE_DATE', '2014-02-xx');
+define('MULTISHIP_CURRENT_VERSION', '1.0.0');
+define('MULTISHIP_UPDATE_DATE', '2014-02-18');
 
 if (!defined('MODULE_MULTISHIP_VERSION')) {
   //----

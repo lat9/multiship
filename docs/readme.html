@@ -20,7 +20,7 @@ timeEffect : 750
 
 <body>
 <div id="top">
-  <h1 id="title">Multiple Ship-To Addresses for Zen Cart v1.5.1/v1.5.2 &mdash; <span class="smaller">Version 1.0.0, BETA 4</span></h1>
+  <h1 id="title">Multiple Ship-To Addresses for Zen Cart v1.5.1/v1.5.2 &mdash; <span class="smaller">Version 1.0.0</span></h1>
   <ul id="menu">
     <li><a href="#introduction" class="drop">Introduction</a>
       <div class="dropdown_1column">
@@ -107,20 +107,14 @@ timeEffect : 750
   <h2 id="usage">Usage Notes</h2>
   <div class="sub-content">
     <ol>
-      <li>This plugin is currently a <strong>beta</strong> release; please don't install it on a live store!</li>
-      <li>The following features have not yet been implemented, but will be prior to the plugin's <em>first non-beta</em> release:<ol>
-        <li><span style="text-decoration: line-through;">Updates, especially a reduction of a product's quantity, to the shopping cart after the customer has selected multiple ship-to addresses.</span> <span style="font-size: smaller;">(incorporated in BETA3)</span></li>
-        <li><span style="text-decoration: line-through;">The handling of virtual and mixed (i.e. virtual and physical products in the same cart) carts.</span> <span style="font-size: smaller;">(incorporated in BETA2)</span></li>
-        <li>Updating and maintaining different orders_status values for the different ship-to address &quot;sub-orders&quot;.</li>
-      </ol></li>
-      <li>Because this plugin makes modifications to the Zen Cart order process, it is not compatible with other plugins that also make order-related modifications including (but not limited to):<ul>
+      <li>Because this plugin makes modifications to the Zen Cart order process, it is not directly compatible with other plugins that also make order-related modifications including (but not limited to):<ul>
         <li>Checkout Without Account (COWOA)</li>
         <li>Edit Orders</li>
         <li>Fast and Easy Checkout</li>
         <li>Super Orders</li>
         <li>Ty Package Tracker</li>
         <li>USPS Click-and-Ship</li>
-      </ul></li>
+      </ul><br />If you have a question about another plugin's compatibility, please ask on this plugin's support thread (see above).</li>
     </ol>
   </div>
 </div>
@@ -139,8 +133,8 @@ timeEffect : 750
   <div class="sub-content no-border">
     <p>The first time an admin signs into (or refreshes the screen of) your Zen Cart admin after you have installed the files for <em>Multiple Ship-to Addresses</em>, an initialization script runs that creates new tables in your Zen Cart database:</p>
     <ol>
-      <li><b>orders_multiship</b>. This table holds the information that identifies the delivery address for a multiship order.</li>
-      <li><b>orders_multiship_totals</b>.  This table holds the order total's values associated with a multiship order.</li>
+      <li><b>orders_multiship</b>. This table holds the information that identifies the delivery address for a multiship sub-order.</li>
+      <li><b>orders_multiship_totals</b>.  This table holds the order total's values associated with a multiship sub-order.</li>
     </ol>
     <p>and modifies your <em>orders_products</em> table to add a field to provide the correlation to the multiship order id for each product.  Entries are created in the <code>admin_pages</code> table to support the use of the <code>invoice_multiship</code> and <code>packingslip_multiship</code> pages.</p>
   </div>
@@ -153,7 +147,7 @@ timeEffect : 750
     <p>If you click either the <b>invoice</b> or <b>packing slip</b> buttons, the page's navigation takes you to different admin pages depending on whether or not the order has been shipped to multiple addresses &mdash; <code>invoice_multiship.php</code> and <code>packingslip_multiship.php</code> or <code>invoice.php</code> and <code>packingslip.php</code>, respectively.  This allowed the restructuring of the invoice and packing-slip printouts without modifying (yet another) <span class="corefile">core file</span>.</p>
     
     <h4 id="o_edit">Editing Orders With Multiple Shipping Addresses</h4>
-    <p>When you click the <b>edit</b> button for an order that has multiple ship-to addresses, the information is displayed as shown by the screenshot that follows. If you click either the <b>invoice</b> or <b>packing slip</b> buttons, the page's navigation takes you to different admin pages depending on whether or not the order has been shipped to multiple addresses &mdash; <code>invoice_multiship.php</code> and <code>packingslip_multiship.php</code> or <code>invoice.php</code> and <code>packingslip.php</code>, respectively.  This allowed the restructuring of the invoice and packing-slip printouts without modifying (yet another) <span class="corefile">core file</span>.</p>
+    <p>When you click the <b>edit</b> button for an order that has multiple ship-to addresses, the information is displayed as shown by the screenshot that follows. If you click either the <b>invoice</b> or <b>packing slip</b> buttons, the page's navigation takes you to the like-named admin page that provides the multiple ship-to address formatting &mdash; as described above.</p>
     <p>There are a couple of differences between this display and that provided for a product that ships to a single address.</p>
     <ol>
       <li>The <b>Shipping Address:</b> field displays <em>Shipping to multiple addresses, see below.</em></li>
@@ -263,10 +257,10 @@ timeEffect : 750
         <li><span class="corefile">/includes/classes/class.base.php</span>. This is the Zen Cart v1.5.2 version of the file.</li>
         <li><span class="corefile">/includes/classes/order.php</span>. This is the Zen Cart v1.5.2 version of the file, with a couple of notifiers added.</li>
         <li><span class="corefile">/includes/classes/shopping_cart.php</span>.  This is the Zen Cart v1.5.2 version of the file with corrections to the actionAddProduct function</li>
-        <li><span class="corefile">/includes/modules/payment/moneyorder.php</span></li>
-        <li><span class="corefile">/YOUR_ADMIN/orders.php</span></li>
-        <li><span class="corefile">/YOUR_ADMIN/includes/classes/order.php</span></li>
-        <li><span class="corefile">/YOUR_ADMIN/includes/functions/general.php</span></li>
+        <li><span class="corefile">/includes/modules/payment/moneyorder.php</span>.  This modification allows the payment method to identify that it supports multiple ship-to addresses.</li>
+        <li><span class="corefile">/YOUR_ADMIN/orders.php</span>.  Changes here support the modified order-display described in <a href="#orders">this</a> section of this readme.</li>
+        <li><span class="corefile">/YOUR_ADMIN/includes/classes/order.php</span>.  A notifier is added so that the multiple ship-to address fields are added to the order's data array.</li>
+        <li><span class="corefile">/YOUR_ADMIN/includes/functions/general.php</span>. A notifier is added to the function that removes an order, allowing the multiple ship-to address fields to be properly removed as well.</li>
       </ol></li>
       <li>Template override files:<ol>
         <li><span class="almostcore">/includes/templates/YOUR_TEMPLATE/templates/tpl_address_book_default.php</span></li>
@@ -337,7 +331,7 @@ timeEffect : 750
         <li>BUGFIX: Customer redirected to checkout_shipping if quantities were changed on the checkout_multiship page.</li>
         <li>Add observers for shopping cart updates and removals.</li>
       </ol></li>
-      <li>v1.0.0 BETA4, 2014-02-xx<ol>
+      <li>v1.0.0, 2014-02-18<ol>
         <li>BUGFIX: Email issues.  The grand-total was not properly formatted for TEXT emails and the HTML emails required major rework.</li>
         <li>BUGFIX: Variable misspelling in /YOUR_ADMIN/orders.php.</li>
         <li>BUGFIX: Customers-&gt;Orders shows a tax percentage value even though no tax was collected for the sub-order.</li>
@@ -386,7 +380,7 @@ timeEffect : 750
       </tr>
        
       <tr>
-        <td class="c1">v1.0.0 BETA4</td>
+        <td class="c1">v1.0.0</td>
         <td><ol>
           <li>/includes/classes/class.multiship.php</li>
           <li><span class="added">/YOUR_ADMIN/invoice_multiship.php</li>
