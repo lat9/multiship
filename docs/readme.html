@@ -20,7 +20,7 @@ timeEffect : 750
 
 <body>
 <div id="top">
-  <h1 id="title">Multiple Ship-To Addresses for Zen Cart v1.5.1/v1.5.2 &mdash; <span class="smaller">Version 1.0.0</span></h1>
+  <h1 id="title">Multiple Ship-To Addresses for Zen Cart v1.5.1/v1.5.2/v1.5.3 &mdash; <span class="smaller">Version 1.1.0</span></h1>
   <ul id="menu">
     <li><a href="#introduction" class="drop">Introduction</a>
       <div class="dropdown_1column">
@@ -113,7 +113,6 @@ timeEffect : 750
         <li>Fast and Easy Checkout</li>
         <li>Super Orders</li>
         <li>Ty Package Tracker</li>
-        <li>USPS Click-and-Ship</li>
       </ul><br />If you have a question about another plugin's compatibility, please ask on this plugin's support thread (see above).</li>
     </ol>
   </div>
@@ -253,10 +252,12 @@ timeEffect : 750
         <li>/includes/languages/english/extra_definitions/YOUR_TEMPLATE</li>
         <li>/includes/templates/YOUR_TEMPLATE</li>
       </ol></li>
+      <li>Sign into your Zen Cart's admin panel.</li>
+      <li>Click on <em>Modules-&gt;Payment</em>.  If the <b>Check/Money Order</b> payment method is enabled, note its current settings and then <b>Remove</b> that payment method.  This plugin provides an update to this payment method to identify that it supports multiple ship-to addresses, so it will need to be configured once the files have been copied to your installation!</li>
       <li>If you have previously made changes to the <span class="corefile">core</span> or <span class="almostcore">template-override</span> files, merge the current file with the one provided by this plugin; otherwise, copy the plugin's files to your store's folder structure:<ol>
-        <li><span class="corefile">/includes/classes/class.base.php</span>. This is the Zen Cart v1.5.2 version of the file.</li>
-        <li><span class="corefile">/includes/classes/order.php</span>. This is the Zen Cart v1.5.2 version of the file, with a couple of notifiers added.</li>
-        <li><span class="corefile">/includes/classes/shopping_cart.php</span>.  This is the Zen Cart v1.5.2 version of the file with corrections to the actionAddProduct function</li>
+        <li><span class="corefile">/includes/classes/class.base.php</span>. This is the Zen Cart v1.5.3 version of the file.</li>
+        <li><span class="corefile">/includes/classes/order.php</span>. This is the Zen Cart v1.5.3 version of the file, with a couple of notifiers added.</li>
+        <li><span class="corefile">/includes/classes/shopping_cart.php</span>.  This is the Zen Cart v1.5.3 version of the file.</li>
         <li><span class="corefile">/includes/modules/payment/moneyorder.php</span>.  This modification allows the payment method to identify that it supports multiple ship-to addresses.</li>
         <li><span class="corefile">/YOUR_ADMIN/orders.php</span>.  Changes here support the modified order-display described in <a href="#orders">this</a> section of this readme.</li>
         <li><span class="corefile">/YOUR_ADMIN/includes/classes/order.php</span>.  A notifier is added so that the multiple ship-to address fields are added to the order's data array.</li>
@@ -266,7 +267,6 @@ timeEffect : 750
         <li><span class="almostcore">/includes/templates/YOUR_TEMPLATE/templates/tpl_address_book_default.php</span></li>
         <li><span class="almostcore">/includes/templates/YOUR_TEMPLATE/templates/tpl_checkout_confirmation_default.php</span></li>
       </ol></li>
-      <li>Sign into your Zen Cart's admin panel.</li>
       <li>Copy the new files, introduced by this plugin, to your store's folder structure:<ol>
         <li>/includes/auto_loaders/config.multiship.php</li>
         <li>/includes/classes/class.multiship.php</li>
@@ -303,6 +303,7 @@ timeEffect : 750
         <li>/YOUR_ADMIN/includes/languages/english/packingslip_multiship.php</li>
        </ol></li>
       <li>Click the &quot;Admin Home&quot; link in your Zen Cart's top admin menu.  This action will cause the plugin's installation script to run.</li>
+      <li>Click <em>Modules-&gt;Payment</em> and install the (updated) &quot;Check/Money Order&quot; payment method to enable the multiple ship-to addresses.</li>
     </ol>
   </div>
   <div class="sub-content"><p><strong>Note:</strong> All changes to <span class="corefile">core</span> and <span class="almostcore">template-override</span> files are notated with the characters <strong>multiship</strong> to make the changes easy to locate!</p></div>
@@ -338,6 +339,10 @@ timeEffect : 750
         <li>Support multiple order-status values: one for the overall order and one per multiple ship-to sub-order.</li>
         <li>Admin invoice and packingslip pages require change for orders with multiple ship-to addresses.</li>
       </ol></li>
+      <li>v1.1.0, 2014-07-xx<ol>
+        <li>Incorporate downwardly-compatible changes introduced by Zen Cart v1.5.3.</li>
+        <li>Updated this readme to indicate that the &quot;Check/Money Order&quot; plugin, supplied by this plugin, needs to be enabled to support the multiple ship-to addresses in your store's processing.</li>
+      </ol></li>
     </ul>
   </div>
   
@@ -363,7 +368,7 @@ timeEffect : 750
         <td class="c3">&mdash;</td>
       </tr>   
        
-      <tr>
+      <tr class="o">
         <td class="c1">v1.0.0 BETA3</td>
         <td><ol>
           <li>/includes/auto_loaders/config.multiship.php</li>
@@ -394,6 +399,19 @@ timeEffect : 750
         </ol></td>
         <td class="c3">Added <em>admin_pages</em> for invoice_multiship and packingslip_multiship pages.</td>
       </tr>
+       
+      <tr class="o">
+        <td class="c1">v1.1.0</td>
+        <td><ol>
+          <li><span class="corefile">/includes/classes/class.base.php</span>.  This is the version released with Zen Cart v1.5.3.</li>
+          <li><span class="corefile">/includes/classes/order.php</span></li>
+          <li><span class="corefile">/includes/classes/shopping_cart.php</span>.  This is the version released with Zen Cart v1.5.3.</li>
+          <li><span class="corefile">/includes/modules/payment/moneyorder.php</span></li>
+          <li><span class="corefile">/YOUR_ADMIN/includes/functions/general.php</span></li>
+          <li><span class="corefile">/YOUR_ADMIN/orders.php</span></li>
+        </ol></td>
+        <td class="c3">&mdash;</td>
+      </tr>  
       
     </table>
   </div>

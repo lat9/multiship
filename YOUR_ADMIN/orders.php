@@ -1,16 +1,19 @@
 <?php
 /**
  * @package admin
- * @copyright Copyright 2003-2011 Zen Cart Development Team
+ * @copyright Copyright 2003-2013 Zen Cart Development Team
  * @copyright Portions Copyright 2003 osCommerce
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
- * @version $Id: orders.php 19530 2011-09-19 13:52:37Z ajeh $
+ * @version GIT: $Id: Author: DrByte  Wed Nov 6 21:04:33 2013 -0500 Modified in v1.5.2 $
  */
 // -----
 // Modified by lat9 (vinosdefrutastropicales.com) as part of the multiple ship-to addresses plugin
 // Copyright 2014, Vinos de Frutas Tropicales
 //
   require('includes/application_top.php');
+
+  // unset variable which is sometimes tainted by bad plugins like magneticOne tools
+  if (isset($module)) unset($module);
 
   require(DIR_WS_CLASSES . 'currencies.php');
   $currencies = new currencies();
@@ -163,7 +166,7 @@
             EMAIL_TEXT_ORDER_NUMBER . ' ' . $oID . "\n\n" .
             EMAIL_TEXT_INVOICE_URL . ' ' . zen_catalog_href_link(FILENAME_CATALOG_ACCOUNT_HISTORY_INFO, 'order_id=' . $oID, 'SSL') . "\n\n" .
             EMAIL_TEXT_DATE_ORDERED . ' ' . zen_date_long($check_status->fields['date_purchased']) . "\n\n" .
-            strip_tags($notify_comments) .
+            $notify_comments .
             EMAIL_TEXT_STATUS_UPDATED . sprintf(EMAIL_TEXT_STATUS_LABEL, $orders_status_array[$status] ) .
             EMAIL_TEXT_STATUS_PLEASE_REPLY;
 
@@ -430,6 +433,7 @@ function couponpopupWindow(url) {
             </td>
           </form>
 
+          </tr>
         </table></td>
       </tr>
 <!-- search -->
@@ -561,7 +565,7 @@ function couponpopupWindow(url) {
         </table></td>
       </tr>
 <?php
-    if (method_exists($module, 'admin_notification')) {
+      if (is_object($module) && method_exists($module, 'admin_notification')) {
 ?>
       <tr>
         <td><?php echo zen_draw_separator('pixel_trans.gif', '1', '10'); ?></td>
