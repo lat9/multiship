@@ -499,7 +499,7 @@ class multiship extends base {
   function _prepare() {
     global $order, $$_SESSION['payment'], $shipping_modules, $currencies, $total_weight, $total_count;
     $this->_debugLog('_prepare: start', $this);
-    
+
     // -----
     // Set the binary flag that indicates whether or not the multiple-shipping selection should be offered to the customer.
     // This selection is offered if all of the following are true:
@@ -589,6 +589,11 @@ class multiship extends base {
         $multiship_info[$address_id]['delivery'] = $order->delivery;
         $multiship_info[$address_id]['content_type'] = $order->content_type;
         $multiship_info[$address_id]['info'] = $order->info;
+        
+        // -----
+        // Pull in the httpClient class for those shipping methods (like UPS) that require it!
+        //
+        require_once(DIR_WS_CLASSES . 'http_client.php'); 
         
         $shipping_quote = $shipping_modules->quote($shipping_info[1], $shipping_info[0]);
         $this->_debugLog("_prepare: quote received for $address_id", array('weight' => $total_weight, 'info' => $shipping_info, 'quote' => $shipping_quote));
