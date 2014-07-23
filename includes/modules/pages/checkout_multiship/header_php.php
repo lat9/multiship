@@ -36,18 +36,23 @@ if (!$_SESSION['customer_id']) {
   }
 }
 
+/* ----- 20140723-lat9-Don't need/want this here, results in unwanted return to checkout_shipping when quantities are updated
 // avoid hack attempts during the checkout procedure by checking the internal cartID
 if (isset($_SESSION['cart']->cartID) && $_SESSION['cartID']) {
   if ($_SESSION['cart']->cartID != $_SESSION['cartID']) {
+    $zco_notifier->notify ('CHECKOUT_MULTISHIP_CARTID_MISMATCH');
     zen_redirect(zen_href_link(FILENAME_CHECKOUT_SHIPPING, '', 'SSL'));
   }
 }
+   ----- */
 
 // if no shipping method has been selected, redirect the customer to the shipping method selection page
 if (!isset($_SESSION['shipping'])) {
+  $zco_notifier->notify ('CHECKOUT_MULTISHIP_SHIPPING_NOT_SELECTED');
   zen_redirect(zen_href_link(FILENAME_CHECKOUT_SHIPPING, '', 'SSL'));
 }
 if (isset($_SESSION['shipping']['id']) && $_SESSION['shipping']['id'] == 'free_free' && defined('MODULE_ORDER_TOTAL_SHIPPING_FREE_SHIPPING_OVER') && $_SESSION['cart']->get_content_type() != 'virtual' && $_SESSION['cart']->show_total() < MODULE_ORDER_TOTAL_SHIPPING_FREE_SHIPPING_OVER) {
+  $zco_notifier->notify ('CHECKOUT_MULTISHIP_FREE_SHIPPING_MISMATCH');
   zen_redirect(zen_href_link(FILENAME_CHECKOUT_SHIPPING, '', 'SSL'));
 }
 
@@ -72,10 +77,12 @@ if (isset($_POST['securityToken'])) {
         $current_qty = $_SESSION['cart']->get_quantity($prid);
         
         $attributes = $_SESSION['cart']->contents[$prid]['attributes'];
-        foreach ($attributes as $option => $value) {
-          if (strpos($option, '_chk') !== false) {
-            unset($attributes[$option]);
-            $attributes[str_replace('_chk', '', $option)] = $value;
+        if (is_array ($attributes)) {
+          foreach ($attributes as $option => $value) {
+            if (strpos($option, '_chk') !== false) {
+              unset($attributes[$option]);
+              $attributes[str_replace('_chk', '', $option)] = $value;
+            }
           }
         }
         
