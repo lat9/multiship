@@ -569,6 +569,11 @@ class multiship extends base {
           $_SESSION['cart']->contents[$prid] = array( 'qty' => $qty );
           if (isset($saved_cart_contents[$prid]['attributes'])) {
             $_SESSION['cart']->contents[$prid]['attributes'] = $saved_cart_contents[$prid]['attributes'];
+            
+          }
+          if (isset ($saved_cart_contents[$prid]['attributes_values'])) {
+            $_SESSION['cart']->contents[$prid]['attributes_values'] = $saved_cart_contents[$prid]['attributes_values'];
+            
           }
         }
         
@@ -718,9 +723,7 @@ class multiship extends base {
           
         }
       }
-      
     }
-    
   }
   
   // -----
