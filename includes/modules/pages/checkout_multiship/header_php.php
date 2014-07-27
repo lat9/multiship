@@ -76,17 +76,16 @@ if (isset($_POST['securityToken'])) {
         $prid = $_POST['prid'][$i];
         $current_qty = $_SESSION['cart']->get_quantity($prid);
         
-        $attributes = $_SESSION['cart']->contents[$prid]['attributes'];
-/*
-        if (is_array ($attributes)) {
-          foreach ($attributes as $option => $value) {
-            if (strpos($option, '_chk') !== false) {
-              unset($attributes[$option]);
-              $attributes[str_replace('_chk', '', $option)] = $value;
-            }
+        $attributes = (isset ($_SESSION['cart']->contents[$prid]['attributes'])) ? $_SESSION['cart']->contents[$prid]['attributes'] : array ();
+
+        foreach ($attributes as $option => $value) {
+          if ($value == 0) {
+            unset($attributes[$option]);
+            $attributes[TEXT_PREFIX . $option] = $_SESSION['cart']->contents[$prid]['attributes_values'][$option];
+            
           }
         }
-*/        
+ 
         $current_qty = ($qty <= 0) ? $current_qty : $current_qty + $qty;       
         $_SESSION['cart']->update_quantity($prid, $current_qty-1, $attributes);
         
@@ -142,7 +141,11 @@ for ($i = 0, $productsArray = array(), $n = sizeof($products); $i < $n; $i++) {
   if ($products[$i]['onetime_charges'] != 0) {
     $products_onetime_charges = true;
     $currentProduct['price'] .= '<span class="onetime_charge">' . ONETIME_CHARGE_INDICATOR . '</span>';
+    
   }
+  
+  $currentProduct['hidden_fields'] = array ();
+  
   if (isset($products[$i]['attributes']) && is_array($products[$i]['attributes'])) {
     $options_order_by = (PRODUCTS_OPTIONS_SORT_ORDER == '0') ? ' ORDER BY LPAD(po.products_options_sort_order,11,"0")' : ' ORDER BY po.products_options_name';
     $currentProduct['attributes'] = array();
