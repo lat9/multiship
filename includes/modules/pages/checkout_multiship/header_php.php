@@ -7,7 +7,7 @@
 // @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
 // ---------------------------------------------------------------------------
 
-$zco_notifier->notify('NOTIFY_HEADER_START_CHECKOUT_MULTISHIP', $_SESSION);
+$zco_notifier->notify('NOTIFY_HEADER_START_CHECKOUT_MULTISHIP', $_SESSION, $_POST);
 require(DIR_WS_MODULES . zen_get_module_directory('require_languages.php'));
 
 // -----
@@ -77,6 +77,7 @@ if (isset($_POST['securityToken'])) {
         $current_qty = $_SESSION['cart']->get_quantity($prid);
         
         $attributes = $_SESSION['cart']->contents[$prid]['attributes'];
+/*
         if (is_array ($attributes)) {
           foreach ($attributes as $option => $value) {
             if (strpos($option, '_chk') !== false) {
@@ -85,7 +86,7 @@ if (isset($_POST['securityToken'])) {
             }
           }
         }
-        
+*/        
         $current_qty = ($qty <= 0) ? $current_qty : $current_qty + $qty;       
         $_SESSION['cart']->update_quantity($prid, $current_qty-1, $attributes);
         
@@ -171,7 +172,8 @@ for ($i = 0, $productsArray = array(), $n = sizeof($products); $i < $n; $i++) {
       }
 
       $currentProduct['attributes'][$attributes_values->fields['products_options_name']] = $attr_value;
- 
+      $zco_notifier->notify ("CHECKOUT_MULTISHIP_ATTRIBUTES ($option => $value):", $attributes, $attributes_values, $currentProduct);
+      
     }
   }
   for ($j = 0; $j < $products[$i]['quantity']; $j++) {

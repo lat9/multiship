@@ -1075,7 +1075,7 @@ class order extends base {
     $html_msg['EMAIL_LAST_NAME'] = $this->customer['lastname'];
     //  $html_msg['EMAIL_TEXT_HEADER'] = EMAIL_TEXT_HEADER;
     $html_msg['EXTRA_INFO'] = '';
-    $this->notify('NOTIFY_ORDER_INVOICE_CONTENT_READY_TO_SEND', array('zf_insert_id' => $zf_insert_id, 'text_email' => $email_order, 'html_email' => $html_msg));
+    $this->notify('NOTIFY_ORDER_INVOICE_CONTENT_READY_TO_SEND', array('zf_insert_id' => $zf_insert_id, 'text_email' => $email_order, 'html_email' => $html_msg), $email_order, $html_msg);
 //-bof-multiship-lat9 *** 2 of 2 ***
     $this->notify('NOTIFY_ORDER_INVOICE_CONTENT_READY_TO_SEND2', array('zf_insert_id' => $zf_insert_id), $email_order, $html_msg);
 //-eof-multiship-lat9 *** 2 of 2 ***
