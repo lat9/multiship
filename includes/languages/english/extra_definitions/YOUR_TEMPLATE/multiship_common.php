@@ -23,3 +23,7 @@ define('ICON_MULTISHIP_NOSHIP_ALT', 'Identifies that a selected ship-to address 
 if (!defined('WARNING_PRODUCT_QUANTITY_ADJUSTED')) {
   define('WARNING_PRODUCT_QUANTITY_ADJUSTED', 'Quantity has been adjusted to what is in stock. ');
 }
+
+define ('MULTISHIP_PRODUCT_ADD_SHIP_PRIMARY', 'The newly-added product <b>(%u x %s)</b> will ship to your <b>Primary</b> address.  You will have the opportunity to change this during the checkout process.');
+define ('MULTISHIP_PRODUCT_INCREASE_SHIP_PRIMARY', 'Additional quantities of the product <b>(%s)</b> will ship to your <b>Primary</b> address.  You will have the opportunity to change this during the checkout process.');
+define ('MULTISHIP_PRODUCT_DECREASE_SHIP_PRIMARY', 'All of the product <b>(%s)</b> will ship to your <b>Primary</b> address.  You will have the opportunity to change this during the checkout process.');

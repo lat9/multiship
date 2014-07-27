@@ -707,6 +707,7 @@ class multiship extends base {
   // details as part of the processing.
   //
   function _updateProduct ($prid, $new_quantity, $attributes) {
+    global $messageStack;
 
     if (!empty($new_quantity)) {
       unset ($this->details, $this->totals, $this->text_email);
@@ -718,13 +719,46 @@ class multiship extends base {
       // default to the customer's current shipping address.
       //
       if (isset($_GET['main_page']) && $_GET['main_page'] != FILENAME_CHECKOUT_MULTISHIP) {
-        if ($new_quantity < $_SESSION['cart']->get_quantity($prid)) {
+        $products_name = zen_get_products_name ($prid);
+        if ($new_quantity < $_SESSION['cart']->get_quantity ($prid)) {
           $this->_removeProduct ($prid);
+          $messageStack->add_session ('header', sprintf (MULTISHIP_PRODUCT_DECREASE_SHIP_PRIMARY, $products_name), 'caution');
+          
+        } elseif ($new_quantity > $_SESSION['cart']->get_quantity ($prid)) {
+          $this->cart[$_SESSION['customer_default_address_id']][$prid] += ($new_quantity - $_SESSION['cart']->get_quantity ($prid));
+          $messageStack->add_session ('header', sprintf (MULTISHIP_PRODUCT_INCREASE_SHIP_PRIMARY, $products_name), 'caution');
           
         }
       }
     }
   }
+ 
+  // -----
+  // Called at the start of the shopping_cart function add_cart to add a product to the cart.  If
+  // multiship addresses have been previously selected, notify the customer that the product addition
+  // will be sent to their "Primary" address and that they can make changes during the checkout process and
+  // record this change in the multiship session values.
+  //
+  function _checkAddProductMessage ($prid, $qty, $attributes) {
+    global $messageStack;
+    $uprid = zen_get_uprid ($prid, $attributes);
+    if ($this->selected && $qty != 0 && !$_SESSION['cart']->in_cart ($uprid)) {
+      $products_name = zen_get_products_name ($prid);
+      $messageStack->add_session ('header', sprintf (MULTISHIP_PRODUCT_ADD_SHIP_PRIMARY, $qty, $products_name), 'caution');
+      
+      if (!isset ($this->cart[$_SESSION['customer_default_address_id']])) {
+        $this->cart[$_SESSION['customer_default_address_id']] = array ();
+        
+      }
+ 
+      if (!isset ($this->cart[$_SESSION['customer_default_address_id']][$uprid])) {
+        $this->cart[$_SESSION['customer_default_address_id']][$uprid] = $qty;
+        unset ($this->details, $this->totals, $this->text_email);
+        
+      }
+    }
+  }
+  
   
   // -----
   // Resets the class variables to their initial state.  Used internally as well as by the multiship_observer upon

@@ -347,7 +347,7 @@ timeEffect : 750
       <li>v1.1.1, 2014-07-xx<ol>
         <li>BUGFIX: Unwanted redirect back to <em>checkout_shipping</em> page after changing quantities on <em>checkout_multiship</em> page.</li>
         <li>BUGFIX: Whitescreen if UPS (or FedEx?) shipping methods selected.</li>
-        <li>BUGFIX: Attribute values lost when cloning products with checkbox, TEXT or file-upload attributes on the checkout_multiship page.</li>
+        <li>BUGFIX: Attribute values lost when cloning products with checkbox, TEXT or file-upload attributes on the checkout_multiship and checkout_confirmation pages.</li>
       </ol></li>
     </ul>
   </div>
@@ -424,6 +424,8 @@ timeEffect : 750
         <td><ol>
           <li>/includes/classes/class.multiship.php</li>
           <li><span class="corefile">/includes/classes/order.php</span></li>
+          <li>/includes/classes/observers/class.multiship_observer.php</li>
+          <li>/includes/languages/english/extra_definitions/YOUR_TEMPLATE/multiship_common.php
           <li>/includes/modules/pages/checkout_multiship/header_php.php</li>
         </ol></td>
         <td class="c3">&mdash;</td>
