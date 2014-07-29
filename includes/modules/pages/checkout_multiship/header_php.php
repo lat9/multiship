@@ -144,8 +144,6 @@ for ($i = 0, $productsArray = array(), $n = sizeof($products); $i < $n; $i++) {
     
   }
   
-  $currentProduct['hidden_fields'] = array ();
-  
   if (isset($products[$i]['attributes']) && is_array($products[$i]['attributes'])) {
     $options_order_by = (PRODUCTS_OPTIONS_SORT_ORDER == '0') ? ' ORDER BY LPAD(po.products_options_sort_order,11,"0")' : ' ORDER BY po.products_options_name';
     $currentProduct['attributes'] = array();
@@ -174,8 +172,8 @@ for ($i = 0, $productsArray = array(), $n = sizeof($products); $i < $n; $i++) {
         
       }
 
-      $currentProduct['attributes'][$attributes_values->fields['products_options_name']] = $attr_value;
-      $zco_notifier->notify ("CHECKOUT_MULTISHIP_ATTRIBUTES ($option => $value):", $attributes, $attributes_values, $currentProduct);
+      $currentProduct['attributes'][] = array ( 'name' => $attributes_values->fields['products_options_name'], 'value' => $attr_value);
+      $zco_notifier->notify ("CHECKOUT_MULTISHIP_ATTRIBUTES ($option => $value):", $attributes, $attributes_values, $currentProduct, $attr_value);
       
     }
   }

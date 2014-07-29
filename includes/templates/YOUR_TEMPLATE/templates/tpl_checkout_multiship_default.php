@@ -36,9 +36,9 @@ foreach ($productsArray as $currentProduct) {
 ?>
         <div class="msipItemAttr"><ul>
 <?php
-    foreach ($currentProduct['attributes'] as $name => $value) {
+    foreach ($currentProduct['attributes'] as $currentAttribute) {
 ?>
-          <li><?php echo $name . TEXT_OPTION_DIVIDER . nl2br($value); ?></li>
+          <li><?php echo $currentAttribute['name'] . TEXT_OPTION_DIVIDER . nl2br ($currentAttribute['value']); ?></li>
 <?php
     }
 ?>
