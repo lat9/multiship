@@ -191,7 +191,7 @@ timeEffect : 750
       <p>When a customer's current order <span class="bitalic">qualifies</span> for multiple ship-to addresses, a new link, as shown by the screenshot to the left, is displayed on your store's <em>Checkout Confirmation</em> page.  If the customer clicks that link, they're taken to the <em>Choose Multiple Shipping Addresses</em> (checkout_multiship) page. An order <span class="bitalic">qualifies</span> for multiple ship-to addresses if:</p>
       <ol>
         <li>The payment method that the customer chose supports multiple ship-to addresses and that payment method is enabled to provide such support.</li>
-        <li>There is one or more <b>physical</b> item present in the customer's cart.</li>
+        <li>There is more than one <b>physical</b> item present in the customer's cart.  Note that any item that is <b>mixed</b>, e.g. a physical product with a download included, does not qualify for the multiple ship-to addresses!</li>
         <li>The  customer is not using a guest checkout (either COWOA or PayPal Express Checkout).</li>
       </ol>
     </div>
@@ -209,7 +209,7 @@ timeEffect : 750
         <li>An item (and its associated ship-to information) <b>is removed</b> by setting its quantity box to 0 and clicking the <em>Update</em> button.</li>
         <li>The quantity of an item currently in the cart <b>can be increased</b> by changing one of the item's quantity boxes to a value greater than one (1) and clicking the &quot;Update&quot; button.  For example, changing the quantity of one of the items to <em>2</em> will increase the quantity of that item by one (1).</li>
         <li>Clicking the &quot;Enter a new shipping address&quot; link will take the customer to their address book, where they can create a new address if needed.</li>
-        <li>Any <em>virtual</em> products in the customer's cart are not listed on this page, since a virtual product has no ship-to address.  All virtual products in a &quot;mixed&quot; (i.e. having a combination of physical and virtual products) cart will be associated with either the customer's default address (if one or more physical items is being shipped to that address) or the the address that has the lowest <code>address_id</code>.  If the customer chooses to send all items to a single address, then all virtual products are also &quot;sent&quot; to that address.</li>
+        <li>No <em>virtual</em> or <em>mixed</em> products in the customer's cart are listed on this page, since a virtual product has no ship-to address.  All virtual products in a &quot;mixed&quot; cart (i.e. having a combination of physical and virtual products) will be associated with either the customer's default address (if one or more physical items is being shipped to that address) or the the address that has the lowest <code>address_id</code>.  If the customer chooses to send all items to a single address, then all virtual products are also &quot;sent&quot; to that address.</li>
         <li>Once the customer has chosen the send-to addresses for each item in their cart, they click the <em>Continue Checkout</em> button to return to the <em>Checkout Confirmation</em> page. If any address chosen is not compatible with the currently-selected shipping method, the customer will be returned to the <code>checkout_multiship</code> page to correct the problem (as displayed by the screenshot to the left).</li>
       </ul>
     </div>
@@ -344,7 +344,7 @@ timeEffect : 750
         <li>Incorporate downwardly-compatible changes introduced by Zen Cart v1.5.3.</li>
         <li>Updated this readme to indicate that the &quot;Check/Money Order&quot; plugin, supplied by this plugin, needs to be enabled to support the multiple ship-to addresses in your store's processing.</li>
       </ol></li>
-      <li>v1.1.1, 2014-07-xx<ol>
+      <li>v1.1.1, 2014-08-16<ol>
         <li>BUGFIX: Unwanted redirect back to <em>checkout_shipping</em> page after changing quantities on <em>checkout_multiship</em> page.</li>
         <li>BUGFIX: Whitescreen if UPS (or FedEx?) shipping methods selected.</li>
         <li>BUGFIX: Attribute values lost when cloning products with checkbox, TEXT or file-upload attributes on the checkout_multiship and checkout_confirmation pages.</li>
