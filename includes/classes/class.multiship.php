@@ -2,7 +2,7 @@
 // ---------------------------------------------------------------------------
 // Part of the Multiple Shipping Addresses plugin for Zen Cart v1.5.1 and later
 //
-// Copyright (C) 2014, Vinos de Frutas Tropicales (lat9)
+// Copyright (C) 2014-2015, Vinos de Frutas Tropicales (lat9)
 //
 // @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
 // ---------------------------------------------------------------------------
@@ -778,11 +778,10 @@ class multiship extends base {
   // error is detected.
   //
   function _debugLog ($message, $extras = array(), $die = false) {
-    $message = __FILE__ . ": $message\n";
     $this->notify($message, $extras);
     
     if ($die) {
-      error_log($message . (zen_not_null($extras)) ? print_r($extras, true) : '');
+      trigger_error ($message . (zen_not_null($extras)) ? print_r($extras, true) : '', E_USER_ERROR);
       die();
     }
   }
