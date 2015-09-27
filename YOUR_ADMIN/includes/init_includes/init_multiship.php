@@ -2,7 +2,7 @@
 // ---------------------------------------------------------------------------
 // Part of the Multiple Shipping Addresses plugin for Zen Cart v1.5.1 and later
 //
-// Copyright (C) 2014, Vinos de Frutas Tropicales (lat9)
+// Copyright (C) 2014-2015, Vinos de Frutas Tropicales (lat9)
 //
 // @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
 // ---------------------------------------------------------------------------
@@ -11,8 +11,8 @@ if (!defined('IS_ADMIN_FLAG')) {
     die('Illegal Access');
 }
 
-define('MULTISHIP_CURRENT_VERSION', '1.0.0');
-define('MULTISHIP_UPDATE_DATE', '2014-02-18');
+define('MULTISHIP_CURRENT_VERSION', '1.1.3');
+define('MULTISHIP_UPDATE_DATE', '2015-10-xx');
 
 if (!defined('MODULE_MULTISHIP_VERSION')) {
   //----
@@ -66,7 +66,7 @@ if (!defined('MODULE_MULTISHIP_VERSION')) {
 // -----
 // Update the configuration table to reflect the current version, if it's not already set.
 //
-if (MODULE_MULTISHIP_VERSION != MULTISHIP_CURRENT_VERSION) {
+if (MODULE_MULTISHIP_VERSION != MULTISHIP_CURRENT_VERSION || MODULE_MULTISHIP_RELEASE_DATE != MULTISHIP_UPDATE_DATE) {
   $db->Execute ("UPDATE " . TABLE_CONFIGURATION . " SET configuration_value = '" . MULTISHIP_CURRENT_VERSION . "' WHERE configuration_key = 'MODULE_MULTISHIP_VERSION'");
   $db->Execute ("UPDATE " . TABLE_CONFIGURATION . " SET configuration_value = '" . MULTISHIP_UPDATE_DATE . "' WHERE configuration_key = 'MODULE_MULTISHIP_RELEASE_DATE'");
 }
