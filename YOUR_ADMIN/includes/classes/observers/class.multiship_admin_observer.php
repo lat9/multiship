@@ -2,7 +2,7 @@
 // ---------------------------------------------------------------------------
 // Part of the Multiple Shipping Addresses plugin for Zen Cart v1.5.1 and later
 //
-// Copyright (C) 2014, Vinos de Frutas Tropicales (lat9)
+// Copyright (C) 2014-2015, Vinos de Frutas Tropicales (lat9)
 //
 // @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
 // ---------------------------------------------------------------------------
@@ -13,7 +13,7 @@ if (!defined('IS_ADMIN_FLAG') || IS_ADMIN_FLAG !== true) {
 
 class multiship_observer extends base {
 
-  function multiship_observer() {
+  function __construct () {
     $this->attach($this, array('NOTIFY_ADMIN_ORDER_CLASS_END_QUERY', 'NOTIFY_FUNCTION_GENERAL_REMOVE_ORDER'));
 
   }
@@ -95,7 +95,7 @@ class multiship_observer extends base {
   
   function _logError ($message) {
     $event_info = ($this->eventID != '') ? '' : (' (' . $this->eventID . ')');
-    error_log(__FILE__ . $event_info . ': ' . $message);
+    trigger_error ($event_info . ': ' . $message, E_USER_ERROR);
     die();
   }
   
