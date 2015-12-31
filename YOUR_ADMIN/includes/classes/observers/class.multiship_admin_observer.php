@@ -14,7 +14,7 @@ if (!defined('IS_ADMIN_FLAG') || IS_ADMIN_FLAG !== true) {
 class multiship_observer extends base {
 
   function __construct () {
-    $this->attach($this, array('NOTIFY_ADMIN_ORDER_CLASS_END_QUERY', 'NOTIFY_FUNCTION_GENERAL_REMOVE_ORDER'));
+    $this->attach($this, array('NOTIFY_ADMIN_ORDER_CLASS_END_QUERY', 'NOTIFIER_ADMIN_ZEN_REMOVE_ORDER'));
 
   }
   
@@ -67,12 +67,12 @@ class multiship_observer extends base {
         break;
       }
       
-      case 'NOTIFY_FUNCTION_GENERAL_REMOVE_ORDER': {
-        if (!is_array($p1a) || !array_key_exists('orders_id', $p1a)) {
-          $this->_logError('Missing orders_id in notification params array (' . print_r($p1a, true) . ')');
+      case 'NOTIFIER_ADMIN_ZEN_REMOVE_ORDER': {
+        if (!isset ($p2) || ((int)$p2) <= 0) {
+          $this->_logError('Missing or invalid orders_id in notification params array.');
 
         }
-        $orders_id = (int)$p1a['orders_id'];
+        $orders_id = (int)$p2;
         $db->Execute("DELETE FROM " . TABLE_ORDERS_MULTISHIP . " WHERE orders_id = $orders_id");
         $db->Execute("DELETE FROM " . TABLE_ORDERS_MULTISHIP_TOTAL . " WHERE orders_id = $orders_id");
         break;

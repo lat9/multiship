@@ -12,7 +12,7 @@ if (!defined('IS_ADMIN_FLAG')) {
 }
 
 define('MULTISHIP_CURRENT_VERSION', '1.1.3');
-define('MULTISHIP_UPDATE_DATE', '2015-10-xx');
+define('MULTISHIP_UPDATE_DATE', '2015-12-31');
 
 if (!defined('MODULE_MULTISHIP_VERSION')) {
   //----

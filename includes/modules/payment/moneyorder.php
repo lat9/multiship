@@ -3,7 +3,7 @@
  * @package money order payment module
  *
  * @package paymentMethod
- * @copyright Copyright 2003-2010 Zen Cart Development Team
+ * @copyright Copyright 2003-2013 Zen Cart Development Team
  * @copyright Portions Copyright 2003 osCommerce
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
  * @version GIT: $Id: Author: DrByte  Tue Jan 22 03:36:04 2013 -0500 Modified in v1.5.2 $
@@ -12,7 +12,7 @@
     var $code, $title, $description, $enabled;
 
 // class constructor
-    function moneyorder() {
+    function __construct() {
       global $order;
 
       $this->code = 'moneyorder';
@@ -37,7 +37,7 @@
 
       if ($this->enabled && (int)MODULE_PAYMENT_MONEYORDER_ZONE > 0 && isset($order->billing['country']['id'])) {
         $check_flag = false;
-        $check = $db->Execute("select zone_id from " . TABLE_ZONES_TO_GEO_ZONES . " where geo_zone_id = '" . MODULE_PAYMENT_MONEYORDER_ZONE . "' and zone_country_id = '" . $order->billing['country']['id'] . "' order by zone_id");
+        $check = $db->Execute("select zone_id from " . TABLE_ZONES_TO_GEO_ZONES . " where geo_zone_id = '" . MODULE_PAYMENT_MONEYORDER_ZONE . "' and zone_country_id = '" . (int)$order->billing['country']['id'] . "' order by zone_id");
         while (!$check->EOF) {
           if ($check->fields['zone_id'] < 1) {
             $check_flag = true;
@@ -52,6 +52,10 @@
         if ($check_flag == false) {
           $this->enabled = false;
         }
+      }
+      // other status checks?
+      if ($this->enabled) {
+        // other checks here
       }
     }
 
@@ -88,11 +92,11 @@
       return false;
     }
     
-//-bof-multi_ship-1/xxx
+//-bof-multi_ship-lat9  *** 1 of 3 ***
     function multiple_shipping_addresses() {
       return MODULE_PAYMENT_MONEYORDER_MULTISHIP == 'True';
     }
-//-eof-multi_ship-1/xxx
+//-eof-multi_ship-lat9  *** 1 of 3 ***
 
     function check() {
       global $db;
@@ -115,9 +119,9 @@
       $db->Execute("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) values ('Sort order of display.', 'MODULE_PAYMENT_MONEYORDER_SORT_ORDER', '0', 'Sort order of display. Lowest is displayed first.', '6', '0', now())");
       $db->Execute("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, use_function, set_function, date_added) values ('Payment Zone', 'MODULE_PAYMENT_MONEYORDER_ZONE', '0', 'If a zone is selected, only enable this payment method for that zone.', '6', '2', 'zen_get_zone_class_title', 'zen_cfg_pull_down_zone_classes(', now())");
       $db->Execute("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, use_function, date_added) values ('Set Order Status', 'MODULE_PAYMENT_MONEYORDER_ORDER_STATUS_ID', '0', 'Set the status of orders made with this payment module to this value', '6', '0', 'zen_cfg_pull_down_order_statuses(', 'zen_get_order_status_name', now())");
-//-bof-multi_ship-2/xxx
+//-bof-multi_ship-lat9  *** 2 of 3 ***
       $db->Execute("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ('Allow Multiple Ship-To Addresses?', 'MODULE_PAYMENT_MONEYORDER_MULTISHIP', 'True', 'Do you want to allow multiple ship-to addresses for orders paid with this payment method?', '6', '1', 'zen_cfg_select_option(array(\'True\', \'False\'), ', now());");
-//-eof-multi_ship-2/xxx
+//-eof-multi_ship-lat9  *** 2 of 3 ***
     }
 
     function remove() {
@@ -126,6 +130,6 @@
     }
 
     function keys() {
-      return array('MODULE_PAYMENT_MONEYORDER_STATUS', 'MODULE_PAYMENT_MONEYORDER_ZONE', 'MODULE_PAYMENT_MONEYORDER_ORDER_STATUS_ID', 'MODULE_PAYMENT_MONEYORDER_SORT_ORDER', /*-bof-multi_ship-3/xxx*/ 'MODULE_PAYMENT_MONEYORDER_MULTISHIP', /*-eof-multi_ship-3/xxx*/ 'MODULE_PAYMENT_MONEYORDER_PAYTO');
+      return array('MODULE_PAYMENT_MONEYORDER_STATUS', 'MODULE_PAYMENT_MONEYORDER_ZONE', 'MODULE_PAYMENT_MONEYORDER_ORDER_STATUS_ID', 'MODULE_PAYMENT_MONEYORDER_SORT_ORDER', /*-bof-multi_ship-lat9 *** 3 of 3 *** */ 'MODULE_PAYMENT_MONEYORDER_MULTISHIP', /*-eof-multi_ship-lat9 *** 3 of 3 *** */ 'MODULE_PAYMENT_MONEYORDER_PAYTO');
     }
   }

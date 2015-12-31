@@ -3,9 +3,9 @@
  * File contains the order-processing class ("order")
  *
  * @package classes
- * @copyright Copyright 2003-2014 Zen Cart Development Team
+ * @copyright Copyright 2003-2015 Zen Cart Development Team
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
- * @version GIT: $Id: Author: DrByte  Tue Apr 15 15:06:16 2014 -0400 Modified in v1.5.3 $
+ * @version GIT: $Id: Author: DrByte  Tue Apr 15 15:06:16 2014 -0400 Modified in v1.5.5 $
  */
 /**
  * order class
@@ -290,6 +290,9 @@ class order extends base {
     $billing_address = $db->Execute($billing_address_query);
 
     // set default tax calculation for not-logged-in visitors
+      $taxCountryId = $taxZoneId = 0;
+      // get tax zone info for logged-in visitors
+      if (isset($_SESSION['customer_id']) && (int)$_SESSION['customer_id'] > 0) {
     $taxCountryId = $taxZoneId = -1;
 
     $tax_address_query = '';
@@ -331,6 +334,7 @@ class order extends base {
         $taxZoneId = $tax_address->fields['entry_zone_id'];
       }
     }
+      }
 
     $class =& $_SESSION['payment'];
 
@@ -373,8 +377,8 @@ class order extends base {
     //echo $_SESSION['payment'];
     /*
     // this is set above to the module filename it should be set to the module title like Checks/Money Order rather than moneyorder
-    if (isset($$_SESSION['payment']) && is_object($$_SESSION['payment'])) {
-    $this->info['payment_method'] = $$_SESSION['payment']->title;
+    if (isset(${$_SESSION['payment']}) && is_object(${$_SESSION['payment']})) {
+    $this->info['payment_method'] = ${$_SESSION['payment']}->title;
     }
     */
 
@@ -449,7 +453,7 @@ class order extends base {
                                       'tax_groups'=>$taxRates,
                                       'tax_description' => zen_get_tax_description($products[$i]['tax_class_id'], $taxCountryId, $taxZoneId),
                                       'price' => $products[$i]['price'],
-                                      'final_price' => $products[$i]['price'] + $_SESSION['cart']->attributes_price($products[$i]['id']),
+                                      'final_price' => zen_round($products[$i]['price'] + $_SESSION['cart']->attributes_price($products[$i]['id']), $decimals),
                                       'onetime_charges' => $_SESSION['cart']->attributes_price_onetime_charges($products[$i]['id'], $products[$i]['quantity']),
                                       'weight' => $products[$i]['weight'],
                                       'products_priced_by_attribute' => $products[$i]['products_priced_by_attribute'],
@@ -459,14 +463,14 @@ class order extends base {
                                       'id' => $products[$i]['id'],
                                       'rowClass' => $rowClass);
 
-      if (STORE_PRODUCT_TAX_BASIS == 'Shipping' && stristr($_SESSION['shipping']['id'], 'storepickup') == TRUE) 
+      if (STORE_PRODUCT_TAX_BASIS == 'Shipping' && isset($_SESSION['shipping']['id']) && stristr($_SESSION['shipping']['id'], 'storepickup') == TRUE) 
       {
         $taxRates = zen_get_multiple_tax_rates($products[$i]['tax_class_id'], STORE_COUNTRY, STORE_ZONE);
         $this->products[$index]['tax'] = zen_get_tax_rate($products[$i]['tax_class_id'], STORE_COUNTRY, STORE_ZONE);
       } else 
       {
-        $taxRates = zen_get_multiple_tax_rates($products[$i]['tax_class_id'], $tax_address->fields['entry_country_id'], $tax_address->fields['entry_zone_id']);
-        $this->products[$index]['tax'] = zen_get_tax_rate($products[$i]['tax_class_id'], $tax_address->fields['entry_country_id'], $tax_address->fields['entry_zone_id']);
+          $taxRates = zen_get_multiple_tax_rates($products[$i]['tax_class_id'], $taxCountryId, $taxZoneId);
+          $this->products[$index]['tax'] = zen_get_tax_rate($products[$i]['tax_class_id'], $taxCountryId, $taxZoneId);
       }
 
       $this->notify('NOTIFY_ORDER_CART_ADD_PRODUCT_LIST', array('index'=>$index, 'products'=>$products[$i]));
@@ -520,6 +524,12 @@ class order extends base {
       // add onetime charges here
       //$_SESSION['cart']->attributes_price_onetime_charges($products[$i]['id'], $products[$i]['quantity'])
 
+      /**************************************
+       * Check for external tax handling code
+       **************************************/
+      $this->use_external_tax_handler_only = FALSE;
+      $this->notify('NOTIFY_ORDER_CART_EXTERNAL_TAX_HANDLING', array(), $index, $taxCountryId, $taxZoneId);
+      if ($this->use_external_tax_handler_only == FALSE) {
       /*********************************************
        * Calculate taxes for this product
        *********************************************/
@@ -555,6 +565,7 @@ class order extends base {
       /*********************************************
        * END: Calculate taxes for this product
        *********************************************/
+    }
       $index++;
     }
 
@@ -599,7 +610,7 @@ class order extends base {
     }
     $this->notify('NOTIFY_ORDER_CART_ORDERSTATUS');
 
-    if ($_SESSION['shipping']['id'] == 'free_free') {
+    if (isset($_SESSION['shipping']['id']) && $_SESSION['shipping']['id'] == 'free_free') {
       $this->info['shipping_module_code'] = $_SESSION['shipping']['id'];
     }
 
@@ -664,7 +675,7 @@ class order extends base {
 
     $insert_id = $db->Insert_ID();
 
-    $this->notify('NOTIFY_ORDER_DURING_CREATE_ADDED_ORDER_HEADER', array_merge(array('orders_id' => $insert_id, 'shipping_weight' => $_SESSION['cart']->weight), $sql_data_array));
+    $this->notify('NOTIFY_ORDER_DURING_CREATE_ADDED_ORDER_HEADER', array_merge(array('orders_id' => $insert_id, 'shipping_weight' => $_SESSION['cart']->weight), $sql_data_array), $insert_id);
 
     for ($i=0, $n=sizeof($zf_ot_modules); $i<$n; $i++) {
       $sql_data_array = array('orders_id' => $insert_id,
@@ -675,8 +686,8 @@ class order extends base {
                               'sort_order' => $zf_ot_modules[$i]['sort_order']);
 
       zen_db_perform(TABLE_ORDERS_TOTAL, $sql_data_array);
-
-      $this->notify('NOTIFY_ORDER_DURING_CREATE_ADDED_ORDERTOTAL_LINE_ITEM', $sql_data_array);
+      $ot_insert_id = $db->insert_ID();
+      $this->notify('NOTIFY_ORDER_DURING_CREATE_ADDED_ORDERTOTAL_LINE_ITEM', $sql_data_array, $ot_insert_id);
     }
 
     $customer_notification = (SEND_EMAILS == 'true') ? '1' : '0';
@@ -687,8 +698,8 @@ class order extends base {
                             'comments' => $this->info['comments']);
 
     zen_db_perform(TABLE_ORDERS_STATUS_HISTORY, $sql_data_array);
-
-    $this->notify('NOTIFY_ORDER_DURING_CREATE_ADDED_ORDER_COMMENT', $sql_data_array);
+    $osh_insert_id = $db->insert_ID();
+    $this->notify('NOTIFY_ORDER_DURING_CREATE_ADDED_ORDER_COMMENT', $sql_data_array, $osh_insert_id);
 
     return $insert_id;
 
@@ -791,7 +802,7 @@ class order extends base {
 
       $order_products_id = $db->Insert_ID();
 
-      $this->notify('NOTIFY_ORDER_DURING_CREATE_ADDED_PRODUCT_LINE_ITEM', array_merge(array('orders_products_id' => $order_products_id), $sql_data_array));
+      $this->notify('NOTIFY_ORDER_DURING_CREATE_ADDED_PRODUCT_LINE_ITEM', array_merge(array('orders_products_id' => $order_products_id), $sql_data_array), $order_products_id);
 
       $this->notify('NOTIFY_ORDER_PROCESSING_CREDIT_ACCOUNT_UPDATE_BEGIN');
       $order_total_modules->update_credit_account($i);//ICW ADDED FOR CREDIT CLASS SYSTEM
@@ -874,8 +885,8 @@ class order extends base {
 
 
           zen_db_perform(TABLE_ORDERS_PRODUCTS_ATTRIBUTES, $sql_data_array);
-
-          $this->notify('NOTIFY_ORDER_DURING_CREATE_ADDED_ATTRIBUTE_LINE_ITEM', $sql_data_array);
+          $opa_insert_id = $db->insert_ID();
+          $this->notify('NOTIFY_ORDER_DURING_CREATE_ADDED_ATTRIBUTE_LINE_ITEM', array_merge(array('orders_products_attributes_id' => $opa_insert_id), $sql_data_array), $opa_insert_id);
 
           if ((DOWNLOAD_ENABLED == 'true') && isset($attributes_values->fields['products_attributes_filename']) && zen_not_null($attributes_values->fields['products_attributes_filename'])) {
             $sql_data_array = array('orders_id' => $zf_insert_id,
@@ -887,8 +898,8 @@ class order extends base {
                                     );
 
             zen_db_perform(TABLE_ORDERS_PRODUCTS_DOWNLOAD, $sql_data_array);
-
-            $this->notify('NOTIFY_ORDER_DURING_CREATE_ADDED_ATTRIBUTE_DOWNLOAD_LINE_ITEM', $sql_data_array);
+            $opd_insert_id = $db->insert_ID();
+            $this->notify('NOTIFY_ORDER_DURING_CREATE_ADDED_ATTRIBUTE_DOWNLOAD_LINE_ITEM', $sql_data_array, $opd_insert_id);
           }
           $this->products_ordered_attributes .= "\n\t" . $attributes_values->fields['products_options_name'] . ' ' . zen_decode_specialchars($this->products[$i]['attributes'][$j]['value']);
         }
@@ -918,8 +929,8 @@ class order extends base {
 
       // update totals counters
       $this->total_weight += ($this->products[$i]['qty'] * $this->products[$i]['weight']);
-      $this->total_tax += zen_calculate_tax($total_products_price * $this->products[$i]['qty'], $products_tax);
-      $this->total_cost += $total_products_price;
+      $this->total_tax += zen_calculate_tax($this->products[$i]['final_price'] * $this->products[$i]['qty'], $this->products[$i]['tax']);
+      $this->total_cost += $this->products[$i]['final_price'] + $this->products[$i]['onetime_charges'];
 
       $this->notify('NOTIFY_ORDER_PROCESSING_ONE_TIME_CHARGES_BEGIN', $i);
 
@@ -1069,7 +1080,7 @@ class order extends base {
     // include copyright
     if (defined('EMAIL_FOOTER_COPYRIGHT')) $email_order .= "\n-----\n" . EMAIL_FOOTER_COPYRIGHT . "\n\n";
 
-    while (strstr($email_order, '&nbsp;')) $email_order = str_replace('&nbsp;', ' ', $email_order);
+    $email_order = str_replace('&nbsp;', ' ', $email_order);
 
     $html_msg['EMAIL_FIRST_NAME'] = $this->customer['firstname'];
     $html_msg['EMAIL_LAST_NAME'] = $this->customer['lastname'];
@@ -1095,14 +1106,14 @@ class order extends base {
 
       // Add extra heading stuff via observer class
       $this->extra_header_text = '';
-      $this->notify('NOTIFY_ORDER_INVOICE_CONTENT_FOR_ADDITIONAL_EMAILS', array('zf_insert_id' => $zf_insert_id, 'text_email' => $email_order, 'html_email' => $html_msg));
+      $this->notify('NOTIFY_ORDER_INVOICE_CONTENT_FOR_ADDITIONAL_EMAILS', $zf_insert_id, $email_order, $html_msg);
       $email_order = $this->extra_header_text . $email_order;
       $html_msg['EMAIL_TEXT_HEADER'] = nl2br($this->extra_header_text) . $html_msg['EMAIL_TEXT_HEADER'];
 
       zen_mail('', SEND_EXTRA_ORDER_EMAILS_TO, SEND_EXTRA_NEW_ORDERS_EMAILS_TO_SUBJECT . ' ' . EMAIL_TEXT_SUBJECT . EMAIL_ORDER_NUMBER_SUBJECT . $zf_insert_id,
       $email_order . $extra_info['TEXT'], STORE_NAME, EMAIL_FROM, $html_msg, 'checkout_extra', $this->attachArray, $this->customer['firstname'] . ' ' . $this->customer['lastname'], $this->customer['email_address']);
     }
-    $this->notify('NOTIFY_ORDER_AFTER_SEND_ORDER_EMAIL', array($zf_insert_id, $email_order, $extra_info, $html_msg));
+    $this->notify('NOTIFY_ORDER_AFTER_SEND_ORDER_EMAIL', $zf_insert_id, $email_order, $extra_info, $html_msg);
   }
 
 }

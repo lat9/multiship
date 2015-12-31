@@ -15,7 +15,7 @@ th, td { padding: 1%; border: 1px solid #3333ff; }
 
 .smaller { font-size: smaller; }
 .corefile { color: red; }
-.almostcore { color: blue; }
+.template { color: green; }
 .removed { text-decoration: line-through; color: blue; }
 .added { color: green; }
 .osh { color: darkcyan; }

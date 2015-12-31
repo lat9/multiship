@@ -1,16 +1,16 @@
 <?php
 /**
  * @package admin
- * @copyright Copyright 2003-2011 Zen Cart Development Team
+ * @copyright Copyright 2003-2015 Zen Cart Development Team
  * @copyright Portions Copyright 2003 osCommerce
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
- * @version $Id: order.php 18695 2011-05-04 05:24:19Z drbyte $
+ * @version $Id: order.php 18695 2011-05-04 05:24:19Z drbyte  Modified in v1.6.0 $
  */
 
   class order extends base {  //-multiship-1/2-Add base extension
     var $info, $totals, $products, $customer, $delivery;
 
-    function order($order_id) {
+    function __construct($order_id) {
       $this->info = array();
       $this->totals = array();
       $this->products = array();
@@ -155,7 +155,7 @@
 
         $subindex = 0;
         $attributes = $db->Execute("select products_options, products_options_values, options_values_price,
-                                           price_prefix,
+                                           price_prefix, products_options_values_id,
                                            product_attribute_is_free
                                     from " . TABLE_ORDERS_PRODUCTS_ATTRIBUTES . "
                                     where orders_id = '" . (int)$order_id . "'
@@ -164,6 +164,7 @@
           while (!$attributes->EOF) {
             $this->products[$index]['attributes'][$subindex] = array('option' => $attributes->fields['products_options'],
                                                                      'value' => $attributes->fields['products_options_values'],
+                                                                     'value_id' => $attributes->fields['products_options_values_id'],
                                                                      'prefix' => $attributes->fields['price_prefix'],
                                                                      'price' => $attributes->fields['options_values_price'],
                                                                      'product_attribute_is_free' =>$attributes->fields['product_attribute_is_free']);
