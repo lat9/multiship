@@ -37,13 +37,15 @@ while (!$orders_status->EOF) {
 <meta http-equiv="Content-Type" content="text/html; charset=<?php echo CHARSET; ?>">
 <title><?php echo TITLE; ?></title>
 <link rel="stylesheet" type="text/css" href="includes/stylesheet.css">
-<script language="javascript" src="includes/menu.js"></script>
+<script type="text/javascript" src="includes/menu.js"></script>
 </head>
 <body marginwidth="0" marginheight="0" topmargin="0" bottommargin="0" leftmargin="0" rightmargin="0" bgcolor="#FFFFFF">
 <!-- body_text //-->
 <?php
 $billing_name = $order->billing['name'];
 $billing_street_address = $order->billing['street_address'];
+$num_suborders = count($order->multiship_info);
+$suborders_processed = 0;
 foreach ($order->multiship_info as $multiship_id => $multiship_info) {
 ?>
 <table border="0" width="100%" cellspacing="0" cellpadding="2">
@@ -205,8 +207,13 @@ foreach ($order->multiship_info as $multiship_id => $multiship_info) {
 
 </table>
 <!-- body_text_eof //-->
-<br style="page-break-before: always;" />
 <?php
+    $suborders_processed++;
+    if ($suborders_processed < $num_suborders) {
+?>
+<div style="page-break-after: always;"></div>
+<?php
+    }
 }  // END loop processing each sub-order
 ?>
 </body>
