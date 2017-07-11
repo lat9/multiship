@@ -13,14 +13,15 @@ if (!defined('IS_ADMIN_FLAG') || IS_ADMIN_FLAG !== true) {
 
 class multiship_observer extends base 
 {
-
     public function __construct () 
     {
         $this->attach(
             $this, 
             array(
                 //-Issued by /admin/includes/classes/order.php
-                'NOTIFY_ADMIN_ORDER_CLASS_END_QUERY',
+                'ORDER_QUERY_ADMIN_COMPLETE',               //-v1.5.5e version
+                'NOTIFY_ADMIN_ORDER_CLASS_END_QUERY',       //-"legacy" multiship version
+                
                 //-Issued by /admin/includes/functions/general.php::zen_remove_order
                 'NOTIFIER_ADMIN_ZEN_REMOVE_ORDER'
             )
@@ -33,6 +34,7 @@ class multiship_observer extends base
         $this->eventID = $eventID;
 
         switch ($eventID) {
+            case 'ORDER_QUERY_ADMIN_COMPLETE':              //-Fall-through ...
             case 'NOTIFY_ADMIN_ORDER_CLASS_END_QUERY':
                 if (!is_array($p1a) || !array_key_exists('orders_id', $p1a)) {
                     $this->logError('Missing orders_id in notification params array (' . print_r($p1a, true) . ')');

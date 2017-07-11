@@ -19,7 +19,7 @@ if (!defined('MODULE_MULTISHIP_VERSION')) {
     // Create each of the database tables for the events plugin, if they don't already exist.
     //
     $db->Execute(
-        "CREATE TABLE IF NOT EXISTS " . TABLE_ORDERS_MULTISHIP . " (
+        "CREATE TABLE  " . TABLE_ORDERS_MULTISHIP . " (
             orders_multiship_id int(11) NOT NULL auto_increment,
             orders_id int(11) NOT NULL default '0',
             delivery_name varchar(64) NOT NULL default '',
@@ -34,11 +34,11 @@ if (!defined('MODULE_MULTISHIP_VERSION')) {
             last_modified datetime default NULL,
             orders_status int(5) NOT NULL default '0',
             content_type char(8) NOT NULL default '',
-        PRIMARY KEY  (orders_multiship_id))";
+        PRIMARY KEY  (orders_multiship_id))"
     );
 
     $db->Execute(
-        "CREATE TABLE IF NOT EXISTS " . TABLE_ORDERS_MULTISHIP_TOTAL . " (
+        "CREATE TABLE " . TABLE_ORDERS_MULTISHIP_TOTAL . " (
             orders_multiship_total_id int(11) unsigned NOT NULL auto_increment,
             orders_id int(11) NOT NULL default '0',
             orders_multiship_id int(11) NOT NULL default '0',

@@ -1,84 +1,87 @@
 <?php
 // ---------------------------------------------------------------------------
-// Part of the Multiple Shipping Addresses plugin for Zen Cart v1.5.1 and later
+// Part of the Multiple Shipping Addresses plugin for Zen Cart v1.5.5 and later
 //
-// Copyright (C) 2014-2016, Vinos de Frutas Tropicales (lat9)
+// Copyright (C) 2014-2017, Vinos de Frutas Tropicales (lat9)
 //
 // @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
 // ---------------------------------------------------------------------------
 
-class multiship_observer extends base {
-
-  function __construct () {
-    $this->attach($this, array( /* order.php class */ 
-                                'NOTIFY_ORDER_DURING_CREATE_ADDED_ORDER_HEADER', 'NOTIFY_ORDER_DURING_CREATE_ADDED_ORDERTOTAL_LINE_ITEM', 'NOTIFY_ORDER_DURING_CREATE_ADDED_PRODUCT_LINE_ITEM', 'NOTIFY_ORDER_DURING_CREATE_ADDED_ATTRIBUTE_LINE_ITEM', 'NOTIFY_ORDER_INVOICE_CONTENT_READY_TO_SEND', 'NOTIFY_ORDER_EMAIL_BEFORE_PRODUCTS', 'NOTIFY_ORDER_PROCESSING_ONE_TIME_CHARGES_BEGIN',
-                                /* shopping_cart.php class */
-                                'NOTIFIER_CART_REMOVE_START', 'NOTIFIER_CART_UPDATE_QUANTITY_START', 'NOTIFIER_CART_ADD_CART_START',
-                                /* page header_php.php's */ 
-                                'NOTIFY_HEADER_START_CHECKOUT_CONFIRMATION', 'NOTIFY_HEADER_END_CHECKOUT_CONFIRMATION', 'NOTIFY_HEADER_END_CHECKOUT_PROCESS'));
-  }
-  
-  function update(&$class, $eventID, $p1a, &$p2, &$p3, &$p4, &$p5, &$p6, &$p7, &$p8, &$p9) {
-    switch ($eventID) {
-      // -----
-      // Issued by /includes/classes/order.php just after writing the overall order's information to the orders table.
-      //
-      case 'NOTIFY_ORDER_DURING_CREATE_ADDED_ORDER_HEADER': {
-        $_SESSION['multiship']->_createOrderHeader($p1a);
-        break;
-      }
-      case 'NOTIFY_ORDER_DURING_CREATE_ADDED_ORDERTOTAL_LINE_ITEM': {
-        $_SESSION['multiship']->_createOrderFixupTotal($p1a);
-        break;
-      }
-      case 'NOTIFY_ORDER_DURING_CREATE_ADDED_PRODUCT_LINE_ITEM': {
-        $_SESSION['multiship']->_createOrderAddProducts($p1a);
-        break;
-      }
-      case 'NOTIFY_ORDER_DURING_CREATE_ADDED_ATTRIBUTE_LINE_ITEM': {
-        $_SESSION['multiship']->_createOrderAddAttributes($p1a);
-        break;
-      }
-      case 'NOTIFY_HEADER_START_CHECKOUT_CONFIRMATION': {
-        $_SESSION['multiship']->_fixCartID();
-        break;
-      }
-      case 'NOTIFY_HEADER_END_CHECKOUT_CONFIRMATION': {
-        $_SESSION['multiship']->_prepare();
-        break;
-      }
-      case 'NOTIFY_HEADER_END_CHECKOUT_PROCESS': {
-        $_SESSION['multiship']->_cleanup();
-        break;
-      }
-      case 'NOTIFY_ORDER_INVOICE_CONTENT_READY_TO_SEND': {
-        $_SESSION['multiship']->_fixupOrderEmail($class, $p1a, $p2, $p3);
-        break;
-      }
-      case 'NOTIFY_ORDER_EMAIL_BEFORE_PRODUCTS': {
-        $_SESSION['multiship']->_saveEmailHeader($p2, $p3);
-        break;
-      }
-      case 'NOTIFY_ORDER_PROCESSING_ONE_TIME_CHARGES_BEGIN': {
-        $_SESSION['multiship']->_insertAttributesText($class);
-        break;
-      }
-      case 'NOTIFIER_CART_REMOVE_START': {
-        $_SESSION['multiship']->_removeProduct($p2);
-        break;
-      }
-      case 'NOTIFIER_CART_UPDATE_QUANTITY_START': {
-        $_SESSION['multiship']->_updateProduct($p2, $p3, $p4);
-        break;
-      }
-      case 'NOTIFIER_CART_ADD_CART_START': {
-        $_SESSION['multiship']->_checkAddProductMessage ($p2, $p3, $p4);
-        break;
-      }
-      default: {
-        break;
-      }
+class multiship_observer extends base 
+{
+    public function __construct() 
+    {
+        $this->attach(
+            $this, array(
+                /* order.php class */ 
+                'NOTIFY_ORDER_DURING_CREATE_ADDED_ORDER_HEADER', 
+                'NOTIFY_ORDER_DURING_CREATE_ADDED_ORDERTOTAL_LINE_ITEM', 
+                'NOTIFY_ORDER_DURING_CREATE_ADDED_PRODUCT_LINE_ITEM', 
+                'NOTIFY_ORDER_DURING_CREATE_ADDED_ATTRIBUTE_LINE_ITEM', 
+                'NOTIFY_ORDER_INVOICE_CONTENT_READY_TO_SEND', 
+                'NOTIFY_ORDER_EMAIL_BEFORE_PRODUCTS', 
+                'NOTIFY_ORDER_PROCESSING_ONE_TIME_CHARGES_BEGIN',
+                
+                /* shopping_cart.php class */
+                'NOTIFIER_CART_REMOVE_START', 
+                'NOTIFIER_CART_UPDATE_QUANTITY_START', 
+                'NOTIFIER_CART_ADD_CART_START',
+                
+                /* page header_php.php's */ 
+                'NOTIFY_HEADER_START_CHECKOUT_CONFIRMATION', 
+                'NOTIFY_HEADER_END_CHECKOUT_CONFIRMATION', 
+                'NOTIFY_HEADER_END_CHECKOUT_PROCESS'
+            )
+        );
     }
-    
-  }
+  
+    public function update(&$class, $eventID, $p1a, &$p2, &$p3, &$p4, &$p5, &$p6, &$p7, &$p8, &$p9) 
+    {
+        switch ($eventID) {
+            // -----
+            // Issued by /includes/classes/order.php just after writing the overall order's information to the orders table.
+            //
+            case 'NOTIFY_ORDER_DURING_CREATE_ADDED_ORDER_HEADER':
+                $_SESSION['multiship']->_createOrderHeader($p1a);
+                break;
+            case 'NOTIFY_ORDER_DURING_CREATE_ADDED_ORDERTOTAL_LINE_ITEM':
+                $_SESSION['multiship']->_createOrderFixupTotal($p1a);
+                break;
+            case 'NOTIFY_ORDER_DURING_CREATE_ADDED_PRODUCT_LINE_ITEM':
+                $_SESSION['multiship']->_createOrderAddProducts($p1a);
+                break;
+            case 'NOTIFY_ORDER_DURING_CREATE_ADDED_ATTRIBUTE_LINE_ITEM':
+                $_SESSION['multiship']->_createOrderAddAttributes($p1a);
+                break;
+            case 'NOTIFY_HEADER_START_CHECKOUT_CONFIRMATION':
+                $_SESSION['multiship']->_fixCartID();
+                break;
+            case 'NOTIFY_HEADER_END_CHECKOUT_CONFIRMATION':
+                $_SESSION['multiship']->_prepare();
+                break;
+            case 'NOTIFY_HEADER_END_CHECKOUT_PROCESS':
+                $_SESSION['multiship']->_cleanup();
+                break;
+            case 'NOTIFY_ORDER_INVOICE_CONTENT_READY_TO_SEND':
+                $_SESSION['multiship']->_fixupOrderEmail($class, $p1a, $p2, $p3);
+                break;
+            case 'NOTIFY_ORDER_EMAIL_BEFORE_PRODUCTS':
+                $_SESSION['multiship']->_saveEmailHeader($p2, $p3);
+                break;
+            case 'NOTIFY_ORDER_PROCESSING_ONE_TIME_CHARGES_BEGIN':
+                $_SESSION['multiship']->_insertAttributesText($class);
+                break;
+            case 'NOTIFIER_CART_REMOVE_START':
+                $_SESSION['multiship']->_removeProduct($p2);
+                break;
+            case 'NOTIFIER_CART_UPDATE_QUANTITY_START':
+                $_SESSION['multiship']->_updateProduct($p2, $p3, $p4);
+                break;
+            case 'NOTIFIER_CART_ADD_CART_START':
+                $_SESSION['multiship']->_checkAddProductMessage ($p2, $p3, $p4);
+                break;
+            default:
+                break;
+        }
+    }
 }

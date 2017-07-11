@@ -231,7 +231,7 @@ class multiship extends base
     // Called by the multiship_observer class, upon receipt of NOTIFY_ORDER_DURING_CREATE_ADDED_ORDER_HEADER
     // (issed by the order class).
     //
-    protected function _createOrderHeader($order_info_array) 
+    public function _createOrderHeader($order_info_array) 
     {
         global $db;
         
@@ -302,7 +302,7 @@ class multiship extends base
     // (issued by the order class).  This gives us an opportunity to modify the overall order's total for the current
     // order-total class.
     //
-    protected function _createOrderFixupTotal ($orders_totals_array) 
+    public function _createOrderFixupTotal ($orders_totals_array) 
     {
         global $db, $currencies;
         if (is_array($this->totals) && isset($this->totals[$orders_totals_array['class']])) {
@@ -321,7 +321,10 @@ class multiship extends base
     // Called by the multiship_observer class upon receipt of NOTIFY_ORDER_DURING_CREATE_ADDED_PRODUCT_LINE_ITEM
     // (issued by the order class).  This is called once for each product in the current session's cart.
     //
-    protected function _createOrderAddProducts($orders_products_array) {
+    // Note: A change was introduced in ZC1.5.5, adding the order-class products' array index; that needs
+    //       to be removed prior to database update!
+    //
+    public function _createOrderAddProducts($orders_products_array) {
         global $db, $currencies;
         $this->_debugLog('_createOrderAddProducts: start', array ('this' => $this));
 
@@ -329,6 +332,7 @@ class multiship extends base
         // If the current order has multiple shipping addresses ...
         //
         if ($this->selected) {
+            unset($orders_products_array['i']);
             $orders_products_id = $orders_products_array['orders_products_id'];
             unset($orders_products_array['orders_products_id']);
             $prid = $orders_products_array['products_prid'];
@@ -392,7 +396,7 @@ class multiship extends base
     // Called by the multiship_observer class upon receipt of NOTIFY_ORDER_DURING_CREATE_ADDED_ATTRIBUTE_LINE_ITEM
     // (issued by the order class).
     //
-    protected function _createOrderAddAttributes($products_attributes_array) 
+    public function _createOrderAddAttributes($products_attributes_array) 
     {
         if ($this->selected) {
             foreach ($this->orders_multiship_ids as $orders_products_id) {
@@ -402,7 +406,7 @@ class multiship extends base
         }
     }
   
-    protected function _insertAttributesText($order) 
+    public function _insertAttributesText($order) 
     {
         if ($this->selected) {
             foreach ($this->details as $address_id => &$currentInfo) {
@@ -421,7 +425,7 @@ class multiship extends base
     // email lead-in information is built).  Save this information for use in the modification of the email for a multiple ship-to
     // order's processing.
     //
-    protected function _saveEmailHeader($text_email, $html_email) 
+    public function _saveEmailHeader($text_email, $html_email) 
     {
         $this->text_email = $text_email;
     }
@@ -431,7 +435,7 @@ class multiship extends base
     // just before sending the order confirmation email).  If the current order has multiple shipping addresses, this provides the
     // fix-ups required for the text and HTML email contents.
     //
-    function _fixupOrderEmail($order, $parmArray, &$email_order, &$html_email) 
+    public function _fixupOrderEmail($order, $parmArray, &$email_order, &$html_email) 
     {
         global $currencies;
 
@@ -509,7 +513,7 @@ class multiship extends base
     // and, thus, the shopping cart's cartID value.  Need the cart's value to match that in the session
     // or the customer will be redirected back to the checkout_shipping page.
     //
-    protected function _fixCartID() 
+    public function _fixCartID() 
     {
         if ($this->selected) {
             $_SESSION['cartID'] = $_SESSION['cart']->cartID;
@@ -520,9 +524,9 @@ class multiship extends base
     // Called by the multiship_observer class upon receipt of NOTIFY_HEADER_END_CHECKOUT_CONFIRMATION
     // (issued by the header_php.php file for the checkout_confirmation page).
     //
-    protected function _prepare() 
+    public function _prepare() 
     {
-        global $order, ${$_SESSION['payment']|, $shipping_modules, $currencies, $total_weight, $total_count;
+        global $order, ${$_SESSION['payment']}, $shipping_modules, $currencies, $total_weight, $total_count;
         $this->_debugLog('_prepare: start', $this);
 
         // -----
@@ -688,7 +692,7 @@ class multiship extends base
     // out any multiship details that were previously calculated since the confirmation page's re-entry
     // will result in a recalculation anyway.
     //
-    protected function _removeProduct($prid) 
+    public function _removeProduct($prid) 
     {
         // -----
         // First, remove all multiship class elements associated with the ship-to details.
@@ -725,7 +729,7 @@ class multiship extends base
     // prior to checkout completion and the multiship shipping calculations will be performed there ... so remove all ship-to
     // details as part of the processing.
     //
-    protected function _updateProduct($prid, $new_quantity, $attributes) 
+    public function _updateProduct($prid, $new_quantity, $attributes) 
     {
         global $messageStack;
 
@@ -757,7 +761,7 @@ class multiship extends base
     // will be sent to their "Primary" address and that they can make changes during the checkout process and
     // record this change in the multiship session values.
     //
-    protected function _checkAddProductMessage($prid, $qty, $attributes) 
+    public function _checkAddProductMessage($prid, $qty, $attributes) 
     {
         global $messageStack;
         $uprid = zen_get_uprid ($prid, $attributes);
@@ -781,7 +785,7 @@ class multiship extends base
     // receipt of NOTIFY_HEADER_END_CHECKOUT_PROCESS (issued by the header_php.php file for the checkout_process page, just
     // prior to re-directing to the checkout_success page).
     //
-    protected function _cleanup() 
+    public function _cleanup() 
     {
         $this->selected = false;
         $this->offer = false;
@@ -793,7 +797,7 @@ class multiship extends base
     // Provides a common notifier-trace log, optionally issuing an error if a fatal, non-recoverable interface
     // error is detected.
     //
-    function _debugLog($message, $extras = array(), $die = false) 
+    protected function _debugLog($message, $extras = array(), $die = false) 
     {
         $this->notify($message, $extras);
 

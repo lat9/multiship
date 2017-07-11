@@ -912,6 +912,7 @@ function couponpopupWindow(url) {
                 <td class="main"><strong><?php echo ($order->info['is_multiship_order']) ? MULTISHIP_OVERALL_STATUS : ENTRY_STATUS; ?></strong> <?php echo zen_draw_pull_down_menu('status', $orders_statuses, $order->info['orders_status']); ?></td>
 <?php
 //-eof-multiship-lat9   *** 7 of 11 ***
+?>
               </tr>
               <tr>
                 <td class="main"><strong><?php echo ENTRY_NOTIFY_CUSTOMER; ?></strong> [<?php echo zen_draw_radio_field('notify', '1', true) . '-' . TEXT_EMAIL . ' ' . zen_draw_radio_field('notify', '0', FALSE) . '-' . TEXT_NOEMAIL . ' ' . zen_draw_radio_field('notify', '-1', FALSE) . '-' . TEXT_HIDE; ?>]&nbsp;&nbsp;&nbsp;</td>
