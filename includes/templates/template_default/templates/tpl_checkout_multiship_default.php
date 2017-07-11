@@ -1,8 +1,8 @@
 <?php
 // ---------------------------------------------------------------------------
-// Part of the Multiple Shipping Addresses plugin for Zen Cart v1.5.1 and later
+// Part of the Multiple Shipping Addresses plugin for Zen Cart v1.5.5 and later
 //
-// Copyright (C) 2014, Vinos de Frutas Tropicales (lat9)
+// Copyright (C) 2014-2017, Vinos de Frutas Tropicales (lat9)
 //
 // @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
 // ---------------------------------------------------------------------------
@@ -11,8 +11,10 @@
 
   <h1 id="checkoutMultishipDefaultHeading"><?php echo HEADING_TITLE; ?></h1>
 
-<?php if ($messageStack->size('multiship') > 0) echo $messageStack->output('multiship'); ?>
-<?php if ($messageStack->size('shopping_cart') > 0) echo $messageStack->output('shopping_cart'); ?>
+<?php 
+if ($messageStack->size('multiship') > 0) echo $messageStack->output('multiship');
+if ($messageStack->size('shopping_cart') > 0) echo $messageStack->output('shopping_cart'); 
+?>
   <div id="checkoutMultishipShipping"><?php echo TEXT_CURRENT_SHIPPING_METHOD; ?><strong><?php echo $_SESSION['shipping']['title']; ?></strong>&nbsp;&nbsp;<a href="<?php echo zen_href_link(FILENAME_CHECKOUT_SHIPPING, '', 'SSL'); ?>"><?php echo zen_image_button(BUTTON_IMAGE_EDIT_SMALL, TEXT_SHIPPING_METHOD_CHANGE) ; ?></a></div>
   <div id="checkoutMultishipInstructions"><?php echo TEXT_MULTISHIP_INSTRUCTIONS; ?></div>
   <div id="checkoutMultishipNewAddress"><?php echo TEXT_NEED_ANOTHER_ADDRESS; ?><a href="<?php echo zen_href_link(FILENAME_ADDRESS_BOOK, '', 'SSL'); ?>"><?php echo TEXT_ENTER_NEW_ADDRESS; ?></a></div>
@@ -32,19 +34,19 @@ foreach ($productsArray as $currentProduct) {
       <div class="item">
         <div class="msipItemName"><?php echo $currentProduct['name'] . zen_draw_hidden_field('prid[]', $currentProduct['id']); ?></div>
 <?php
-  if (isset($currentProduct['attributes'])) {
+    if (isset($currentProduct['attributes'])) {
 ?>
         <div class="msipItemAttr"><ul>
 <?php
-    foreach ($currentProduct['attributes'] as $currentAttribute) {
+        foreach ($currentProduct['attributes'] as $currentAttribute) {
 ?>
           <li><?php echo $currentAttribute['name'] . TEXT_OPTION_DIVIDER . nl2br ($currentAttribute['value']); ?></li>
 <?php
-    }
+        }
 ?>
         </ul></div>
 <?php
-  }
+    }
 ?>
       </div>
       <div class="msipPrice"><?php echo $currentProduct['price']; ?></div>
@@ -52,7 +54,7 @@ foreach ($productsArray as $currentProduct) {
       <div class="sendto"><?php echo zen_draw_pull_down_menu('address[]', $multishipAddresses, $currentProduct['sendto'], 'onchange="ok2leave(); this.form.submit();"') . ' ' . $_SESSION['multiship']->get_noship_image($currentProduct['sendto']); ?></div>
     </div>
 <?php
-  $even_odd = ($even_odd == ' even') ? ' odd' : ' even';
+    $even_odd = ($even_odd == ' even') ? ' odd' : ' even';
 }
 ?>
   </div>

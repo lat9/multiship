@@ -36,4 +36,3 @@ define('ENTRY_PAYMENT_METHOD', 'Payment Method:');
 define('ENTRY_DATE_PURCHASED', 'Date Ordered:');
 
 define('ENTRY_ORDER_ID','Invoice No. ');
-?>

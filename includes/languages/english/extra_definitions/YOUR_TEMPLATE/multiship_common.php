@@ -1,8 +1,8 @@
 <?php
 // ---------------------------------------------------------------------------
-// Part of the Multiple Shipping Addresses plugin for Zen Cart v1.5.1 and later
+// Part of the Multiple Shipping Addresses plugin for Zen Cart v1.5.5 and later
 //
-// Copyright (C) 2014, Vinos de Frutas Tropicales (lat9)
+// Copyright (C) 2014-2017, Vinos de Frutas Tropicales (lat9)
 //
 // @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
 // ---------------------------------------------------------------------------
@@ -21,7 +21,7 @@ define('ICON_MULTISHIP_NOSHIP', 'multiship_noship.png');
 define('ICON_MULTISHIP_NOSHIP_ALT', 'Identifies that a selected ship-to address is not compatible with the currently-selected shipping method.');
 
 if (!defined('WARNING_PRODUCT_QUANTITY_ADJUSTED')) {
-  define('WARNING_PRODUCT_QUANTITY_ADJUSTED', 'Quantity has been adjusted to what is in stock. ');
+    define('WARNING_PRODUCT_QUANTITY_ADJUSTED', 'Quantity has been adjusted to what is in stock. ');
 }
 
 define ('MULTISHIP_PRODUCT_ADD_SHIP_PRIMARY', 'The newly-added product <b>(%u x %s)</b> will ship to your <b>Primary</b> address.  You will have the opportunity to change this during the checkout process.');

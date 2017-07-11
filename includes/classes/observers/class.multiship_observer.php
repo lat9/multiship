@@ -2,7 +2,7 @@
 // ---------------------------------------------------------------------------
 // Part of the Multiple Shipping Addresses plugin for Zen Cart v1.5.1 and later
 //
-// Copyright (C) 2014-2015, Vinos de Frutas Tropicales (lat9)
+// Copyright (C) 2014-2016, Vinos de Frutas Tropicales (lat9)
 //
 // @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
 // ---------------------------------------------------------------------------
@@ -11,7 +11,7 @@ class multiship_observer extends base {
 
   function __construct () {
     $this->attach($this, array( /* order.php class */ 
-                                'NOTIFY_ORDER_DURING_CREATE_ADDED_ORDER_HEADER', 'NOTIFY_ORDER_DURING_CREATE_ADDED_ORDERTOTAL_LINE_ITEM', 'NOTIFY_ORDER_DURING_CREATE_ADDED_PRODUCT_LINE_ITEM', 'NOTIFY_ORDER_DURING_CREATE_ADDED_ATTRIBUTE_LINE_ITEM', 'NOTIFY_ORDER_INVOICE_CONTENT_READY_TO_SEND2', 'NOTIFY_ORDER_EMAIL_BEFORE_PRODUCTS', 'NOTIFY_ORDER_PROCESSING_ONE_TIME_CHARGES_BEGIN',
+                                'NOTIFY_ORDER_DURING_CREATE_ADDED_ORDER_HEADER', 'NOTIFY_ORDER_DURING_CREATE_ADDED_ORDERTOTAL_LINE_ITEM', 'NOTIFY_ORDER_DURING_CREATE_ADDED_PRODUCT_LINE_ITEM', 'NOTIFY_ORDER_DURING_CREATE_ADDED_ATTRIBUTE_LINE_ITEM', 'NOTIFY_ORDER_INVOICE_CONTENT_READY_TO_SEND', 'NOTIFY_ORDER_EMAIL_BEFORE_PRODUCTS', 'NOTIFY_ORDER_PROCESSING_ONE_TIME_CHARGES_BEGIN',
                                 /* shopping_cart.php class */
                                 'NOTIFIER_CART_REMOVE_START', 'NOTIFIER_CART_UPDATE_QUANTITY_START', 'NOTIFIER_CART_ADD_CART_START',
                                 /* page header_php.php's */ 
@@ -51,7 +51,7 @@ class multiship_observer extends base {
         $_SESSION['multiship']->_cleanup();
         break;
       }
-      case 'NOTIFY_ORDER_INVOICE_CONTENT_READY_TO_SEND2': {
+      case 'NOTIFY_ORDER_INVOICE_CONTENT_READY_TO_SEND': {
         $_SESSION['multiship']->_fixupOrderEmail($class, $p1a, $p2, $p3);
         break;
       }

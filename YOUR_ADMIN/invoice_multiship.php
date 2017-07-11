@@ -8,28 +8,30 @@
 */
 // -----
 // Modified by lat9 (vinosdefrutastropicales.com) as part of the multiple ship-to addresses plugin
-// Copyright 2014, Vinos de Frutas Tropicales
+// Copyright 2014-2017, Vinos de Frutas Tropicales
 //
-  require('includes/application_top.php');
-  
-  include(DIR_WS_LANGUAGES . $_SESSION['language'] . '/orders_multiship.php');
-  
-  require(DIR_WS_CLASSES . 'currencies.php');
-  $currencies = new currencies();
+require 'includes/application_top.php' ;
 
-  $oID = (int)zen_db_prepare_input($_GET['oID']);
+include DIR_WS_LANGUAGES . $_SESSION['language'] . '/orders_multiship.php';
 
-  include(DIR_WS_CLASSES . 'order.php');
-  $order = new order($oID);
+require DIR_WS_CLASSES . 'currencies.php';
+$currencies = new currencies();
 
-  $orders_status_array = array();
-  $orders_status = $db->Execute("select orders_status_id, orders_status_name
-                                 from " . TABLE_ORDERS_STATUS . "
-                                 where language_id = '" . (int)$_SESSION['languages_id'] . "'");
-  while (!$orders_status->EOF) {
+$oID = (int)zen_db_prepare_input($_GET['oID']);
+
+include DIR_WS_CLASSES . 'order.php';
+$order = new order($oID);
+
+$orders_status_array = array();
+$orders_status = $db->Execute(
+    "SELECT orders_status_id, orders_status_name
+       FROM " . TABLE_ORDERS_STATUS . "
+      WHERE language_id = " . (int)$_SESSION['languages_id']
+);
+while (!$orders_status->EOF) {
     $orders_status_array[$orders_status->fields['orders_status_id']] = $orders_status->fields['orders_status_name'];
     $orders_status->MoveNext();
-  }
+}
 ?>
 <!doctype html public "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html <?php echo HTML_PARAMS; ?>>
@@ -67,7 +69,7 @@ function couponpopupWindow(url) {
       </tr>
 
 <?php
-  if ($order->billing['name'] != $order->delivery['name'] || $order->billing['street_address'] != $order->delivery['street_address']) {
+if ($order->billing['name'] != $order->delivery['name'] || $order->billing['street_address'] != $order->delivery['street_address']) {
 ?>
       <tr>
         <td class="main"><b><?php echo ENTRY_CUSTOMER; ?></b></td>
@@ -76,7 +78,7 @@ function couponpopupWindow(url) {
         <td class="main"><?php echo zen_address_format($order->customer['format_id'], $order->customer, 1, '', '<br>'); ?></td>
       </tr>
 <?php 
-  } 
+} 
 ?>
       <tr>
         <td valign="top"><table width="100%" border="0" cellspacing="0" cellpadding="2">
@@ -129,14 +131,17 @@ function couponpopupWindow(url) {
     <td><?php echo zen_draw_separator('pixel_trans.gif', '1', '10'); ?></td>
   </tr>
 <?php
-  $currency = $order->info['currency'];
-  $currency_value = $order->info['currency_value'];
-  $decimal_places = $currencies->get_decimal_places($currency);
-  foreach ($order->multiship_info as $multiship_id => $multiship_info) {
-    $taxable_check = $db->Execute ("SELECT `value` FROM " . TABLE_ORDERS_MULTISHIP_TOTAL . "
-                                     WHERE orders_id = $oID
-                                       AND orders_multiship_id = $multiship_id
-                                       AND class = 'ot_tax' LIMIT 1");
+$currency = $order->info['currency'];
+$currency_value = $order->info['currency_value'];
+$decimal_places = $currencies->get_decimal_places($currency);
+foreach ($order->multiship_info as $multiship_id => $multiship_info) {
+    $taxable_check = $db->Execute(
+        "SELECT `value` 
+           FROM " . TABLE_ORDERS_MULTISHIP_TOTAL . "
+          WHERE orders_id = $oID
+            AND orders_multiship_id = $multiship_id
+            AND class = 'ot_tax' LIMIT 1"
+    );
     $no_tax_collected = ($taxable_check->EOF || $taxable_check->fields['value'] == 0);
 ?>
   <tr class="dataTableHeadingRow">
@@ -156,43 +161,40 @@ function couponpopupWindow(url) {
       </tr>
 <?php
     foreach ($order->products as $currentProduct) {
-      if ($currentProduct['orders_multiship_id'] != $multiship_id) {
-        continue;
-      }
-      $product_price = $currentProduct['final_price'];
-      $product_tax = ($no_tax_collected) ? 0 : $currentProduct['tax'];
-      $product_qty = $currentProduct['qty'];
-      $product_onetime = $currentProduct['onetime_charges'];
+        if ($currentProduct['orders_multiship_id'] != $multiship_id) {
+            continue;
+        }
+        $product_price = $currentProduct['final_price'];
+        $product_tax = ($no_tax_collected) ? 0 : $currentProduct['tax'];
+        $product_qty = $currentProduct['qty'];
+        $product_onetime = $currentProduct['onetime_charges'];
       
-      if (DISPLAY_PRICE_WITH_TAX_ADMIN == 'true') {
-        $priceIncTax = $currencies->format(zen_round(zen_add_tax($product_price, $product_tax), $decimal_places) * $product_qty, true, $currency, $currency_value);
-      } else {
-        $priceIncTax = $currencies->format(zen_add_tax($product_price, $product_tax) * $product_qty, true, $currency, $currency_value);
-      }
+        if (DISPLAY_PRICE_WITH_TAX_ADMIN == 'true') {
+            $priceIncTax = $currencies->format(zen_round(zen_add_tax($product_price, $product_tax), $decimal_places) * $product_qty, true, $currency, $currency_value);
+        } else {
+            $priceIncTax = $currencies->format(zen_add_tax($product_price, $product_tax) * $product_qty, true, $currency, $currency_value);
+        }
 ?>
       <tr class="dataTableRow">
         <td class="dataTableContent" valign="top" align="right"><?php echo $product_qty; ?>&nbsp;x</td>
         <td class="dataTableContent" valign="top"><?php echo $currentProduct['name']; ?>
 <?php
-      if (array_key_exists('attributes', $currentProduct) && sizeof($currentProduct['attributes']) > 0) {
-        foreach ($currentProduct['attributes'] as $currentAttribute) {
+        if (isset($currentProduct['attributes']) && count($currentProduct['attributes']) > 0) {
+            foreach ($currentProduct['attributes'] as $currentAttribute) {
 ?>
           <br /><span class="nobreak"><small>&nbsp;<i> - <?php echo $currentAttribute['option'] . ': ' . nl2br(zen_output_string_protected($currentAttribute['value'])); ?>
 <?php
-          if ($currentAttribute['price'] != '0') {
-            echo ' (' . $currentAttribute['prefix'] . $currencies->format($currentAttribute['price'] * $product_qty, true, $currency, $currency_value) . ')';
-            
-          }
-          if ($currentAttribute['product_attribute_is_free'] == '1' and $currentProduct['product_is_free'] == '1') {
-            echo TEXT_INFO_ATTRIBUTE_FREE;
-            
-          }
+                if ($currentAttribute['price'] != '0') {
+                    echo ' (' . $currentAttribute['prefix'] . $currencies->format($currentAttribute['price'] * $product_qty, true, $currency, $currency_value) . ')';
+                }
+                if ($currentAttribute['product_attribute_is_free'] == '1' and $currentProduct['product_is_free'] == '1') {
+                    echo TEXT_INFO_ATTRIBUTE_FREE;
+                }
 ?>
           </i></small></span>
 <?php
-        }  // END attributes foreach
-            
-      }  // current product has attributes
+            }  // END attributes foreach
+        }  // current product has attributes
 ?>
         </td>
         <td class="dataTableContent" valign="top"><?php echo $currentProduct['model']; ?></td>
@@ -215,14 +217,14 @@ function couponpopupWindow(url) {
             <td align="right" class="<?php echo str_replace('_', '-', $currentTotal['class']); ?>-Amount"><?php echo $currencies->format($currentTotal['value'], false); ?></td>
           </tr>
 <?php
-        }  // END totals foreach
+    }  // END totals foreach
 ?>
         </table></td>
       </tr>
     </table></td>
   </tr>
 <?php
-  }  // END multiship address foreach
+}  // END multiship address foreach
 ?>
   <tr class="separator-row">
     <td style="border-top: 1px solid #414141;"><div style="width: 100%"><div style="width: 70%; float: left;">&nbsp;</div><div style="width: 29%; float: right;"><strong><?php echo MULTISHIP_GRAND_TOTALS; ?></strong></div></div></td>
@@ -231,19 +233,19 @@ function couponpopupWindow(url) {
   <tr>
     <td align="right"><table border="0" cellspacing="0" cellpadding="2">
 <?php
-  foreach ($order->totals as $currentTotal) {
+foreach ($order->totals as $currentTotal) {
 ?>
       <tr>
         <td align="right" class="<?php echo str_replace('_', '-', $currentTotal['class']); ?>-Text"><?php echo $currentTotal['title']; ?></td>
         <td align="right" class="<?php echo str_replace('_', '-', $currentTotal['class']); ?>-Amount"><?php echo $currencies->format($currentTotal['value'], false); ?></td>
       </tr>
 <?php
-  }  // END totals foreach
+}  // END totals foreach
 ?>
     </table></td>
   </tr>
 <?php
-  if (ORDER_COMMENTS_INVOICE > 0) {
+if (ORDER_COMMENTS_INVOICE > 0) {
 ?>
   <tr>
     <td class="main"><table border="0" cellspacing="0" cellpadding="5">
@@ -254,13 +256,15 @@ function couponpopupWindow(url) {
       </tr>
 <?php
     $limit = (ORDER_COMMENTS_INVOICE == 1) ? ' LIMIT 1' : '';
-    $orders_history = $db->Execute("SELECT orders_status_id, date_added, comments
-                                      FROM " . TABLE_ORDERS_STATUS_HISTORY . "
-                                     WHERE orders_id = $oID AND customer_notified >= 0
-                                     ORDER BY date_added$limit");
+    $orders_history = $db->Execute(
+        "SELECT orders_status_id, date_added, comments
+           FROM " . TABLE_ORDERS_STATUS_HISTORY . "
+          WHERE orders_id = $oID AND customer_notified >= 0
+       ORDER BY date_added$limit"
+    );
 
     if ($orders_history->RecordCount() > 0) {
-      while (!$orders_history->EOF) {
+        while (!$orders_history->EOF) {
 ?>
       <tr>
         <td class="smallText" align="center" valign="top"><?php echo zen_datetime_short($orders_history->fields['date_added']); ?></td>
@@ -268,9 +272,9 @@ function couponpopupWindow(url) {
         <td class="smallText" valign="top"><?php echo ($orders_history->fields['comments'] == '' ? TEXT_NONE : nl2br(zen_db_output($orders_history->fields['comments']))) . '&nbsp;'; ?></td>
       </tr>
 <?php
-        $orders_history->MoveNext();
+            $orders_history->MoveNext();
 
-      }
+        }
     } else {
 ?>
       <tr>
@@ -282,7 +286,7 @@ function couponpopupWindow(url) {
     </table></td>
   </tr>
 <?php
- } // order comments
+} // order comments
 ?>
 </table>
 <!-- body_text_eof //-->

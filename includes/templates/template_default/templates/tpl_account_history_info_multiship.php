@@ -12,9 +12,9 @@
  * @version $Id: tpl_account_history_info_default.php 19103 2011-07-13 18:10:46Z wilt $
  */
 // ---------------------------------------------------------------------------
-// Part of the Multiple Shipping Addresses plugin for Zen Cart v1.5.1 and later
+// Part of the Multiple Shipping Addresses plugin for Zen Cart v1.5.5 and later
 //
-// Copyright (C) 2014, Vinos de Frutas Tropicales (lat9)
+// Copyright (C) 2014-2017, Vinos de Frutas Tropicales (lat9)
 //
 // @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
 // ---------------------------------------------------------------------------
@@ -62,13 +62,13 @@ require($template->get_template_dir('tpl_modules_multiship.php',DIR_WS_TEMPLATE,
  * Used to display any downloads associated with the cutomers account
  */
 if (DOWNLOAD_ENABLED == 'true') {
-  require($template->get_template_dir('tpl_modules_downloads.php',DIR_WS_TEMPLATE, $current_page_base,'templates'). '/tpl_modules_downloads.php');
+    require($template->get_template_dir('tpl_modules_downloads.php',DIR_WS_TEMPLATE, $current_page_base,'templates'). '/tpl_modules_downloads.php');
 }
 
 /**
  * Used to loop thru and display order status information
  */
-if (sizeof($statusArray)) {
+if (count($statusArray)) {
 ?>
 
 <table border="0" width="100%" cellspacing="0" cellpadding="0" id="myAccountOrdersStatus" summary="Table contains the date, order status and any comments regarding the order">
@@ -79,7 +79,7 @@ if (sizeof($statusArray)) {
         <th scope="col" id="myAccountStatusComments"><?php echo TABLE_HEADING_STATUS_COMMENTS; ?></th>
        </tr>
 <?php
-  foreach ($statusArray as $statuses) {
+    foreach ($statusArray as $statuses) {
 ?>
     <tr>
         <td><?php echo zen_date_short($statuses['date_added']); ?></td>
@@ -87,10 +87,11 @@ if (sizeof($statusArray)) {
         <td><?php echo (empty($statuses['comments']) ? '&nbsp;' : nl2br(zen_output_string_protected($statuses['comments']))); ?></td> 
      </tr>
 <?php
-  }
+    }
 ?>
 </table>
-<?php } ?>
-
+<?php 
+} 
+?>
 <hr />
 </div>
