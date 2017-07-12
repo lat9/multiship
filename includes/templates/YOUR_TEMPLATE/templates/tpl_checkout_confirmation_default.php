@@ -67,7 +67,7 @@
 <h2 id="checkoutConfirmDefaultShippingAddress"><?php echo HEADING_DELIVERY_ADDRESS; ?></h2>
 <div class="buttonRow forward"><?php echo '<a href="' . $editShippingButtonLink . '">' . zen_image_button(BUTTON_IMAGE_EDIT_SMALL, BUTTON_EDIT_SMALL_ALT) . '</a>'; ?></div>
 <?php
-//-bof-multiship-1/3
+//-bof-multiship-lat9  *** 1 of 3 ***
     if ($multiple_shipping_active) {
 ?>
 <div id="multishipActive"><?php echo SHIPPING_TO_MULTIPLE_ADDRESSES; ?></div>
@@ -91,7 +91,7 @@
 <?php
       }
     }
-//-eof-multiship-1/3
+//-eof-multiship-lat9  *** 1 of 3 ***
 ?>
 </div>
 <?php
@@ -119,12 +119,12 @@
 <?php    } //endif STOCK_ALLOW_CHECKOUT ?>
 <?php  } //endif flagAnyOutOfStock ?>
 <?php
-//-bof-multiship-2/3
+//-bof-multiship-lat9  *** 2 of 3 ***
 if ($multiple_shipping_active) {
   require($template->get_template_dir('tpl_modules_multiship.php',DIR_WS_TEMPLATE, $current_page_base,'templates'). '/tpl_modules_multiship.php');
         
 } else {
-//-eof-multiship-2/3
+//-eof-multiship-lat9  *** 2 of 3 ***
 ?>
       <table id="cartContentsDisplay">
         <tr class="cartTableHeading">
@@ -184,9 +184,9 @@ if ($multiple_shipping_active) {
   }
 ?>
 <?php
-//-bof-multiship-3/3
+//-bof-multiship-lat9  *** 3 of 3 ***
 }
-//-eof-multiship-3/3
+//-eof-multiship-lat9  *** 3 of 3 ***
 ?>
 
 <?php
