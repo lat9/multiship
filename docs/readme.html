@@ -257,11 +257,9 @@ timeEffect : 750
       <li>Click on <em>Modules-&gt;Payment</em>.  If the <b>Check/Money Order</b> payment method is enabled, note its current settings and then <b>Remove</b> that payment method.  This plugin provides an update to this payment method to identify that it supports multiple ship-to addresses, so it will need to be configured once the files have been copied to your installation!</li>
       <li>For each of the <span class="corefile">core</span> or <span class="template">template-override</span> files distributed by this plugin, merge the plugin's file with any other changes you've made and then copy that file to your store's folder structure:<ol>
         <li><span class="corefile">/includes/modules/payment/moneyorder.php</span>.  This modification allows the payment method to identify that it supports multiple ship-to addresses.</li>
-        <li><span class="corefile">/YOUR_ADMIN/orders.php</span>.  Changes here support the modified order-display described in <a href="#orders">this</a> section of this readme.</li>
-      </ol></li>
-      <li>Template override files:<ol>
         <li><span class="template">/includes/templates/YOUR_TEMPLATE/templates/tpl_address_book_default.php</span></li>
         <li><span class="template">/includes/templates/YOUR_TEMPLATE/templates/tpl_checkout_confirmation_default.php</span></li>
+        <li><span class="corefile">/YOUR_ADMIN/orders.php</span>.  Changes here support the modified order-display described in <a href="#orders">this</a> section of this readme.</li>
       </ol></li>
       <li>Copy the <strong>new</strong> files, introduced by this plugin, to your store's folder structure:<ol>
         <li>/includes/auto_loaders/config.multiship.php</li>
