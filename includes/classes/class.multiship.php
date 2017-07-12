@@ -45,86 +45,73 @@ class multiship extends base
     // 
     function set_multiship ($address_array, $prid_array) 
     {
-    $this->selected = false;
-    $multiship_values = array();
-    $address = false;
-    foreach ($address_array as $i => $currentAddress) {
-      if ($address === false) {
-        $address = $currentAddress;
-      }
-      if ($address != $currentAddress) {
-        $this->selected = true;
-        $address = $currentAddress;
-      }
-      
-      $prid = $prid_array[$i];
-      
-      if (isset($multiship_values[$address])) {
-        $multiship_values[$address]['has_physical'] |= $this->cart_item_is_physical ($prid);
-        
-      } else {
-        $multiship_values[$address] = array();
-        $multiship_values[$address]['has_physical'] = $this->cart_item_is_physical ($prid);
-        
-      }
-      
-      if (isset($multiship_values[$address][$prid])) {
-        $multiship_values[$address][$prid]++;
-         
-      } else {
-        $multiship_values[$address][$prid] = 1;
-        
-      }
-      
-    }  // END foreach inspecting each address/prid pair
-    
-    if ($this->selected) {
-      if ($_SESSION['cart']->get_content_type() == 'mixed') {
-        $num_physical_addresses = 0;
-        foreach ($multiship_values as $address_id => $productInfo) {
-          if ($productInfo['has_physical']) {
-            $num_physical_addresses++;
-            if (!isset($physical_product_address_id)) {
-              $physical_product_address_id = $address_id;
+        $this->selected = false;
+        $multiship_values = array();
+        $address = false;
+        foreach ($address_array as $i => $currentAddress) {
+            if ($address === false) {
+                $address = $currentAddress;
             }
-          } else {
-            $virtual_product_address_id = $address_id;
-          }
-        }
-        if (isset($virtual_product_address_id) && $num_physical_addresses == 1) {
-          $virtual_products = $multiship_values[$virtual_product_address_id];
-          unset ($virtual_products['has_physical'], $multiship_values[$virtual_product_address_id]);
-          if (isset($multiship_values[$_SESSION['customer_default_address_id']])) {
-            $physical_product_address_id = $_SESSION['customer_default_address_id'];
-          }
-          if (sizeof($multiship_values) == 1) {
-            $_SESSION['sendto'] = $physical_product_address_id;
-            $this->selected = false;
-            unset($this->cart);
-            
-          } else {
-            $multiship_values[$physical_product_address_id] = array_merge ($multiship_values[$physical_product_address_id], $virtual_products);
-            $this->cart = $multiship_values;
-            
-          }
+            if ($address != $currentAddress) {
+                $this->selected = true;
+                $address = $currentAddress;
+            }
           
-        } else {
-          $this->cart = $multiship_values;
+            $prid = $prid_array[$i];
           
-        }
-        
-      } else {
-        $this->cart = $multiship_values;
+            if (isset($multiship_values[$address])) {
+                $multiship_values[$address]['has_physical'] |= $this->cart_item_is_physical ($prid);
+            } else {
+                $multiship_values[$address] = array();
+                $multiship_values[$address]['has_physical'] = $this->cart_item_is_physical ($prid);
+            }
+          
+            if (isset($multiship_values[$address][$prid])) {
+                $multiship_values[$address][$prid]++;
+            } else {
+                $multiship_values[$address][$prid] = 1;
+            }
+          
+        }  // END foreach inspecting each address/prid pair
 
-      }
-      
-    } else {
-      unset ($this->cart);
-      
+        if ($this->selected) {
+            if ($_SESSION['cart']->get_content_type() == 'mixed') {
+                $num_physical_addresses = 0;
+                foreach ($multiship_values as $address_id => $productInfo) {
+                    if ($productInfo['has_physical']) {
+                        $num_physical_addresses++;
+                        if (!isset($physical_product_address_id)) {
+                            $physical_product_address_id = $address_id;
+                        }
+                    } else {
+                        $virtual_product_address_id = $address_id;
+                    }
+                }
+                if (isset($virtual_product_address_id) && $num_physical_addresses == 1) {
+                    $virtual_products = $multiship_values[$virtual_product_address_id];
+                    unset ($virtual_products['has_physical'], $multiship_values[$virtual_product_address_id]);
+                    if (isset($multiship_values[$_SESSION['customer_default_address_id']])) {
+                        $physical_product_address_id = $_SESSION['customer_default_address_id'];
+                    }
+                    if (count($multiship_values) == 1) {
+                        $_SESSION['sendto'] = $physical_product_address_id;
+                        $this->selected = false;
+                        unset($this->cart);
+                    } else {
+                        $multiship_values[$physical_product_address_id] = array_merge ($multiship_values[$physical_product_address_id], $virtual_products);
+                        $this->cart = $multiship_values;
+                    }
+                } else {
+                    $this->cart = $multiship_values;
+                }
+            } else {
+                $this->cart = $multiship_values;
+            }
+        } else {
+            unset($this->cart);
+        }
+        return $this->selected;
     }
-    
-    return $this->selected;
-  }
   
     // -----
     // Returns a binary flag that indicates whether or not the customer has selected multiple
