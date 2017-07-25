@@ -21,7 +21,7 @@ timeEffect : 750
 
 <body>
 <div id="top">
-  <h1 id="title">Multiple Ship-To Addresses for Zen Cart v1.5.5 and later &mdash; <span class="smaller">Version 1.2.0</span></h1>
+  <h1 id="title">Multiple Ship-To Addresses for Zen Cart v1.5.5 and later &mdash; <span class="smaller">Version 1.2.1</span></h1>
   <ul id="menu">
     <li><a href="#introduction" class="drop">Introduction</a>
       <div class="dropdown_1column">
@@ -312,6 +312,9 @@ timeEffect : 750
   <h2 id="history" class="inner">Version History</h2>
   <div class="sub-content">
     <ul>
+      <li>v1.2.1, 2017-07-xx<ol>
+        <li>BUGFIX: Correct SQL uninstall script.</li>
+      </ol></li>
       <li>v1.2.0, 2017-07-12<ol>
         <li>CHANGE: Restructure plugin's distribution, dropping support for Zen Cart versions prior to 1.5.5.  <strong>Note:</strong> All files have been &quot;re-factored&quot;.</li>
         <li>BUGFIX: Correct packing-slip page-break operations.</li>
@@ -363,12 +366,20 @@ timeEffect : 750
   <div class="sub-content">
     <p>Legend for the <b>File Changes</b>: Changed &mdash; <span class="added">Added</span> &mdash; <span class="removed">Removed</span></p>
     <table>
-      <tr class="o">
+      <tr class="3">
         <th width="5%" class="c1">Version</th>
         <th width="50%">Files Changed/Added</th>
         <th width="45%">Database Changes</th>
       </tr>
  
+      <tr class="o">
+        <td class="c1">v1.2.1</td>
+        <td><ol>
+          <li>/uninstall_multiship.sql</li>
+        </ol></td>
+        <td class="c3">&mdash;</td>
+      </tr>
+      
       <tr class="3">
         <td class="c1">v1.2.0</td>
         <td><ol>
@@ -389,7 +400,7 @@ timeEffect : 750
         <td class="c3">&mdash;</td>
       </tr>
       
-      <tr class="3">
+      <tr class="o">
         <td class="c1">v1.1.4</td>
         <td><ol>
           <li><span class="corefile">/includes/classes/order.php</span></li>
