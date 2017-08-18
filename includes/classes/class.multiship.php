@@ -386,6 +386,7 @@ class multiship extends base
     public function _createOrderAddAttributes($products_attributes_array) 
     {
         if ($this->selected) {
+            unset($products_attributes_array['orders_products_attributes_id']);
             foreach ($this->orders_multiship_ids as $orders_products_id) {
                 $products_attributes_array['orders_products_id'] = $orders_products_id;
                 zen_db_perform(TABLE_ORDERS_PRODUCTS_ATTRIBUTES, $products_attributes_array);
