@@ -314,6 +314,8 @@ timeEffect : 750
     <ul>
       <li>v1.2.1, 2017-07-xx<ol>
         <li>BUGFIX: Correct SQL uninstall script.</li>
+        <li>BUGFIX: MySQL error when placing a multiple ship-to order that includes attributed products.</li>
+        <li>BUGFIX: Removing a multiple ship-to-order results in a PHP error log.</li>
       </ol></li>
       <li>v1.2.0, 2017-07-12<ol>
         <li>CHANGE: Restructure plugin's distribution, dropping support for Zen Cart versions prior to 1.5.5.  <strong>Note:</strong> All files have been &quot;re-factored&quot;.</li>
@@ -376,6 +378,9 @@ timeEffect : 750
         <td class="c1">v1.2.1</td>
         <td><ol>
           <li>/uninstall_multiship.sql</li>
+          <li>/includes/classes/observers/class.multiship.php</li>
+          <li>/YOUR_ADMIN/includes/classes/class.multiship_admin_observer.php</li>
+          <li>/YOUR_ADMIN/includes/init_includes/init_multiship.php</li>
         </ol></td>
         <td class="c3">&mdash;</td>
       </tr>
