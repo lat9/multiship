@@ -28,7 +28,7 @@ class multiship_observer extends base
         );
     }
   
-    public function update(&$class, $eventID, $p1a) 
+    public function update(&$class, $eventID, $p1a, &$p2, &$p3) 
     {
         global $db;
         $this->eventID = $eventID;
