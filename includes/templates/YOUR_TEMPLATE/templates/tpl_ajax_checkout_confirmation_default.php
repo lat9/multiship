@@ -6,53 +6,53 @@
  * Displays final checkout details, cart, payment and shipping info details.
  *
  * @package templateSystem
- * @copyright Copyright 2003-2016 Zen Cart Development Team
+ * @copyright Copyright 2003-2019 Zen Cart Development Team
  * @copyright Portions Copyright 2003 osCommerce
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
- * @version $Id: picaflor-azul Fri Jan 8 00:33:36 2016 -0500 New in v1.5.5 $
+ * @version $Id: DrByte 2019 Jan 04 Modified in v1.5.6a $
  */
 ?>
 <div class="centerColumn" id="checkoutConfirmDefault">
 
 <h1 id="checkoutConfirmDefaultHeading"><?php echo HEADING_TITLE; ?></h1>
 
-<?php if ($messageStack->size('redemptions') > 0)           echo $messageStack->output('redemptions'); ?>
+<?php if ($messageStack->size('redemptions') > 0) echo $messageStack->output('redemptions'); ?>
 <?php if ($messageStack->size('checkout_confirmation') > 0) echo $messageStack->output('checkout_confirmation'); ?>
-<?php if ($messageStack->size('checkout') > 0)              echo $messageStack->output('checkout'); ?>
+<?php if ($messageStack->size('checkout') > 0) echo $messageStack->output('checkout'); ?>
 
 <div id="checkoutBillto" class="back">
-  <h2 id="checkoutConfirmDefaultBillingAddress"><?php echo HEADING_BILLING_ADDRESS; ?></h2>
+<h2 id="checkoutConfirmDefaultBillingAddress"><?php echo HEADING_BILLING_ADDRESS; ?></h2>
 <?php if (!$flagDisablePaymentAddressChange) { ?>
-  <div class="buttonRow forward"><?php echo '<a href="' . zen_href_link(FILENAME_CHECKOUT_PAYMENT, '', 'SSL') . '">' . zen_image_button(BUTTON_IMAGE_EDIT_SMALL, BUTTON_EDIT_SMALL_ALT) . '</a>'; ?></div>
+<div class="buttonRow forward"><?php echo '<a href="' . zen_href_link(FILENAME_CHECKOUT_PAYMENT, '', 'SSL') . '">' . zen_image_button(BUTTON_IMAGE_EDIT_SMALL, BUTTON_EDIT_SMALL_ALT) . '</a>'; ?></div>
 <?php } ?>
 
-  <address><?php echo zen_address_format($order->billing['format_id'], $order->billing, 1, ' ', '<br />'); ?></address>
+<address><?php echo zen_address_format($order->billing['format_id'], $order->billing, 1, ' ', '<br />'); ?></address>
 
 <?php
-  $class = &$_SESSION['payment'];
+  $class =& $_SESSION['payment'];
 ?>
 
-  <h3 id="checkoutConfirmDefaultPayment"><?php echo HEADING_PAYMENT_METHOD; ?></h3>
-  <h4 id="checkoutConfirmDefaultPaymentTitle"><?php echo $GLOBALS[$class]->title; ?></h4>
+<h3 id="checkoutConfirmDefaultPayment"><?php echo HEADING_PAYMENT_METHOD; ?></h3>
+<h4 id="checkoutConfirmDefaultPaymentTitle"><?php echo $GLOBALS[$class]->title; ?></h4>
 
 <?php
   if (is_array($payment_modules->modules)) {
     if ($confirmation = $payment_modules->confirmation()) {
 ?>
-  <div class="important"><?php echo $confirmation['title']; ?></div>
+<div class="important"><?php echo $confirmation['title']; ?></div>
 <?php
     }
 ?>
-  <div class="important">
+<div class="important">
 <?php
       for ($i=0, $n=sizeof($confirmation['fields']); $i<$n; $i++) {
 ?>
-    <div class="back"><?php echo $confirmation['fields'][$i]['title']; ?></div>
-    <div ><?php echo $confirmation['fields'][$i]['field']; ?></div>
+<div class="back"><?php echo $confirmation['fields'][$i]['title']; ?></div>
+<div ><?php echo $confirmation['fields'][$i]['field']; ?></div>
 <?php
-       }
+     }
 ?>
-  </div>
+      </div>
 <?php
   }
 ?>
@@ -63,38 +63,39 @@
   if ($_SESSION['sendto'] != false) {
 ?>
 <div id="checkoutShipto" class="forward">
-  <h2 id="checkoutConfirmDefaultShippingAddress"><?php echo HEADING_DELIVERY_ADDRESS; ?></h2>
-
+<h2 id="checkoutConfirmDefaultShippingAddress"><?php echo HEADING_DELIVERY_ADDRESS; ?></h2>
 <?php
 //-bof-multiship-lat9  *** 1 of 3 ***
-    if (!empty($multiple_shipping_active)) {
-        require $template->get_template_dir('tpl_checkout_confirmation_multiship_address.php', DIR_WS_TEMPLATE, $current_page_base, 'templates'). '/tpl_checkout_confirmation_multiship_address.php';
-    } else {
+  if (!empty($multiple_shipping_active)) {
+      require $template->get_template_dir('tpl_checkout_confirmation_multiship_address.php', DIR_WS_TEMPLATE, $current_page_base, 'templates'). '/tpl_checkout_confirmation_multiship_address.php';
+  } else {
 ?>
-  <div class="buttonRow forward"><?php echo '<a href="' . $editShippingButtonLink . '">' . zen_image_button(BUTTON_IMAGE_EDIT_SMALL, BUTTON_EDIT_SMALL_ALT) . '</a>'; ?></div>
-  <address><?php echo zen_address_format($order->delivery['format_id'], $order->delivery, 1, ' ', '<br />'); ?></address>
+<div class="buttonRow forward"><?php echo '<a href="' . $editShippingButtonLink . '">' . zen_image_button(BUTTON_IMAGE_EDIT_SMALL, BUTTON_EDIT_SMALL_ALT) . '</a>'; ?></div>
+
+<address><?php echo zen_address_format($order->delivery['format_id'], $order->delivery, 1, ' ', '<br />'); ?></address>
+
 <?php
     if ($order->info['shipping_method']) {
 ?>
-  <h3 id="checkoutConfirmDefaultShipment"><?php echo HEADING_SHIPPING_METHOD; ?></h3>
-  <h4 id="checkoutConfirmDefaultShipmentTitle"><?php echo $order->info['shipping_method']; ?></h4>
+<h3 id="checkoutConfirmDefaultShipment"><?php echo HEADING_SHIPPING_METHOD; ?></h3>
+<h4 id="checkoutConfirmDefaultShipmentTitle"><?php echo $order->info['shipping_method']; ?></h4>
 
 <?php
-      }
     }
+  }
 //-eof-multiship-lat9  *** 1 of 3 ***
 ?>
-  </div>
+</div>
 <?php
   }
 ?>
-  <br class="clearBoth" />
+<br class="clearBoth" />
 
 <div class="group" id="order-comments">
 
-  <h2 id="checkoutConfirmDefaultHeadingComments"><?php echo HEADING_ORDER_COMMENTS; ?></h2>
-  <div class="buttonRow forward"><?php echo  '<a href="' . zen_href_link(FILENAME_CHECKOUT_PAYMENT, '', 'SSL') . '">' . zen_image_button(BUTTON_IMAGE_EDIT_SMALL, BUTTON_EDIT_SMALL_ALT) . '</a>'; ?></div>
-  <div><?php echo (empty($order->info['comments']) ? NO_COMMENTS_TEXT : nl2br(zen_output_string_protected($order->info['comments'])) . zen_draw_hidden_field('comments', $order->info['comments'])); ?></div>
+<h2 id="checkoutConfirmDefaultHeadingComments"><?php echo HEADING_ORDER_COMMENTS; ?></h2>
+<div class="buttonRow forward"><?php echo  '<a href="' . zen_href_link(FILENAME_CHECKOUT_PAYMENT, '', 'SSL') . '">' . zen_image_button(BUTTON_IMAGE_EDIT_SMALL, BUTTON_EDIT_SMALL_ALT) . '</a>'; ?></div>
+<div><?php echo (empty($order->info['comments']) ? NO_COMMENTS_TEXT : nl2br(zen_output_string_protected($order->info['comments'])) . zen_draw_hidden_field('comments', $order->info['comments'])); ?></div>
 
 </div>
 
@@ -117,10 +118,11 @@ if ($multiple_shipping_active) {
 } else {
 //-eof-multiship-lat9  *** 2 of 3 ***
 ?>
+
       <table id="cartContentsDisplay">
         <tr class="cartTableHeading">
-          <th scope="col" id="ccQuantityHeading"><?php echo TABLE_HEADING_QUANTITY; ?></th>
-          <th scope="col" id="ccProductsHeading"><?php echo TABLE_HEADING_PRODUCTS; ?></th>
+        <th scope="col" id="ccQuantityHeading"><?php echo TABLE_HEADING_QUANTITY; ?></th>
+        <th scope="col" id="ccProductsHeading"><?php echo TABLE_HEADING_PRODUCTS; ?></th>
 <?php
   // If there are tax groups, display the tax columns for price breakdown
   if (sizeof($order->info['tax_groups']) > 1) {
@@ -149,7 +151,7 @@ if ($multiple_shipping_active) {
       echo '</ul>';
     } // endif attribute-info
 ?>
-          </td>
+        </td>
 
 <?php // display tax info if exists ?>
 <?php if (sizeof($order->info['tax_groups']) > 1)  { ?>
@@ -163,7 +165,7 @@ if ($multiple_shipping_active) {
         </td>
       </tr>
 <?php  }  // end for loopthru all products ?>
-    </table>
+      </table>
 
 
 <?php
@@ -179,16 +181,63 @@ if ($multiple_shipping_active) {
 }
 //-eof-multiship-lat9  *** 3 of 3 ***
 ?>
-
 <?php
   echo zen_draw_form('checkout_confirmation', $form_action_url, 'post', 'id="checkout_confirmation" onsubmit="submitonce();"');
+?>
+<div id="processButtonHolder"></div>
+<?php
+   if (is_array($payment_modules->modules)) {
+     $processButtonOptions = $payment_modules->process_button_ajax();
+     if (isset($processButtonOptions['ccFields']) && count($processButtonOptions['ccFields'])> 0 ) {
+       foreach  ($processButtonOptions['ccFields'] as $newField => $oldField)
+       {
+?>
+<input type="hidden" name="<?php echo $newField; ?>" value="">
+<?php if (!is_array($oldField)) { ?>
+<script>
+$(document).ready(function () {
+    $(":input[name='<?php echo $newField; ?>']").val($(":input[name='<?php echo $oldField; ?>']").val());
+});
+</script>
+<?php } else { ?>
 
-  if (is_array($payment_modules->modules)) {
-    echo $payment_modules->process_button();
-  }
+<script>
+    $(document).ready(function () {
+     var oldField = window['<?php echo $oldField['name']; ?>'](<?php echo $oldField['args']; ?>);
+     $(":input[name='<?php echo $newField; ?>']").val(oldField);
+    });
+</script>
+<?php } ?>
+<?php
+       }
+     }
+     if (isset($processButtonOptions['extraFields']) && count($processButtonOptions['extraFields'])> 0 ) {
+       foreach  ($processButtonOptions['extraFields'] as $fieldName => $fieldValue)
+       {
+?>
+<input type="hidden" name="<?php echo $fieldName; ?>"  value="<?php echo $fieldValue; ?>">
+<?php
+       }
+     }
+   }
+?>
+<?php
+// Add shipping-module "extra" variables so they get transported to the checkout_process page.
+if (isset ($_SESSION['shipping']['extras']) && is_array ($_SESSION['shipping']['extras'])) {
+    list ($module, $method) = explode ('_', $_SESSION['shipping']['id']);
+    foreach ($_SESSION['shipping']['extras'] as $varname => $value) {
+        echo zen_draw_hidden_field ($module . '_' . $varname, $value) . PHP_EOL;
+    }
+}
 ?>
 <div class="buttonRow forward confirm-order"><?php echo zen_image_submit(BUTTON_IMAGE_CONFIRM_ORDER, BUTTON_CONFIRM_ORDER_ALT, 'name="btn_submit" id="btn_submit"') ;?></div>
 </form>
 <div class="buttonRow back"><?php echo TITLE_CONTINUE_CHECKOUT_PROCEDURE . '<br />' . TEXT_CONTINUE_CHECKOUT_PROCEDURE; ?></div>
 
 </div>
+<script>
+    $(document).ready(function () {
+        // $(window).scrollTop(0);
+        $("html, body").animate({ scrollTop: 0 }, "fast");
+    });
+</script>

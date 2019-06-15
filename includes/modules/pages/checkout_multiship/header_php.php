@@ -1,12 +1,9 @@
 <?php
-// ---------------------------------------------------------------------------
+// -----
 // Part of the Multiple Shipping Addresses plugin for Zen Cart v1.5.5 and later
-//
-// Copyright (C) 2014-2017, Vinos de Frutas Tropicales (lat9)
-//
+// Copyright (C) 2014-2019, Vinos de Frutas Tropicales (lat9)
 // @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
-// ---------------------------------------------------------------------------
-
+//
 $zco_notifier->notify('NOTIFY_HEADER_START_CHECKOUT_MULTISHIP', $_SESSION, $_POST);
 require DIR_WS_MODULES . zen_get_module_directory('require_languages.php');
 
@@ -19,12 +16,12 @@ $cart_contents = $_SESSION['cart']->count_contents();
 if ($cart_contents <= 0) {
     zen_redirect(zen_href_link(FILENAME_SHOPPING_CART));
 } elseif ($cart_contents == 1) {
-    zen_redirect(zen_href_link(FILENAME_CHECKOUT_CONFIRMATION));
+    zen_redirect(zen_href_link(FILENAME_CHECKOUT_SHIPPING));
 }
 
 // if the customer is not logged on, redirect them to the login page
-if (!$_SESSION['customer_id']) {
-    $_SESSION['navigation']->set_snapshot(array('mode' => 'SSL', 'page' => FILENAME_CHECKOUT_PAYMENT));
+if (empty($_SESSION['customer_id'])) {
+    $_SESSION['navigation']->set_snapshot(array('mode' => 'SSL', 'page' => FILENAME_CHECKOUT_MULTISHIP));
     zen_redirect(zen_href_link(FILENAME_LOGIN, '', 'SSL'));
 } else {
     // validate customer
@@ -46,11 +43,11 @@ if (isset($_SESSION['cart']->cartID) && $_SESSION['cartID']) {
 
 // if no shipping method has been selected, redirect the customer to the shipping method selection page
 if (!isset($_SESSION['shipping'])) {
-    $zco_notifier->notify ('CHECKOUT_MULTISHIP_SHIPPING_NOT_SELECTED');
+    $zco_notifier->notify('CHECKOUT_MULTISHIP_SHIPPING_NOT_SELECTED');
     zen_redirect(zen_href_link(FILENAME_CHECKOUT_SHIPPING, '', 'SSL'));
 }
 if (isset($_SESSION['shipping']['id']) && $_SESSION['shipping']['id'] == 'free_free' && defined('MODULE_ORDER_TOTAL_SHIPPING_FREE_SHIPPING_OVER') && $_SESSION['cart']->get_content_type() != 'virtual' && $_SESSION['cart']->show_total() < MODULE_ORDER_TOTAL_SHIPPING_FREE_SHIPPING_OVER) {
-    $zco_notifier->notify ('CHECKOUT_MULTISHIP_FREE_SHIPPING_MISMATCH');
+    $zco_notifier->notify('CHECKOUT_MULTISHIP_FREE_SHIPPING_MISMATCH');
     zen_redirect(zen_href_link(FILENAME_CHECKOUT_SHIPPING, '', 'SSL'));
 }
 
@@ -68,7 +65,7 @@ if (isset($_POST['securityToken'])) {
     // If the update button was pressed, then one or more of the item quantities might have changed.
     //
     if (isset($_POST['update_x'])) {
-        for ($i = 0, $n = sizeof($_POST['qty']); $i < $n; $i++) {
+        for ($i = 0, $n = count($_POST['qty']); $i < $n; $i++) {
             $qty = (int)$_POST['qty'][$i];
             if ($qty != 1) {
                 $prid = $_POST['prid'][$i];
@@ -86,7 +83,7 @@ if (isset($_POST['securityToken'])) {
                 $_SESSION['cart']->update_quantity($prid, $current_qty-1, $attributes);
             
                 if ($qty <= 0) {
-                    unset ($_POST['prid'][$i], $_POST['qty'][$i], $_POST['address'][$i]);
+                    unset($_POST['prid'][$i], $_POST['qty'][$i], $_POST['address'][$i]);
                 } else {
                     $sendto = $_POST['address'][$i];
                     for ($j = 0, $m = $qty - 1; $j < $m; $j++) {
@@ -101,20 +98,25 @@ if (isset($_POST['securityToken'])) {
     // -----
     // Record the customer's multiship selection in the session variable.
     //
-    $_SESSION['multiship']->set_multiship ($_POST['address'], $_POST['prid']);
+    $_SESSION['multiship']->set_multiship($_POST['address'], $_POST['prid']);
 }
 
-$multiship_selected = $_SESSION['multiship']->is_selected();
+$multiship_selected = $_SESSION['multiship']->isSelected();
 
 // -----
 // Build up address list input to create product-by-product drop-down address selection.
 //
-$addresses = $db->Execute("SELECT address_book_id FROM " . TABLE_ADDRESS_BOOK . " WHERE customers_id = " . (int)$_SESSION['customer_id']);
+$addresses = $db->Execute(
+    "SELECT address_book_id 
+       FROM " . TABLE_ADDRESS_BOOK . " 
+      WHERE customers_id = " . (int)$_SESSION['customer_id'] . "
+      ORDER BY address_book_id ASC"
+);
 if ($addresses->EOF) {
     zen_redirect(zen_href_link(FILENAME_ADDRESS_BOOK, '', 'SSL'));
 }
 $multishipAddresses = array();
-while(!$addresses->EOF) {
+while (!$addresses->EOF) {
     $multishipAddresses[] = array( 
         'id' => $addresses->fields['address_book_id'],
         'text' => str_replace("\n", ', ', zen_address_label($_SESSION['customer_id'], $addresses->fields['address_book_id']))
@@ -128,7 +130,7 @@ while(!$addresses->EOF) {
 //
 $products = $_SESSION['cart']->get_products();
 $products_onetime_charges = false;
-for ($i = 0, $productsArray = array(), $n = sizeof($products); $i < $n; $i++) {
+for ($i = 0, $productsArray = array(), $n = count($products); $i < $n; $i++) {
     $currentProduct = array( 
         'id' => $products[$i]['id'],
         'name' => $products[$i]['name'],
@@ -173,7 +175,7 @@ for ($i = 0, $productsArray = array(), $n = sizeof($products); $i < $n; $i++) {
                 'name' => $attributes_values->fields['products_options_name'], 
                 'value' => $attr_value
             );
-            $zco_notifier->notify ("CHECKOUT_MULTISHIP_ATTRIBUTES ($option => $value):", $attributes, $attributes_values, $currentProduct, $attr_value);
+            $zco_notifier->notify("CHECKOUT_MULTISHIP_ATTRIBUTES ($option => $value):", $attributes, $attributes_values, $currentProduct, $attr_value);
       
         }
     }
@@ -187,10 +189,10 @@ for ($i = 0, $productsArray = array(), $n = sizeof($products); $i < $n; $i++) {
 // product could have been either added or removed during prior processing.
 //
 $multiship_details = $_SESSION['multiship']->get_cart();
-for ($i = 0, $n = sizeof($productsArray); $i < $n; $i++) {
+for ($i = 0, $n = count($productsArray); $i < $n; $i++) {
     $productsArray[$i]['sendto'] = $_SESSION['sendto'];
     $prid = $productsArray[$i]['id'];
-    $productsArray[$i]['is_physical'] = $_SESSION['multiship']->cart_item_is_physical($prid);
+    $productsArray[$i]['is_physical'] = $_SESSION['multiship']->cartItemIsPhysical($prid);
     foreach ($multiship_details as $address_id => &$currentProducts) {
         if (isset($currentProducts[$prid]) && $currentProducts[$prid] > 0) {
             $productsArray[$i]['sendto'] = $address_id;
@@ -198,13 +200,13 @@ for ($i = 0, $n = sizeof($productsArray); $i < $n; $i++) {
             break;
         }
     }
-    unset ($currentProducts);
+    unset($currentProducts);
 }
 
 $breadcrumb->add(NAVBAR_TITLE_1, zen_href_link(FILENAME_CHECKOUT_CONFIRMATION, '', 'SSL'));
 $breadcrumb->add(NAVBAR_TITLE_2);
 
-$flag_disable_right = $flag_disable_left = true;
+//$flag_disable_right = $flag_disable_left = true;
 
 // This should be last line of the script:
 $zco_notifier->notify('NOTIFY_HEADER_END_CHECKOUT_MULTISHIP');

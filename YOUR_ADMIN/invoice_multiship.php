@@ -8,11 +8,9 @@
 */
 // -----
 // Modified by lat9 (vinosdefrutastropicales.com) as part of the multiple ship-to addresses plugin
-// Copyright 2014-2017, Vinos de Frutas Tropicales
+// Copyright 2014-2019, Vinos de Frutas Tropicales
 //
 require 'includes/application_top.php' ;
-
-include DIR_WS_LANGUAGES . $_SESSION['language'] . '/orders_multiship.php';
 
 require DIR_WS_CLASSES . 'currencies.php';
 $currencies = new currencies();
