@@ -1,18 +1,16 @@
 <?php
-// ---------------------------------------------------------------------------
-// Part of the Multiple Shipping Addresses plugin for Zen Cart v1.5.6 and later
-//
-// Copyright (C) 2014-2017, Vinos de Frutas Tropicales (lat9)
-//
+// -----
+// Part of the Multiple Shipping Addresses plugin for Zen Cart v1.5.5 and later
+// Copyright (C) 2014-2019, Vinos de Frutas Tropicales (lat9)
 // @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
-// ---------------------------------------------------------------------------
+//
 
 if (!defined('IS_ADMIN_FLAG')) {
     die('Illegal Access');
 }
 
-define('MULTISHIP_CURRENT_VERSION', '1.2.1-beta1');
-define('MULTISHIP_UPDATE_DATE', '2017-08-18');
+define('MULTISHIP_CURRENT_VERSION', '2.0.0-beta1');
+define('MULTISHIP_UPDATE_DATE', '2019-06-14');
 
 $multiship_update_date = MULTISHIP_UPDATE_DATE . ' 00:00:00';
 
