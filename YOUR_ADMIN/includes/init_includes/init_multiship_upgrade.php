@@ -22,11 +22,11 @@ if (!defined('IS_ADMIN_FLAG')) {
 //
 switch (true) {
     // -----
-    // v3.0.0:
+    // v2.0.0:
     // - The plugin now has its own configuration group.
     // - Add setting to identify compatible payment methods.
     //
-    case version_compare(MODULE_MULTISHIP_VERSION, '3.0.0', '<'):
+    case version_compare(MODULE_MULTISHIP_VERSION, '2.0.0', '<'):
         // -----
         // Modify the pre-existing settings' titles and descriptions, moving them to their own
         // configuration group (were previously 'hidden' in Modules).

@@ -21,6 +21,9 @@ class multiship_observer extends base
                 //-Issued by /includes/classes/order.php
                 'NOTIFY_ORDER_AFTER_QUERY',
                 
+                //-Issued by /admin/includes/classes/order.php (pre-zc156) and on admin for zc156 (albeit deprecated)
+                'ORDER_QUERY_ADMIN_COMPLETE',
+                
                 //-Issued by /admin/orders.php
                 'NOTIFY_ADMIN_ORDERS_MENU_LEGEND',
                 'NOTIFY_ADMIN_ORDERS_SHOW_ORDER_DIFFERENCE',
@@ -38,13 +41,35 @@ class multiship_observer extends base
     {
         global $db;
         $this->eventID = $eventID;
+        $order_query_admin = false;
 
         switch ($eventID) {
-            case 'NOTIFY_ORDER_AFTER_QUERY':
-                if (empty($p2)) {
-                    $this->logError('Invalid notification parameters: ' . var_export($p2, true));
+            // -----
+            // Enabling zc155/zc156 interoperability, the zc155 admin order-class issues **only** this
+            // event while the zc156 version brings in the storefront version of the class which issues
+            // this event (deprecated) _after_ issuing the event that follows.
+            //
+            // If the NOTIFY_ORDER_AFTER_QUERY event has been processed, there's nothing to do here.  If
+            // it hasn't (i.e. zc155), then this clause sets a flag to let the zc156 event "know" that
+            // the orders_id has been gathered.
+            //
+            case 'ORDER_QUERY_ADMIN_COMPLETE':
+                if (isset($this->processed_order)) {
+                    break;
                 }
-                $orders_id = (int)$p2;
+                $order_query_admin = true;
+                if (empty($p1['orders_id'])) {
+                    $this->logError('Invalid notification parameters: ' . json_encode($p1));
+                }
+                $orders_id = (int)$p1['orders_id'];
+            case 'NOTIFY_ORDER_AFTER_QUERY':            //-Fall through from above processing
+                if (!$order_query_admin) {
+                    if (empty($p2)) {
+                        $this->logError('Invalid notification parameters: ' . json_encode($p2));
+                    }
+                    $orders_id = (int)$p2;
+                }
+                $this->processed_order = true;
         
                 $multiship_orders = $db->Execute(
                     "SELECT orders_multiship_id, delivery_name as name, delivery_company as company, delivery_street_address as street_address, delivery_suburb as suburb, 

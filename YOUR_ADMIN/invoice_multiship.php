@@ -17,7 +17,14 @@ $currencies = new currencies();
 
 $oID = (int)zen_db_prepare_input($_GET['oID']);
 
-include DIR_WS_CLASSES . 'order.php';
+// -----
+// Bring in storefront version of the class for zc155 (already baked-in for zc156 and later).
+//
+if (strpos(PROJECT_VERSION_MINOR, '5.5') === 0) {
+    require DIR_FS_CATALOG . DIR_WS_CLASSES . 'order.php';
+} else {
+    require DIR_WS_CLASSES . 'order.php';
+}
 $order = new order($oID);
 
 $orders_status_array = array();
