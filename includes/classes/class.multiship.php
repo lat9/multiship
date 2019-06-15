@@ -620,6 +620,9 @@ class multiship extends base
             $saved_cart_contents = $_SESSION['cart']->contents;
             $saved_sendto = $_SESSION['sendto'];
             $saved_shipping_cost = $_SESSION['shipping']['cost'];
+            global $total_weight, $total_count;
+            $saved_total_weight = $total_weight;
+            $saved_total_count = $total_count;
             
             // -----
             // Ditto with the current order.  Save the current instance and declare that variable
@@ -739,6 +742,8 @@ class multiship extends base
             $_SESSION['sendto'] = $saved_sendto;
             $_SESSION['shipping']['cost'] = $saved_shipping_cost;
             $order = $saved_order;
+            $total_weight = $saved_total_weight;
+            $total_count = $saved_total_count;
         }  // Customer has chosen multiple ship-to addresses
     }
   
