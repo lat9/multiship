@@ -602,14 +602,16 @@ class multiship extends base
             $shipping_error = false;
             if (!isset($_SESSION['shipping']['id'])) {
                 $shipping_error = true;
+                $session_shipping = false;
             } else {
                 $shipping_info = explode ('_', $_SESSION['shipping']['id']);
                 if (count($shipping_info) != 2) {
                     $shipping_error = true;
+                    $session_shipping = $_SESSION['shipping'];
                 }
             }
             if ($shipping_error) {
-                $this->debugLog('checkoutInitialization: Redirecting to checkout_shipping, invalid shipping method.' . PHP_EOL . json_encode($_SESSION['shipping']));
+                $this->debugLog('checkoutInitialization: Returning to checkout_shipping, invalid shipping method.' . PHP_EOL . json_encode($session_shipping));
                 return;
             }
           
@@ -665,13 +667,14 @@ class multiship extends base
                 $_SESSION['sendto'] = $address_id;
                 $total_weight = $_SESSION['cart']->show_weight();
                 $total_count = $_SESSION['cart']->count_contents();
+                $_SESSION['shipping']['cost'] = 0;
             
                 // -----
                 // Let the order class do the "heavy lifting" in the pulling in of the product list and delivery address 
                 // information for the current shipping address.
                 //
                 $order = new order;
-                $this->debugLog(PHP_EOL . "Initialize step 1 ($address_id), order-info: " . json_encode($order->info));
+                $this->debugLog(PHP_EOL . "Initialize step 1 ($address_id), total_weight = $total_weight, total_count = $total_count, order-info: " . json_encode($order->info));
                 $multiship_info[$address_id]['products'] = $order->products;
                 $multiship_info[$address_id]['delivery'] = $order->delivery;
                 $multiship_info[$address_id]['content_type'] = $order->content_type;
@@ -690,6 +693,8 @@ class multiship extends base
                     $_SESSION['cart']->contents = $saved_cart_contents;
                     $_SESSION['sendto'] = $saved_sendto;
                     $_SESSION['shipping']['cost'] = $saved_shipping_cost;
+                    $total_weight = $saved_total_weight;
+                    $total_count = $saved_total_count;
                     zen_redirect(zen_href_link(FILENAME_CHECKOUT_MULTISHIP, '', 'SSL'));
                 }
                 
@@ -860,7 +865,7 @@ class multiship extends base
     protected function debugLog($message, $include_date = false) 
     {
         if ($this->debug) {
-            $date = ($include_date === false) ? '' : date('Y-m-d H:i:s: ');
+            $date = ($include_date === false) ? '' : (PHP_EOL . date('Y-m-d H:i:s: '));
             error_log("$date$message" . PHP_EOL, 3, $this->logfile);
         }
     }
