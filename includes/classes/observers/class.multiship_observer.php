@@ -4,7 +4,6 @@
 // Copyright (C) 2014-2019, Vinos de Frutas Tropicales (lat9)
 // @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
 //
-
 class multiship_observer extends base 
 {
     public function __construct() 
@@ -27,8 +26,9 @@ class multiship_observer extends base
                     'NOTIFIER_CART_ADD_CART_START',
                     
                     /* page header_php.php's */ 
-                    'NOTIFY_HEADER_START_CHECKOUT_CONFIRMATION', 
                     'NOTIFY_HEADER_END_CHECKOUT_PROCESS',
+                    'NOTIFY_HEADER_START_CHECKOUT_SHIPPING',
+                    'NOTIFY_HEADER_START_CHECKOUT_PAYMENT',
                     
                     /* /includes/modules[/YOUR_TEMPLATE]/checkout_process.php */
                     'NOTIFY_CHECKOUT_PROCESS_AFTER_ORDER_TOTALS_PROCESS',
@@ -40,6 +40,31 @@ class multiship_observer extends base
     public function update(&$class, $eventID, $p1, &$p2, &$p3, &$p4, &$p5, &$p6, &$p7, &$p8, &$p9) 
     {
         switch ($eventID) {
+            // -----
+            // These two notifications work in concert with the jscript_checkout_shipping_multiship.php script's
+            // processing.  If Multi-Ship is enabled, that jQuery processing adds an additional field to the to-be-posted
+            // form and submits the form on any change of the shipping selection. If the checkout_shipping page's 
+            // header finds the selection OK, it records the selection in the session and re-directs to checkout_payment.
+            //
+            // If, on entry to the checkout_shipping page, the jQuery-added variable is set, a session
+            // variable is set to be interrogated on the checkout_payment page.  If that variable is set on
+            // entry to checkout_payment, this processing redirects back to checkout_shipping to allow the
+            // Multiple Ship-to addresses' processing to perform any shipping-cost recalculations based on that
+            // shipping-selection change.
+            //
+            case 'NOTIFY_HEADER_START_CHECKOUT_SHIPPING':
+                unset($_SESSION['multiship_shipping_changed']);
+                if (!empty($_POST['multiship_changed'])) {
+                    $_SESSION['multiship_shipping_changed'] = true;
+                }
+                break;
+            case 'NOTIFY_HEADER_START_CHECKOUT_PAYMENT':
+                if (isset($_SESSION['multiship_shipping_changed'])) {
+                    unset($_SESSION['multiship_shipping_changed']);
+                    zen_redirect(zen_href_link(FILENAME_CHECKOUT_SHIPPING, '', 'SSL'));
+                }
+                break;
+                
             // -----
             // Issued by /includes/classes/order.php just after writing the overall order's information to the orders table.
             //
@@ -84,10 +109,6 @@ class multiship_observer extends base
             //
             case 'NOTIFY_ORDER_DURING_CREATE_ADDED_ATTRIBUTE_LINE_ITEM':
                 $_SESSION['multiship']->createOrderAddAttributes($p1);
-                break;
-                
-            case 'NOTIFY_HEADER_START_CHECKOUT_CONFIRMATION':
-                $_SESSION['multiship']->_fixCartID();
                 break;
 
             case 'NOTIFY_HEADER_END_CHECKOUT_PROCESS':

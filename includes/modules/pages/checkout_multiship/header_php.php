@@ -98,7 +98,7 @@ if (isset($_POST['securityToken'])) {
     // -----
     // Record the customer's multiship selection in the session variable.
     //
-    $_SESSION['multiship']->set_multiship($_POST['address'], $_POST['prid']);
+    $_SESSION['multiship']->setMultiship($_POST['address'], $_POST['prid']);
 }
 
 $multiship_selected = $_SESSION['multiship']->isSelected();

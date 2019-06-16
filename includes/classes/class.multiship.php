@@ -65,7 +65,7 @@ class multiship extends base
     // The function returns a binary flag that indicates whether or not multiple shipping addresses have
     // been selected.
     // 
-    public function set_multiship($address_array, $prid_array) 
+    public function setMultiship($address_array, $prid_array) 
     {
         $this->selected = false;
         $multiship_values = array();
@@ -132,6 +132,7 @@ class multiship extends base
                 }
             }
         }
+        $this->shipping_method_id = ($this->selected) ? $_SESSION['shipping']['id'] : '';
         return $this->selected;
     }
   
@@ -187,7 +188,38 @@ class multiship extends base
     {
         return (isset($this->shipping_method)) ? $this->shipping_method : '';
     }
-  
+    
+    // -----
+    // Returns the 'id' (e.g. 'usps_xxxx' or 'flat_flat') of the shipping-method that provided the shipping
+    // cost for the current multiship selections.
+    //
+    public function getShippingId()
+    {
+        if (empty($this->shipping_method_id)) {
+            trigger_error("Sequencing error, shipping_method_id is empty.", E_USER_ERROR);
+            exit();
+        }
+        $this->debugLog("getShippingId, returning {$this->shipping_method_id}.");
+        return $this->shipping_method_id;
+    }
+    
+    // -----
+    // Returns the summation of the shipping costs for the current multiship selections.
+    //
+    public function getMultiShipShippingCost()
+    {
+        if (empty($this->details)) {
+            trigger_error("Sequencing error, details is empty.", E_USER_ERROR);
+            exit();
+        }
+        $shipping_cost = 0;
+        foreach ($this->details as $addr_id => $ms_info) {
+            $shipping_cost += $ms_info['info']['shipping_cost'];
+        }
+        $this->debugLog("getMultiShipShippingCost, returning $shipping_cost.");
+        return $shipping_cost;
+    }
+    
     // -----
     // Returns the current multiship "cart" contents.
     //
@@ -551,19 +583,6 @@ class multiship extends base
     }
   
     // -----
-    // Called by the multiship_observer class upon receipt of NOTIFY_HEADER_START_CHECKOUT_CONFIRMATION.
-    // If the order currently contains multiple ship-to addresses, then the quantities might have changed
-    // and, thus, the shopping cart's cartID value.  Need the cart's value to match that in the session
-    // or the customer will be redirected back to the checkout_shipping page.
-    //
-    public function _fixCartID() 
-    {
-        if ($this->selected) {
-            $_SESSION['cartID'] = $_SESSION['cart']->cartID;
-        }
-    }
-  
-    // -----
     // Called at the end of the checkout-shipping page by an additional header module,
     // allows us to see if multiple ship-to addresses should be offered (or have been
     // previously selected) for the current order.
@@ -614,6 +633,7 @@ class multiship extends base
                 $this->debugLog('checkoutInitialization: Returning to checkout_shipping, invalid shipping method.' . PHP_EOL . json_encode($session_shipping));
                 return;
             }
+            $this->shipping_method_id = $_SESSION['shipping']['id'];
           
             // -----
             // Save the current contents of both the shopping cart and the default sendto-address.  These values will be
@@ -674,7 +694,7 @@ class multiship extends base
                 // information for the current shipping address.
                 //
                 $order = new order;
-                $this->debugLog(PHP_EOL . "Initialize step 1 ($address_id), total_weight = $total_weight, total_count = $total_count, order-info: " . json_encode($order->info));
+                $this->debugLog("Initialize step 1 ($address_id), total_weight = $total_weight, total_count = $total_count, order-info: " . json_encode($order->info), true);
                 $multiship_info[$address_id]['products'] = $order->products;
                 $multiship_info[$address_id]['delivery'] = $order->delivery;
                 $multiship_info[$address_id]['content_type'] = $order->content_type;
@@ -686,7 +706,7 @@ class multiship extends base
                 require_once DIR_WS_CLASSES . 'http_client.php'; 
             
                 $shipping_quote = $GLOBALS['shipping_modules']->quote($shipping_info[1], $shipping_info[0]);
-                $this->debugLog("Quote received for $address_id", array('weight' => $total_weight, 'info' => $shipping_info, 'quote' => $shipping_quote));
+                $this->debugLog("Quote received for $address_id: " . json_encode($shipping_info) . ', quote: ' . json_encode($shipping_quote));
                 if (!is_array($shipping_quote) || count($shipping_quote) == 0) {
                     $this->debugLog("No shipping quote for $address_id, redirecting the checkout_multiship");
                     $this->noship_address_id = $address_id;

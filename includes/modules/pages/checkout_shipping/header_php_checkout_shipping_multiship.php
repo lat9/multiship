@@ -27,6 +27,18 @@ $multiple_shipping_active = $_SESSION['multiship']->isSelected();
 if ($multiple_shipping_active) {
     $offer_multiple_shipping = false;
     $multiple_shipping_address_count = $_SESSION['multiship']->numShippingAddresses();
+    $multiship_shipping = explode('_', $_SESSION['multiship']->getShippingId());
+    if (isset($quotes) && is_array($quotes)) {
+        for ($i = 0, $n = count($quotes); $i < $n ; $i++) {
+            if ($quotes[$i]['id'] == $multiship_shipping[0]) {
+                for ($j = 0, $m = count($quotes[$i]['methods']); $j < $m; $j++) {
+                    if ($quotes[$i]['methods'][$j]['id'] == $multiship_shipping[1]) {
+                        $quotes[$i]['methods'][$j]['cost'] = $_SESSION['multiship']->getMultiShipShippingCost();
+                    }
+                }
+            }
+        }
+    }
 }
 
 $zco_notifier->notify('NOTIFY_HEADER_END_CHECKOUT_SHIPPING_MULTISHIP');
