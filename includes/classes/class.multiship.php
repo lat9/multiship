@@ -746,6 +746,7 @@ class multiship extends base
                     $multiship_info[$address_id]['totals'] = $order_total_modules->process();
                     foreach ($multiship_info[$address_id]['totals'] as &$currentTotal) {
                         $code = $currentTotal['code'];
+                        $currentTotal['class'] = str_replace('_', '', $code);
                         if ($code == 'ot_shipping') {
                             $currentTotal['value'] = $shipping_quote[0]['methods'][0]['cost'];
                             $currentTotal['text'] = $GLOBALS['currencies']->format($currentTotal['value'], true, $order->info['currency'], $order->info['currency_value']);
