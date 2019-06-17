@@ -23,6 +23,14 @@ if ($multiple_shipping_active) {
     if (is_array($multiship_totals) && isset($multiship_totals['ot_total'])) {
         $multiship_grand_total = $multiship_totals['ot_total'];
     }
+    if (MODULE_MULTISHIP_PAYMENT_METHODS != '') {
+        $multiship_unsupported_payments = explode(',', str_replace(' ', '', MODULE_MULTISHIP_PAYMENT_METHODS));
+        foreach ($multiship_unsupported_payments as $multiship_payment2remove) {
+            if (isset(${$multiship_payment2remove}) && is_object(${$multiship_payment2remove})) {
+                ${$multiship_payment2remove}->enabled = false;
+            }
+        }
+    }
 }
 
 $zco_notifier->notify('NOTIFY_HEADER_END_CHECKOUT_PAYMENT_MULTISHIP');
