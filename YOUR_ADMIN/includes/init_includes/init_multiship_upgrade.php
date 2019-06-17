@@ -58,7 +58,7 @@ switch (true) {
             VALUES
                 ('Enable Multiple Ship-to Addresses?', 'MODULE_MULTISHIP_ENABLE', 'false', 'Should multiple ship-to addresses be offered to customers?', $cgi, 10, now(), NULL, 'zen_cfg_select_option(array(\'true\', \'false\'),'),
                 
-                ('Supported Payment Methods', 'MODULE_MULTISHIP_PAYMENT_METHODS', '', 'Identify, using a comma-separated list (intervening blanks are OK), the payment methods to be offered if an order has multiple ship-to addresses &mdash; <em>all other payment methods will be <b>disabled</b></em> if a customer chooses to supply multiple ship-to addresses!<br /><br />Leave the setting as an empty string (the default) to enable the plugin for <b>all</b> payment methods.<br />', $cgi, 20, now(), NULL, NULL),
+                ('Unsupported Payment Methods', 'MODULE_MULTISHIP_PAYMENT_METHODS', '', 'Identify, using a comma-separated list (intervening blanks are OK), the payment methods to be <b>disabled</b> if an order has multiple ship-to addresses.<br /><br />Leave the setting as an empty string (the default) to enable the plugin for <b>all</b> payment methods.<br />', $cgi, 20, now(), NULL, NULL),
                 
                 ('Enable debug?', 'MODULE_MULTISHIP_DEBUG', 'false', 'Enable the plugin\'s debug?', $cgi, 500, now(), NULL, 'zen_cfg_select_option(array(\'true\', \'false\'),')"
         );
