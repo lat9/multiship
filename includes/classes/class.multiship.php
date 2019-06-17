@@ -639,12 +639,8 @@ class multiship extends base
             // Save the current contents of both the shopping cart and the default sendto-address.  These values will be
             // manipulated to provide the shipping costs on a per-ship-to address basis.
             //
-            $saved_cart_contents = $_SESSION['cart']->contents;
-            $saved_sendto = $_SESSION['sendto'];
-            $saved_shipping_cost = $_SESSION['shipping']['cost'];
             global $total_weight, $total_count;
-            $saved_total_weight = $total_weight;
-            $saved_total_count = $total_count;
+            $this->saveOrdersBaseValues();
             
             // -----
             // Ditto with the current order.  Save the current instance and declare that variable
@@ -652,6 +648,14 @@ class multiship extends base
             //
             global $order;
             $saved_order = $order;
+            
+            // -----
+            // Set a class variable (used by the updateShippingTaxInfo method) to indicate that we're
+            // in the process of gathering the multiple ship-to addresses' information.  That way, the
+            // tax-related calculations for the order's sub-orders will use the store's current
+            // configuration.
+            //
+            $this->initialization_active = true;
           
             // -----
             // Loop through each of the ship-to addresses that were previously gathered, populating the shopping-cart object
@@ -661,6 +665,7 @@ class multiship extends base
             $this->totals = array();
             $multiship_info = array();
             $multiship_grand_total = 0;
+            $multiship_shipping_total = 0;
             foreach ($this->cart as $address_id => $products) {
                 $multiship_info[$address_id] = array();
                 $multiship_info[$address_id]['address'] = zen_address_label($_SESSION['customer_id'], $address_id, false, '', ', ');
@@ -709,17 +714,15 @@ class multiship extends base
                 $this->debugLog("Quote received for $address_id: " . json_encode($shipping_info) . ', quote: ' . json_encode($shipping_quote));
                 if (!is_array($shipping_quote) || count($shipping_quote) == 0) {
                     $this->debugLog("No shipping quote for $address_id, redirecting the checkout_multiship");
+                    $this->restoreOrdersBaseValues();
                     $this->noship_address_id = $address_id;
-                    $_SESSION['cart']->contents = $saved_cart_contents;
-                    $_SESSION['sendto'] = $saved_sendto;
-                    $_SESSION['shipping']['cost'] = $saved_shipping_cost;
-                    $total_weight = $saved_total_weight;
-                    $total_count = $saved_total_count;
+                    unset($this->installation_active);
                     zen_redirect(zen_href_link(FILENAME_CHECKOUT_MULTISHIP, '', 'SSL'));
                 }
                 
                 $shipping_cost = $shipping_quote[0]['methods'][0]['cost'];
                 $multiship_info[$address_id]['info']['shipping_cost'] = $shipping_cost;
+                $multiship_shipping_total += $shipping_cost;
                 $_SESSION['shipping']['cost'] = $shipping_cost;
                 $shipping_class = $shipping_info[0];
                 global ${$shipping_class};
@@ -732,18 +735,24 @@ class multiship extends base
                 // in the pulling in of the product list and delivery address information for the current shipping address.
                 //
                 $order = new order;
-                $this->debugLog("Initialize step 2 ($address_id), order-info: " . json_encode($order->info));
-                $multiship_info[$address_id]['products'] = $order->products;
-                $multiship_info[$address_id]['delivery'] = $order->delivery;
-                $multiship_info[$address_id]['content_type'] = $order->content_type;
-                $multiship_info[$address_id]['info'] = $order->info;
 
                 require_once DIR_WS_CLASSES . 'order_total.php';
                 $order_total_modules = new order_total;
                 $order_total_modules->collect_posts();
                 $order_total_modules->pre_confirmation_check();
+                
+                $this->debugLog("Initialize step 2 ($address_id), order-info: " . json_encode($order->info));
+                $multiship_info[$address_id]['products'] = $order->products;
+                $multiship_info[$address_id]['delivery'] = $order->delivery;
+                $multiship_info[$address_id]['content_type'] = $order->content_type;
+                $multiship_info[$address_id]['info'] = $order->info;
+                
                 if (MODULE_ORDER_TOTAL_INSTALLED) {
                     $multiship_info[$address_id]['totals'] = $order_total_modules->process();
+                    if (isset($_SESSION['shipping_tax_description'])) {
+                        $multiship_info[$address_id]['info']['shipping_tax_description'] = $_SESSION['shipping_tax_description'];
+                    }
+                    $multiship_info[$address_id]['info']['shipping_tax'] = $order->info['shipping_tax'];
                     foreach ($multiship_info[$address_id]['totals'] as &$currentTotal) {
                         $code = $currentTotal['code'];
                         $currentTotal['class'] = str_replace('_', '', $code);
@@ -763,14 +772,86 @@ class multiship extends base
             }
 
             $this->details = $multiship_info;
-          
-            $_SESSION['cart']->contents = $saved_cart_contents;
-            $_SESSION['sendto'] = $saved_sendto;
-            $_SESSION['shipping']['cost'] = $saved_shipping_cost;
+            $this->restoreOrdersBaseValues();
+            $_SESSION['shipping']['cost'] = $multiship_shipping_total;
+            $this->shipping_total = $multiship_shipping_total;
             $order = $saved_order;
-            $total_weight = $saved_total_weight;
-            $total_count = $saved_total_count;
         }  // Customer has chosen multiple ship-to addresses
+        unset($this->initialization_active);
+    }
+    protected function saveOrdersBaseValues()
+    {
+        global $total_weight, $total_count;
+        $this->saved_order_info = array(
+            'cart_contents' => $_SESSION['cart']->contents,
+            'sendto' => $_SESSION['sendto'],
+            'shipping_cost' => $_SESSION['shipping']['cost'],
+            'total_weight' => $total_weight,
+            'total_count' => $total_count,
+        );
+        if (isset($_SESSION['shipping_tax_description'])) {
+            $this->saved_order_info['shipping_tax_description'] = $_SESSION['shipping_tax_description'];
+        }
+        if (isset($_SESSION['shipping_tax_amount'])) {
+            $this->saved_order_info['shipping_tax_amount'] = $_SESSION['shipping_tax_amount'];
+        }
+    }
+    protected function restoreOrdersBaseValues()
+    {
+        global $total_weight, $total_count;
+        $_SESSION['cart']->contents = $this->saved_order_info['cart_contents'];
+        $_SESSION['sendto'] = $this->saved_order_info['sendto'];
+        $_SESSION['shipping']['cost'] = $this->saved_order_info['shipping_cost'];
+        $total_weight = $this->saved_order_info['total_weight'];
+        $total_count = $this->saved_order_info['total_count'];
+        if (isset($this->saved_order_info['shipping_tax_description'])) {
+            $_SESSION['shipping_tax_description'] = $this->saved_order_info['shipping_tax_description'];
+        }
+        if (isset($this->saved_order_info['shipping_tax_amount'])) {
+            $_SESSION['shipping_tax_amount'] = $this->saved_order_info['shipping_tax_amount'];
+        }
+        unset($this->saved_order_info);
+    }
+    
+    // -----
+    // Called at the start of the checkout_payment page to fix-up the session-based
+    // shipping cost to reflect any changes based on the multiple ship-to addresses.  That
+    // value is used by the order-class on initial creation of the order and stored in
+    // the order-object's info['shipping_cost'] field.
+    //
+    public function fixupSessionShippingCost()
+    {
+        if (!empty($_SESSION['shipping']) && isset($this->shipping_total)) {
+            $_SESSION['shipping']['cost'] = $this->shipping_total;
+        }
+    }
+    
+    // -----
+    // Called via notification from the ot_shipping module prior to calculating the tax to be
+    // applied to the order's shipping.  If multiple ship-to addresses are being used for this
+    // order, populate the order's shipping-tax and shipping-tax description fields based
+    // on the aggregate calculation of the multiple ship-to addresses' values.
+    //
+    public function updateShippingTaxInfo(&$shipping_tax, &$shipping_tax_description)
+    {
+        if (!$this->selected || !empty($this->initialization_active)) {
+            return false;
+        }
+        $shipping_tax = 0;
+        foreach ($this->details as $address_id => $info) {
+            if (!empty($info['info']['shipping_tax'])) {
+                $shipping_tax += $info['info']['shipping_tax'];
+                if (isset($info['info']['shipping_tax_description'])) {
+                    $shipping_tax_description = $info['info']['shipping_tax_description'];
+                    if (!isset($GLOBALS['order']->info['tax_groups'][$shipping_tax_description])) {
+                        $GLOBALS['order']->info['tax_groups'][$shipping_tax_description] = 0;
+                    }
+                    $GLOBALS['order']->info['tax_groups'][$shipping_tax_description] += $info['info']['shipping_tax'];
+                }
+            }
+        }
+        $GLOBALS['order']->info['shipping_tax'] = $shipping_tax;
+        return true;
     }
   
     // -----

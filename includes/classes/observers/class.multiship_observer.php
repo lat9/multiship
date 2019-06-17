@@ -32,6 +32,9 @@ class multiship_observer extends base
                     
                     /* /includes/modules[/YOUR_TEMPLATE]/checkout_process.php */
                     'NOTIFY_CHECKOUT_PROCESS_AFTER_ORDER_TOTALS_PROCESS',
+                    
+                    /* /includes/modules/order_total/ot_shipping.php (zc156b+) */
+                    'NOTIFY_OT_SHIPPING_TAX_CALCS',
                 )
             );
         }
@@ -63,6 +66,22 @@ class multiship_observer extends base
                     unset($_SESSION['multiship_shipping_changed']);
                     zen_redirect(zen_href_link(FILENAME_CHECKOUT_SHIPPING, '', 'SSL'));
                 }
+                $_SESSION['multiship']->fixupSessionShippingCost();
+                break;
+                
+            // -----
+            // Issued by /includes/modules/order_total/ot_shipping.php just prior to the shipping tax calculations.
+            // If the order has multiple ship-to addresses, the session-based class will provide an update to those
+            // calculations, based on possibly multiple shipping-tax rates.
+            //
+            // Parameters:
+            //
+            // $p2 ... (r/w) A reference to the boolean flag, set to true if the shipping-tax calculations should be overridden.
+            // $p3 ... (r/w) A reference to the possibly-updated $shipping_tax value.
+            // $p4 ... (r/w) A reference to the possibly-updated $shipping_tax_description
+            //
+            case 'NOTIFY_OT_SHIPPING_TAX_CALCS':
+                $p2 = $_SESSION['multiship']->updateShippingTaxInfo($p3, $p4);
                 break;
                 
             // -----
