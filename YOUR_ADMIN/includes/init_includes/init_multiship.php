@@ -9,8 +9,8 @@ if (!defined('IS_ADMIN_FLAG')) {
     die('Illegal Access');
 }
 
-define('MULTISHIP_CURRENT_VERSION', '2.0.0-beta1');
-define('MULTISHIP_UPDATE_DATE', '2019-06-14');
+define('MULTISHIP_CURRENT_VERSION', '2.0.0-beta2');
+define('MULTISHIP_UPDATE_DATE', '2019-06-18');
 
 $multiship_update_date = MULTISHIP_UPDATE_DATE . ' 00:00:00';
 
@@ -79,5 +79,17 @@ if (($current_page == FILENAME_ORDERS_INVOICE . '.php' || $current_page == FILEN
         } else {
             zen_redirect(zen_href_link(FILENAME_PACKINGSLIP_MULTISHIP, "oID=$oID"));
         }
+    }
+}
+
+// -----
+// If the current page-request is for "Edit Orders" and the current order contains multiple
+// ship-to addresses, deny that request (with message to the admin), since that edit would
+// destroy the order's multiple addresses' recording.
+//
+if (defined('FILENAME_EDIT_ORDERS') && $current_page == FILENAME_EDIT_ORDERS && !empty($_GET['oID'])) {
+    if ($multiship->isMultiShipOrder($_GET['oID'])) {
+        $messageStack->add_session(MULTISHIP_ORDER_CANT_EDIT, 'error');
+        zen_redirect(zen_href_link(FILENAME_ORDERS, 'oID=' . (int)$_GET['oID'] . '&amp;action=edit'));
     }
 }
