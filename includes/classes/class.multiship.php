@@ -32,14 +32,60 @@ class multiship extends base
     //
     public function isEnabled()
     {
+        // -----
+        // The plugin is initially enabled via configuration setting.
+        //
         $this->enabled = (defined('MODULE_MULTISHIP_ENABLE') && MODULE_MULTISHIP_ENABLE == 'true');
-        if (!$this->enabled) {
-            $this->sessionCleanup();
-        } else {
+        
+        // -----
+        // If enabled via configuration, need check a couple of additional conditions before
+        // multiple ship-to addresses can be enabled for the current order.
+        //
+        if ($this->enabled) {
             $payment_methods = str_replace(' ', '', MODULE_MULTISHIP_PAYMENT_METHODS);
             $this->payment_methods = ($payment_methods != '') ? explode(',', $payment_methods) : false;
             $this->debug = (MODULE_MULTISHIP_DEBUG == 'true');
             $this->logfile = DIR_FS_LOGS . '/multiship_' . date('Ymd') . '.log';
+            
+            // -----
+            // If a customer's currently logged-in, and they're part of a 'group-pricing'
+            // group, multiple ship-to addresses are disabled.  The ot_group_pricing
+            // processing performs its calculations assuming that the order's current
+            // ship-to *address* is the basis of any tax-calculations and if there are
+            // multiple *different* tax rates for the ship-to addresses, those calculations
+            // will not be correct.
+            //
+            if (!empty($_SESSION['customer_id'])) {
+                $group = $GLOBALS['db']->Execute(
+                    "SELECT customers_group_pricing 
+                       FROM " . TABLE_CUSTOMERS . " 
+                      WHERE customers_id = " . (int)$_SESSION['customer_id'] . "
+                      LIMIT 1");
+                if ($group->fields['customers_group_pricing'] != 0) {
+                    $this->debugLog("isEnabled, setting disabled since the currently logged-in customer is part of a group-pricing group.");
+                    $this->enabled = false;
+                }
+            }
+            
+            // -----
+            // If a coupon was applied to the order (during the checkout_payment page's
+            // processing) and the customer "comes back" to the checkout_shipping step,
+            // multiple ship-to addresses can no longer be offered for reasons similar to the
+            // disablement for group pricing.
+            //
+            if (!empty($_SESSION['cc_id'])) {
+                $this->debugLog("isEnabled, setting disabled since there is a coupon currently applied to the order.");
+                $this->enabled = false;
+            }
+        }
+        
+        // -----
+        // If the plugin is not currently enabled (which could occur if the configuration and/or
+        // customer's group-pricing setup were changed since login), clean up the multiship
+        // session information.
+        //
+        if (!$this->enabled) {
+            $this->sessionCleanup();
         }
         return $this->enabled;
     }
@@ -152,7 +198,7 @@ class multiship extends base
     //
     public function canOffer() 
     {
-        return $this->can_offer;
+        return ($this->enabled && $this->can_offer);
     }
   
     // -----

@@ -23,6 +23,11 @@ if ($multiple_shipping_active) {
     if (is_array($multiship_totals) && isset($multiship_totals['ot_total'])) {
         $multiship_grand_total = $multiship_totals['ot_total'];
     }
+    
+    // -----
+    // If any payment methods are to be disallowed when an order has multiple ship-to
+    // addresses, set their 'enabled' status to 'disabled'.
+    //
     if (MODULE_MULTISHIP_PAYMENT_METHODS != '') {
         $multiship_unsupported_payments = explode(',', str_replace(' ', '', MODULE_MULTISHIP_PAYMENT_METHODS));
         foreach ($multiship_unsupported_payments as $multiship_payment2remove) {
@@ -30,6 +35,19 @@ if ($multiple_shipping_active) {
                 ${$multiship_payment2remove}->enabled = false;
             }
         }
+    }
+    
+    // -----
+    // Cycle through the currently-defined order-totals modules.  If ot_coupon is there,
+    // it'll be removed as coupons and multiple ship-to addresses are incompatible.
+    //
+    if (isset($order_total_modules)) {
+        for ($i = 0, $n = count($order_total_modules->modules); $i < $n; $i++) {
+            if ($order_total_modules->modules[$i] == 'ot_coupon.php') {
+                unset($order_total_modules->modules[$i]);
+            }
+        }
+        $order_total_modules->modules = array_values($order_total_modules->modules);
     }
 }
 
