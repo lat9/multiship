@@ -11,7 +11,8 @@ class multiship_observer extends base
         if (!empty($_SESSION['multiship']) && $_SESSION['multiship']->isEnabled()) {
             $this->attach(
                 $this, array(
-                    /* order.php class */ 
+                    /* order.php class */
+                    'NOTIFY_ORDER_CART_FINISHED',
                     'NOTIFY_ORDER_DURING_CREATE_ADDED_ORDER_HEADER', 
                     'NOTIFY_ORDER_DURING_CREATE_ADDED_ORDERTOTAL_LINE_ITEM', 
                     'NOTIFY_ORDER_DURING_CREATE_ADDED_PRODUCT_LINE_ITEM', 
@@ -82,6 +83,15 @@ class multiship_observer extends base
             //
             case 'NOTIFY_OT_SHIPPING_TAX_CALCS':
                 $p2 = $_SESSION['multiship']->updateShippingTaxInfo($p3, $p4);
+                break;
+                
+            // -----
+            // Issued by /includes/classes/order.php at the end of its conversion of the information in the cart
+            // to its order-placement format.  Gives us the opportunity to update the order's information to
+            // capture any tax/total information for a multi-ship order.
+            //
+            case 'NOTIFY_ORDER_CART_FINISHED':
+                $_SESSION['multiship']->updateOrdersTotalsAndTaxes($class);
                 break;
                 
             // -----

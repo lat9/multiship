@@ -284,6 +284,47 @@ class multiship extends base
         }
         return $is_physical;
     }
+    
+    // -----
+    // Called by the multiship-observer class, upon receipt of NOTIFY_ORDER_CART_FINISHED from the order-class.
+    //
+    // If the current order has multiple ship-to addresses, we'll sum up the totals and taxes associated
+    // with those sub-orders into the order's header/info section for follow-on use by any order-total
+    // modules' processing.
+    //
+    public function updateOrdersTotalsAndTaxes(&$order)
+    {
+        // -----
+        // Quick return if the order doesn't have multiple ship-to addresses.
+        //
+        if (!$this->selected) {
+            return;
+        }
+        
+        $this->debugLog("updateOrdersTotalAndTaxes, on entry: " . json_encode($order->info), true);
+        
+        // -----
+        // Set the order's current total, tax (and tax groups, used by ot_tax for its display) and shipping_cost
+        // based on the totals for each multi-ship sub-order.
+        //
+        $order->info['total'] = $this->totals['ot_total'];
+        $order->info['tax'] = $this->totals['ot_tax'];
+        $order->info['shipping_cost'] = $this->totals['ot_shipping'];
+        
+        // -----
+        // Loop through each of the sub-orders to update the order's multi-ship tax groups.
+        //
+        $order->info['tax_groups'] = array();
+        foreach ($this->details as $addr_id => $info) {
+            foreach ($info['info']['tax_groups'] as $tax_group_name => $tax_group_value) {
+                if (!isset($order->info['tax_groups'][$tax_group_name])) {
+                    $order->info['tax_groups'][$tax_group_name] = 0;
+                }
+                $order->info['tax_groups'][$tax_group_name] += $tax_group_value;
+            }
+        }
+        $this->debugLog("updateOrdersTotalAndTaxes, on exit: " . json_encode($order->info));
+    }
 
     // -----
     // Called by the multiship-observer class, upon receipt of NOTIFY_CHECKOUT_PROCESS_AFTER_ORDER_TOTALS_PROCESS
@@ -677,11 +718,11 @@ class multiship extends base
                     $_SESSION['cart']->contents[$prid] = array(
                         'qty' => $qty
                     );
-                    if (isset($saved_cart_contents[$prid]['attributes'])) {
-                        $_SESSION['cart']->contents[$prid]['attributes'] = $saved_cart_contents[$prid]['attributes'];
+                    if (isset($this->saved_order_info['cart_contents'][$prid]['attributes'])) {
+                        $_SESSION['cart']->contents[$prid]['attributes'] = $this->saved_order_info['cart_contents'][$prid]['attributes'];
                     }
-                    if (isset ($saved_cart_contents[$prid]['attributes_values'])) {
-                        $_SESSION['cart']->contents[$prid]['attributes_values'] = $saved_cart_contents[$prid]['attributes_values'];
+                    if (isset($this->saved_order_info['cart_contents'][$prid]['attributes_values'])) {
+                        $_SESSION['cart']->contents[$prid]['attributes_values'] = $this->saved_order_info['cart_contents'][$prid]['attributes_values'];
                     }
                 }
             
@@ -829,29 +870,21 @@ class multiship extends base
     // -----
     // Called via notification from the ot_shipping module prior to calculating the tax to be
     // applied to the order's shipping.  If multiple ship-to addresses are being used for this
-    // order, populate the order's shipping-tax and shipping-tax description fields based
-    // on the aggregate calculation of the multiple ship-to addresses' values.
+    // order, the updateOrdersTotalsAndTaxes method has already adjusted the order's taxes and total
+    // to account for each sub-order's values.
+    //
+    // Since there's nothing for ot_shipping to do with the shipping taxes, return a tax-rate
+    // of 0 to be applied for an "unknown" tax class.
     //
     public function updateShippingTaxInfo(&$shipping_tax, &$shipping_tax_description)
     {
-        if (!$this->selected || !empty($this->initialization_active)) {
-            return false;
+        $this->debugLog("updateShippingTaxInfo, on entry: " . json_encode($GLOBALS['order']->info));
+        $shipping_tax_override = ($this->selected && empty($this->initialization_active));
+        if ($shipping_tax_override) {
+            $shipping_tax = 0;
+            $shipping_tax_description = TEXT_UNKNOWN_TAX_RATE;
         }
-        $shipping_tax = 0;
-        foreach ($this->details as $address_id => $info) {
-            if (!empty($info['info']['shipping_tax'])) {
-                $shipping_tax += $info['info']['shipping_tax'];
-                if (isset($info['info']['shipping_tax_description'])) {
-                    $shipping_tax_description = $info['info']['shipping_tax_description'];
-                    if (!isset($GLOBALS['order']->info['tax_groups'][$shipping_tax_description])) {
-                        $GLOBALS['order']->info['tax_groups'][$shipping_tax_description] = 0;
-                    }
-                    $GLOBALS['order']->info['tax_groups'][$shipping_tax_description] += $info['info']['shipping_tax'];
-                }
-            }
-        }
-        $GLOBALS['order']->info['shipping_tax'] = $shipping_tax;
-        return true;
+        return $shipping_tax_override;
     }
   
     // -----
@@ -967,8 +1000,9 @@ class multiship extends base
     protected function debugLog($message, $include_date = false) 
     {
         if ($this->debug) {
-            $date = ($include_date === false) ? '' : (PHP_EOL . date('Y-m-d H:i:s: '));
-            error_log("$date$message" . PHP_EOL, 3, $this->logfile);
+            $header = ($include_date === false) ? '' : (PHP_EOL . date('Y-m-d H:i:s: '));
+            $header .= '(' . $GLOBALS['current_page_base'] . ') ';
+            error_log("$header$message" . PHP_EOL, 3, $this->logfile);
         }
     }
 }
