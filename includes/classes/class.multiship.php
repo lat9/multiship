@@ -295,9 +295,10 @@ class multiship extends base
     public function updateOrdersTotalsAndTaxes(&$order)
     {
         // -----
-        // Quick return if the order doesn't have multiple ship-to addresses.
+        // Quick return if the order doesn't have multiple ship-to addresses, or if the multi-ship
+        // totals and details have not yet been set.
         //
-        if (!$this->selected) {
+        if (!$this->selected || !empty($this->initialization_active)) {
             return;
         }
         
