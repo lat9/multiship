@@ -6,7 +6,7 @@
 <title>Multiple Ship-To Addresses</title>
 <link rel="stylesheet" href="style.css" type="text/css" />
 <link rel="stylesheet" href="menu.css" type="text/css" />
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js" type="text/javascript"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js" type="text/javascript"></script>
 <script src="back_to_top.min.js" type="text/javascript"></script>
 <script type="text/javascript">
 $(document).ready(function(){
@@ -103,7 +103,7 @@ timeEffect : 750
 <div class="the_content">
   <h2 id="credits">Credits</h2>
   <div class="sub-content">
-    <p>Copyright &copy; 2014-2017, <a href="http://vinosdefrutastropicales.com" target="_blank" rel="noreferrer">Vinos de Frutas Tropicales</a> (lat9).  Current Support Thread at Zen Cart Forums: <a href="http://www.zen-cart.com/showthread.php?211914-Multiple-Ship-To-Addresses-Support-Thread" target="_blank">http://www.zen-cart.com/showthread.php?211914-Multiple-Ship-To-Addresses-Support-Thread</a></p>
+    <p>Copyright &copy; 2014-2017, <a href="https://vinosdefrutastropicales.com" target="_blank" rel="noreferrer">Vinos de Frutas Tropicales</a> (lat9).  Current Support Thread at Zen Cart Forums: <a href="https://www.zen-cart.com/showthread.php?211914-Multiple-Ship-To-Addresses-Support-Thread" target="_blank">https://www.zen-cart.com/showthread.php?211914-Multiple-Ship-To-Addresses-Support-Thread</a></p>
   </div>
   <h2 id="usage">Usage Notes</h2>
   <div class="sub-content">
@@ -309,85 +309,22 @@ timeEffect : 750
 
 <h1 class="the_head" id="vach">Version and Change History</h1>
 <div class="the_content">
-  <h2 id="history" class="inner">Version History</h2>
-  <div class="sub-content">
     <ul>
-      <li>v1.2.1, 2017-07-xx<ol>
+      <li>v2.0.0, 2019-06-xx<ul>
         <li>BUGFIX: Correct SQL uninstall script.</li>
         <li>BUGFIX: MySQL error when placing a multiple ship-to order that includes attributed products.</li>
         <li>BUGFIX: Removing a multiple ship-to-order results in a PHP error log.</li>
-      </ol></li>
-      <li>v1.2.0, 2017-07-12<ol>
-        <li>CHANGE: Restructure plugin's distribution, dropping support for Zen Cart versions prior to 1.5.5.  <strong>Note:</strong> All files have been &quot;re-factored&quot;.</li>
-        <li>BUGFIX: Correct packing-slip page-break operations.</li>
-      </ol></li>
-      <li>v1.1.4 2016-01-01<ol>
-        <li>CHANGE: Update notifier use to remove a core file!</li>
-      </ol></li>
-      <li>v1.1.3 2015-12-31<ol>
-        <li>CHANGE: PHP 7 compatibility; update class constructor function names to __construct.</li>
-        <li>CHANGE: Use trigger_error instead of error_log to log interface errors.</li>
-        <li>CHANGE: Use Zen Cart v1.5.5 as the change-basis for the core- and template-file changes.</li>
-      </ol></li>
-      <li>v1.1.2 2014-12-20<ol>
-        <li>CHANGE: Incorporate downwardly-compatible changes introduced in Zen Cart v1.5.4.</li>
-      </ol></li>
-      <li>v1.1.1, 2014-08-16<ol>
-        <li>BUGFIX: Unwanted redirect back to <em>checkout_shipping</em> page after changing quantities on <em>checkout_multiship</em> page.</li>
-        <li>BUGFIX: Whitescreen if UPS (or FedEx?) shipping methods selected.</li>
-        <li>BUGFIX: Attribute values lost when cloning products with checkbox, TEXT or file-upload attributes on the checkout_multiship and checkout_confirmation pages.</li>
-      </ol></li>
-      <li>v1.1.0, 2014-07-13<ol>
-        <li>Incorporate downwardly-compatible changes introduced by Zen Cart v1.5.3.</li>
-        <li>Updated this readme to indicate that the &quot;Check/Money Order&quot; plugin, supplied by this plugin, needs to be enabled to support the multiple ship-to addresses in your store's processing.</li>
-      </ol></li>
-      <li>v1.0.0, 2014-02-18<ol>
-        <li>BUGFIX: Email issues.  The grand-total was not properly formatted for TEXT emails and the HTML emails required major rework.</li>
-        <li>BUGFIX: Variable misspelling in /YOUR_ADMIN/orders.php.</li>
-        <li>BUGFIX: Customers-&gt;Orders shows a tax percentage value even though no tax was collected for the sub-order.</li>
-        <li>Support multiple order-status values: one for the overall order and one per multiple ship-to sub-order.</li>
-        <li>Admin invoice and packingslip pages require change for orders with multiple ship-to addresses.</li>
-      </ol></li>
-      <li>v1.0.0 BETA3, 2014-02-10:<ol>
-        <li>BUGFIX: Introduced in BETA2, stray entry in checkout_confirmation page when multiple ship-to addresses are selected.</li>
-        <li>BUGFIX: Unneeded/unwanted code in checkout_multiship header causing PHP warnings.</li>
-        <li>BUGFIX: HTML emails for multiple ship-to address orders missing quantity and model number.</li>
-        <li>BUGFIX: Need to display shopping_cart messages on the checkout_multiship page, just in case the quantity was reduced based on stock.</li>
-        <li>BUGFIX: Changes in quantity on checkout_multiship without intervening update click are lost if the continue checkout button is pressed.</li>
-        <li>BUGFIX: Customer redirected to checkout_shipping if quantities were changed on the checkout_multiship page.</li>
-        <li>Add observers for shopping cart updates and removals.</li>
-      </ol></li>
-      <li>v1.0.0 BETA 2, 2014-02-01:<ol>
-        <li>Incorporated handling of virtual products in the customer's order.</li>
-      </ol></li>
-      <li>v1.0.0 BETA 1, 2014-01-28, Initial release.</li>
-    </ul>
-  </div>
-  
-  <h2 id="changes" class="inner">File/Database Changes by Version</h2>
-  <div class="sub-content">
-    <p>Legend for the <b>File Changes</b>: Changed &mdash; <span class="added">Added</span> &mdash; <span class="removed">Removed</span></p>
-    <table>
-      <tr class="3">
-        <th width="5%" class="c1">Version</th>
-        <th width="50%">Files Changed/Added</th>
-        <th width="45%">Database Changes</th>
-      </tr>
- 
-      <tr class="o">
-        <td class="c1">v1.2.1</td>
-        <td><ol>
+        <li>The following files were changed, added or removed:<ol>
           <li>/uninstall_multiship.sql</li>
           <li>/includes/classes/observers/class.multiship.php</li>
           <li>/YOUR_ADMIN/includes/classes/class.multiship_admin_observer.php</li>
           <li>/YOUR_ADMIN/includes/init_includes/init_multiship.php</li>
-        </ol></td>
-        <td class="c3">&mdash;</td>
-      </tr>
-      
-      <tr class="3">
-        <td class="c1">v1.2.0</td>
-        <td><ol>
+        </ol></li>
+      </ul></li>
+      <li>v1.2.0, 2017-07-12<ul>
+        <li>CHANGE: Restructure plugin's distribution, dropping support for Zen Cart versions prior to 1.5.5.  <strong>Note:</strong> All files have been &quot;re-factored&quot;.</li>
+        <li>BUGFIX: Correct packing-slip page-break operations.</li>
+        <li>The following files were changed or removed:<ol>
           <li><span class="corefile removed">/includes/classes/class.base.php</span> <span class="smaller">(no longer distributed)</span></li>
           <li><span class="corefile removed">/includes/classes/order.php</span> <span class="smaller">(no longer distributed)</span></li>
           <li><span class="corefile removed">/includes/classes/shopping_cart.php</span> <span class="smaller">(no longer distributed)</span></li>
@@ -401,23 +338,21 @@ timeEffect : 750
           <li><span class="corefile removed">/YOUR_ADMIN/includes/classes/order.php</span> <span class="smaller">(no longer distributed)</span></li>
           <li><span class="corefile removed">/YOUR_ADMIN/includes/functions/general.php</span> <span class="smaller">(no longer distributed)</span></li>
           <li>/YOUR_ADMIN/includes/init_includes/init_multiship.php</li>
-        </ol></td>
-        <td class="c3">&mdash;</td>
-      </tr>
-      
-      <tr class="o">
-        <td class="c1">v1.1.4</td>
-        <td><ol>
+        </ol></li>
+      </ul></li>
+      <li>v1.1.4 2016-01-01<ul>
+        <li>CHANGE: Update notifier use to remove a core file!</li>
+        <li>The following files were changed:<ol>
           <li><span class="corefile">/includes/classes/order.php</span></li>
           <li>/includes/classes/observers/class.multiship_observer.php</li>
           <li>/YOUR_ADMIN/includes/init_includes/init_multiship.php</li>
-        </ol></td>
-        <td class="c3">&mdash;</td>
-      </tr>
-     
-      <tr class="3">
-        <td class="c1">v1.1.3</td>
-        <td><ol>
+        </ol></li>
+      </ul></li>
+      <li>v1.1.3 2015-12-31<ul>
+        <li>CHANGE: PHP 7 compatibility; update class constructor function names to __construct.</li>
+        <li>CHANGE: Use trigger_error instead of error_log to log interface errors.</li>
+        <li>CHANGE: Use Zen Cart v1.5.5 as the change-basis for the core- and template-file changes.</li>
+        <li>The following files were changed:<ol>
           <li>/includes/classes/class.multiship.php</li>
           <li><span class="corefile">/includes/classes/order.php</span></li>
           <li><span class="corefile">/includes/classes/shopping_cart.php</span></li>
@@ -428,51 +363,50 @@ timeEffect : 750
           <li>/YOUR_ADMIN/includes/classes/observers/class.multiship_admin_observer.php</li>
           <li><span class="corefile">/YOUR_ADMIN/includes/functions/general.php</span></li>
           <li>/YOUR_ADMIN/includes/init_includes/init_multiship.php</li>
-        </ol></td>
-        <td class="c3">&mdash;</td>
-      </tr>
-      
-      <tr class="o">
-        <td class="c1">v1.1.2</td>
-        <td><ol>
+        </ol></li>
+      </ul></li>
+      <li>v1.1.2 2014-12-20<ul>
+        <li>CHANGE: Incorporate downwardly-compatible changes introduced in Zen Cart v1.5.4.</li>
+        <li>The following files were changed or added:<ol>
           <li><span class="corefile">/includes/classes/shopping_cart.php</span></li>
           <li><span class="corefile">/YOUR_ADMIN/orders.php</span></li>
           <li><span class="added">/YOUR_ADMIN/includes/auto_loaders/config.zc154_compatibility.php</span></li>
           <li><span class="added">/YOUR_ADMIN/includes/init_includes/init_zc154_compatibility.php</span></li>
           <li><span class="corefile">/YOUR_ADMIN/includes/functions/general.php</span></li>
-        </ol></td>
-        <td class="c3">&mdash;</td>
-      </tr>
-      
-      <tr>
-        <td class="c1">v1.1.1</td>
-        <td><ol>
+        </ol></li>
+      </ul></li>
+      <li>v1.1.1, 2014-08-16<ul>
+        <li>BUGFIX: Unwanted redirect back to <em>checkout_shipping</em> page after changing quantities on <em>checkout_multiship</em> page.</li>
+        <li>BUGFIX: Whitescreen if UPS (or FedEx?) shipping methods selected.</li>
+        <li>BUGFIX: Attribute values lost when cloning products with checkbox, TEXT or file-upload attributes on the checkout_multiship and checkout_confirmation pages.</li>
+        <li>The following files were changed:<ol>
           <li>/includes/classes/class.multiship.php</li>
           <li><span class="corefile">/includes/classes/order.php</span></li>
           <li>/includes/classes/observers/class.multiship_observer.php</li>
           <li>/includes/languages/english/extra_definitions/YOUR_TEMPLATE/multiship_common.php
           <li>/includes/modules/pages/checkout_multiship/header_php.php</li>
           <li>/includes/templates/YOUR_TEMPLATE/tpl_checkout_multiship_default.php</li>
-        </ol></td>
-        <td class="c3">&mdash;</td>
-      </tr>
-      
-      <tr class="o">
-        <td class="c1">v1.1.0</td>
-        <td><ol>
+        </ol></li>
+      </ul></li>
+      <li>v1.1.0, 2014-07-13<ul>
+        <li>Incorporate downwardly-compatible changes introduced by Zen Cart v1.5.3.</li>
+        <li>Updated this readme to indicate that the &quot;Check/Money Order&quot; plugin, supplied by this plugin, needs to be enabled to support the multiple ship-to addresses in your store's processing.</li>
+        <li>The following files were changed:<ol>
           <li><span class="corefile">/includes/classes/class.base.php</span>.  This is the version released with Zen Cart v1.5.3.</li>
           <li><span class="corefile">/includes/classes/order.php</span></li>
           <li><span class="corefile">/includes/classes/shopping_cart.php</span>.  This is the version released with Zen Cart v1.5.3.</li>
           <li><span class="corefile">/includes/modules/payment/moneyorder.php</span></li>
           <li><span class="corefile">/YOUR_ADMIN/includes/functions/general.php</span></li>
           <li><span class="corefile">/YOUR_ADMIN/orders.php</span></li>
-        </ol></td>
-        <td class="c3">&mdash;</td>
-      </tr>
-      
-      <tr>
-        <td class="c1">v1.0.0</td>
-        <td><ol>
+        </ol></li>
+      </ul></li>
+      <li>v1.0.0, 2014-02-18<ul>
+        <li>BUGFIX: Email issues.  The grand-total was not properly formatted for TEXT emails and the HTML emails required major rework.</li>
+        <li>BUGFIX: Variable misspelling in /YOUR_ADMIN/orders.php.</li>
+        <li>BUGFIX: Customers-&gt;Orders shows a tax percentage value even though no tax was collected for the sub-order.</li>
+        <li>Support multiple order-status values: one for the overall order and one per multiple ship-to sub-order.</li>
+        <li>Admin invoice and packingslip pages require change for orders with multiple ship-to addresses.</li>
+        <li>The following files were changed:<ol>
           <li>/includes/classes/class.multiship.php</li>
           <li><span class="added">/YOUR_ADMIN/invoice_multiship.php</li>
           <li><span class="corefile">/YOUR_ADMIN/orders.php</li>
@@ -482,13 +416,20 @@ timeEffect : 750
           <li><span class="added">/YOUR_ADMIN/includes/languages/english/extra_datafiles/multiship_names.php</span></li>
           <li><span class="added">/YOUR_ADMIN/includes/languages/english/invoice_multiship.php</span></li>
           <li><span class="added">/YOUR_ADMIN/includes/languages/english/packingslip_multiship.php</span></li>
-        </ol></td>
-        <td class="c3">Added <em>admin_pages</em> for invoice_multiship and packingslip_multiship pages.</td>
-      </tr>
-      
-      <tr class="o">
-        <td class="c1">v1.0.0 BETA3</td>
-        <td><ol>
+        </ol></li>
+        <li>The following database changes were made:<ol>
+          <li>Added <em>admin_pages</em> for invoice_multiship and packingslip_multiship pages.</li>
+        </ol></li>
+      </ul></li>
+      <li>v1.0.0 BETA3, 2014-02-10:<ul>
+        <li>BUGFIX: Introduced in BETA2, stray entry in checkout_confirmation page when multiple ship-to addresses are selected.</li>
+        <li>BUGFIX: Unneeded/unwanted code in checkout_multiship header causing PHP warnings.</li>
+        <li>BUGFIX: HTML emails for multiple ship-to address orders missing quantity and model number.</li>
+        <li>BUGFIX: Need to display shopping_cart messages on the checkout_multiship page, just in case the quantity was reduced based on stock.</li>
+        <li>BUGFIX: Changes in quantity on checkout_multiship without intervening update click are lost if the continue checkout button is pressed.</li>
+        <li>BUGFIX: Customer redirected to checkout_shipping if quantities were changed on the checkout_multiship page.</li>
+        <li>Add observers for shopping cart updates and removals.</li>
+        <li>The following files were changed or added:<ol>
           <li>/includes/auto_loaders/config.multiship.php</li>
           <li>/includes/classes/class.multiship.php</li>
           <li><span class="corefile">/includes/classes/shopping_cart.php</span> <span class="added">(Added)</span></li>
@@ -498,23 +439,20 @@ timeEffect : 750
           <li>/includes/modules/pages/checkout_multiship/header_php.php</li>
           <li><span class="added">/includes/modules/pages/checkout_multiship/jscript_goodbye.php</span></li>
           <li>/includes/templates/YOUR_TEMPLATE/templates/tpl_checkout_multiship_default.php</li>
-        </ol></td>
-        <td class="c3">&mdash;</td>
-      </tr>      
-       <tr>
-        <td class="c1">v1.0.0 BETA2</td>
-        <td><ol>
+        </ol></li>
+      </ul></li>
+      <li>v1.0.0 BETA 2, 2014-02-01:<ul>
+        <li>Incorporated handling of virtual products in the customer's order.</li>
+        <li>The following files were changed:<ol>
           <li>/includes/classes/class.multiship.php</li>
           <li>/includes/languages/english/YOUR_TEMPLATE/checkout_multiship.php</li>
           <li>/includes/modules/pages/checkout_multiship/header_php.php</li>
           <li>/includes/templates/YOUR_TEMPLATE/css/checkout_multiship.css</li>
           <li>/includes/templates/YOUR_TEMPLATE/templates/tpl_checkout_multiship_default.php</li>
-        </ol></td>
-        <td class="c3">&mdash;</td>
-      </tr>   
-
-    </table>
-  </div>
+        </ol></li>
+      </ul></li>
+      <li>v1.0.0 BETA 1, 2014-01-28, Initial release.</li>
+    </ul>
 </div>
   <p id="back-top"><a href="#top"><span></span>Back to Top</a></p>
 </div>
