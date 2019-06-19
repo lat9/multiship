@@ -8,18 +8,23 @@
 */
 // -----
 // Modified by lat9 (vinosdefrutastropicales.com) as part of the multiple ship-to addresses plugin
-// Copyright 2014-2017, Vinos de Frutas Tropicales
+// Copyright 2014-2019, Vinos de Frutas Tropicales
 //
 require 'includes/application_top.php' ;
-
-include DIR_WS_LANGUAGES . $_SESSION['language'] . '/orders_multiship.php';
 
 require DIR_WS_CLASSES . 'currencies.php';
 $currencies = new currencies();
 
 $oID = (int)zen_db_prepare_input($_GET['oID']);
 
-include DIR_WS_CLASSES . 'order.php';
+// -----
+// Bring in storefront version of the class for zc155 (already baked-in for zc156 and later).
+//
+if (strpos(PROJECT_VERSION_MINOR, '5.5') === 0) {
+    require DIR_FS_CATALOG . DIR_WS_CLASSES . 'order.php';
+} else {
+    require DIR_WS_CLASSES . 'order.php';
+}
 $order = new order($oID);
 
 $orders_status_array = array();

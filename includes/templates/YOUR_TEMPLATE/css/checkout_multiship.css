@@ -1,11 +1,11 @@
+#checkoutMultishipDefault select { width: auto; }
 #checkoutMultishipNewAddress, #onetime_charges, #checkoutMultishipShipping { padding-top: 10px; padding-bottom: 5px; }
 #checkoutMultishipShipping { border-bottom: 1px solid #414141; margin-bottom: 5px; }
-#multishipTable { display: table; width: 100%; }
-#multishipTableHeading, .multishipTableItem { display: table-row; }
+#multishipTable { width: 100%; }
 #multishipTableHeading { font-weight: bold; }
 #multishipTableHeading > div, .multishipTableItem > div { display: table-cell; padding: 5px; border-bottom: 1px solid #414141; }
 .qty input { width: 1em; }
-.even { background-color: #e8e8e8; }
-.odd { background-color: #f0f0f0; }
+#multishipTable tr:nth-child(even) { background-color: #ebebeb; }
+/*#multishipTable tr:nth-child(odd) { background-color: #f0f0f0; } */
 .onetime_charge, #onetime_charges { color: red; }
 .virtual { display: none; }
