@@ -9,8 +9,8 @@ if (!defined('IS_ADMIN_FLAG')) {
     die('Illegal Access');
 }
 
-define('MULTISHIP_CURRENT_VERSION', '2.0.0-beta2');
-define('MULTISHIP_UPDATE_DATE', '2019-06-18');
+define('MULTISHIP_CURRENT_VERSION', '2.0.0-beta3');
+define('MULTISHIP_UPDATE_DATE', '2019-06-19');
 
 $multiship_update_date = MULTISHIP_UPDATE_DATE . ' 00:00:00';
 
