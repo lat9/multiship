@@ -154,9 +154,9 @@ if (zen_not_null($action) && $order_exists == true) {
       $email_include_message = (isset($_POST['notify_comments']) && $_POST['notify_comments'] == 'on');
       $customer_notified = (int)(isset($_POST['notify'])) ? $_POST['notify'] : '0';
 
-//-bof-multiship-lat9  *** 1 of xx ***
+//-bof-multiship-lat9  *** 1 of 4 ***
       $zco_notifier->notify('NOTIFY_ADMIN_ORDERS_UPDATE_ORDER_START', $oID);
-//-eof-multiship-lat9  *** 1 of xx ***
+//-eof-multiship-lat9  *** 1 of 4 ***
 
       $order_updated = false;
       $status_updated = zen_update_orders_history($oID, $comments, null, $status, $customer_notified, $email_include_message);
@@ -586,11 +586,11 @@ if (zen_not_null($action) && $order_exists == true) {
         }
         ?>
 <?php
-//-bof-multiship-lat9  *** 2 of xx ***
+//-bof-multiship-lat9  *** 2 of 4 ***
         if (!empty($order->info['is_multiship_order'])) {
             require DIR_WS_MODULES . 'multiship_orders_products.php';
         } else {
-//-eof-multiship-lat9  *** 2 of xx ***
+//-eof-multiship-lat9  *** 2 of 4 ***
 ?>
 
         <div class="row">
@@ -678,9 +678,9 @@ if (zen_not_null($action) && $order_exists == true) {
             ?>
         </div>
 <?php
-//-bof-multiship-lat9  *** 3 of xx ***
+//-bof-multiship-lat9  *** 3 of 4 ***
         }
-//-eof-multiship-lat9  *** 3 of xx ***
+//-eof-multiship-lat9  *** 3 of 4 ***
 ?>
         <div class="row"><?php echo zen_draw_separator('pixel_trans.gif', '1', '10'); ?></div>
         <div class="row">
@@ -751,7 +751,7 @@ if (zen_not_null($action) && $order_exists == true) {
               </div>
             </div>
 <?php
-//-bof-multiship-lat9  *** 4 of xx ***
+//-bof-multiship-lat9  *** 4 of 4 ***
         // -----
         // Give an observer the chance to supply some additional status-related inputs.  Each
         // entry in the $extra_status_inputs returned contains:
@@ -778,7 +778,7 @@ if (zen_not_null($action) && $order_exists == true) {
 <?php
             }
         }
-//-eof-multiship-lat9  *** 4 of xx ***
+//-eof-multiship-lat9  *** 4 of 4 ***
 ?>
             <div class="form-group">
                 <div class="col-sm-3 control-label" style="font-weight: 700;"><?php echo ENTRY_NOTIFY_CUSTOMER; ?></div>
