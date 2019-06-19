@@ -23,6 +23,8 @@ Changes are made to your admin's `/admin/orders.php`. When you view the orders f
 
 If you click either the **Invoice** or **Packing Slip** buttons, the page's navigation takes you to different admin pages depending on whether or not the order has been shipped to multiple addresses &mdash; `invoice_multiship.php` and `packingslip_multiship.php` or `invoice.php` and `packingslip.php`, respectively.  This allows the restructuring of the invoice and packing-slip printouts without modifying (yet another) core file!
 
+**Note:** Orders with multiple shipping addresses **cannot be edited** using _Edit Orders_!  The _**Multiple Shipping Addresses**_ processing will deny any request to edit such an order.
+
 ![Orders' Listing Changes](images/msa_orders_listing.jpg)
 
 When you click the _default_ **edit** button for an order that has multiple ship-to addresses, the information is displayed as shown by the screenshot that follows. If you click either the **Invoice** or **Packing Slip** buttons, the page's navigation takes you to an admin page that provides the multiple ship-to address formatting &mdash; as described above.
