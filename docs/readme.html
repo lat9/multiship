@@ -121,22 +121,33 @@ timeEffect : 750
 <div class="the_content">
   <h2 id="install" class="inner">Installation</h2>
   <div class="sub-content">
-    <p>There are <span class="corefile">core-file overwrites</span> in this plugin; you should <strong>always</strong> backup your cart's database and files prior to making any changes. Unzip the plugin's package file and then:</p>
+    <p>There are <span class="corefile">core-file</span> overwrites and <span class="template">template-overrides</span> required by this plugin; you should <strong>always</strong> backup your cart's database and files prior to making any changes. Unzip the plugin's package file and then:</p>
     <ol>
-      <li>Rename the YOUR_ADMIN folder to match the name of your Zen Cart's admin folder.</li>
-      <li>Rename the YOUR_TEMPLATE folder (1 of them) to match the name of your Zen Cart's custom template:<ol>
+      <li>Rename the /YOUR_ADMIN sub-directories to match the name of your Zen Cart's admin sub-directory.<ol>
+        <li>/zc155/YOUR_ADMIN</li>
+        <li>/zc156/YOUR_ADMIN</li>
+      </ol></li>
+      <li>Rename the YOUR_TEMPLATE sub-directory to match the name of your Zen Cart's custom template:<ol>
         <li>/includes/templates/YOUR_TEMPLATE</li>
       </ol></li>
-      <li>Sign into your Zen Cart's admin panel.</li>
-      <li>For each of the <span class="corefile">core</span> or <span class="template">template-override</span> files distributed by this plugin, merge the plugin's file with any other changes you've made and then copy that file to your store's folder structure:<ol>
+      <li>Choose the <span class="corefile">core-file</span> overwrites to be merged with your store's current file-set, based on the Zen Cart version to be used:<ul>
+        <li>Zen Cart 1.5.6 through 1.5.6b<ol type="a">
+          <li><span class="corefile">/zc156/YOUR_ADMIN/orders.php</span>.  This is the zc156b version of the file, with <b>4</b> marked change-sections.</li>
+        </ol></li>
+        <li>Zen Cart 1.5.5 through 1.5.5f<ol type="a">
+          <li><span class="corefile">/zc155/includes/modules/order_total/ot_shipping.php</span>.  This is the zc156 version of the file, with an additional notifier required by the plugin.</li>
+          <li><span class="corefile">/zc155/YOUR_ADMIN/orders.php</span>.  This is the zc155f version of the file, with <b>8</b> marked change-sections.</li>
+        </ol></li>
+      </ul></li>
+      <li>For each of the <span class="template">template-override</span> files distributed by this plugin, merge the plugin's changes with any other changes you've made and then copy that file to your store's file-system.  In all cases, Zen Cart 1.5.6b's <code>responsive_classic</code> template serves as the change-basis for these files.<ol>
         <li><span class="template">/includes/templates/YOUR_TEMPLATE/templates/tpl_account_history_info_default.php</span> <span class="smaller">(Added in v2.0.0)</span></li>
         <li><span class="template">/includes/templates/YOUR_TEMPLATE/templates/tpl_ajax_checkout_confirmation_default.php</span> <span class="smaller">(Added in v2.0.0)</span></li>
         <li><span class="template">/includes/templates/YOUR_TEMPLATE/templates/tpl_address_book_default.php</span></li>
         <li><span class="template">/includes/templates/YOUR_TEMPLATE/templates/tpl_checkout_confirmation_default.php</span></li>
         <li><span class="template">/includes/templates/YOUR_TEMPLATE/templates/tpl_checkout_shipping_default.php</span> <span class="smaller">(Added in v2.0.0)</span></li>
         <li><span class="template">/includes/templates/YOUR_TEMPLATE/templates/tpl_modules_order_totals.php</span> <span class="smaller">(Added in v2.0.0)</span></li>
-        <li><span class="corefile">/YOUR_ADMIN/orders.php</span>.  Changes here support the modified order-display described in <a href="#orders">this</a> section of this readme.</li>
       </ol></li>
+      <li>Sign into your Zen Cart's admin panel.</li>
       <li>Copy the <strong>new</strong> files, introduced by this plugin, to your store's folder structure:<ol>
         <li>/includes/auto_loaders/config.multiship.php</li>
         <li>/includes/classes/class.multiship.php</li>
@@ -181,13 +192,14 @@ timeEffect : 750
         <li>/YOUR_ADMIN/includes/modules/multiship_orders_products.php <span class="smaller">(Added in v2.0.0)</span></li>
        </ol></li>
       <li>Click the &quot;Admin Home&quot; link in your Zen Cart's top admin menu.  This action will cause the plugin's installation script to run.</li>
+      <li>Navigate to your admin's <em>Configuration-&gt;Multiple Ship-to Addresses</em> to configure the plugin, noting that it's not enabled on initial install (or upgrade to v2.0.0).</li>
     </ol>
   </div>
   <div class="sub-content"><p><strong>Note:</strong> All changes to <span class="corefile">core</span> and <span class="template">template-override</span> files are notated with the characters <strong>multiship</strong> to make the changes easy to locate!</p></div>
   
   <h2 id="uninstall" class="inner">Uninstall</h2>
   <div class="sub-content">
-    <p>First, delete the files that were copied to your zen-cart installation's folders (restoring the prior contents of the <span class="corefile">core</span> and <span class="template">template-override</span> files) then use your admin's <em>Tools-&gt;Run SQL Patches</em> to run the file <b>uninstall_multiship.sql</b> that ships with this plugin.</p>
+    <p>First, delete the files that were copied to your Zen Cart installation's file-system (restoring the prior contents of the <span class="corefile">core</span> and <span class="template">template-override</span> files) then use your admin's <em>Tools-&gt;Run SQL Patches</em> to run the file <b>uninstall_multiship.sql</b> that ships with this plugin.</p>
   </div>
 </div>
 
@@ -198,11 +210,51 @@ timeEffect : 750
         <li>BUGFIX: Correct SQL uninstall script.</li>
         <li>BUGFIX: MySQL error when placing a multiple ship-to order that includes attributed products.</li>
         <li>BUGFIX: Removing a multiple ship-to-order results in a PHP error log.</li>
-        <li>The following files were changed, added or removed:<ol>
+        <li>CHANGE: Move multiple shipping address selection to the &quot;shipping&quot; phase of checkout.</li>
+        <li>CHANGE: Disallow <em>Edit Orders</em> from editing orders created with multiple shipping addresses.</li>
+        <li>CHANGE: Don't offer multiple shipping addresses to customers in a <em>group-pricing</em> group.</li>
+        <li>CHANGE: Don't offer coupon-entry for orders to be placed with multiple shipping addresses.</li>
+        <li>The following files were changed, <span class="added">added</span> or <span class="removed">removed</span>:<ol>
           <li>/uninstall_multiship.sql</li>
+          <li>/includes/classes/class.multiship.php</li>
           <li>/includes/classes/observers/class.multiship.php</li>
+          <li>/includes/languages/english/extra_definitions/multiship_common.php</li>
+          <li>/includes/languages/english/checkout_multiship.php</li>
+          <li>/includes/modules/pages/account/header_php_account_multiship.php</li>
+          <li>/includes/modules/pages/account_history_info/header_php_account_history_info_multiship.php</li>
+          <li>/includes/modules/pages/account_history_info/main_template_vars.php</li>
+          <li>/includes/modules/pages/checkout_confirmation/header_php_checkout_confirmation_multiship.php</li>
+          <li>/includes/modules/pages/checkout_multiship/header_php.php</li>
+          <li><span class="added">/includes/modules/pages/checkout_payment/header_php_checkout_payment_multiship.php</span></li>
+          <li><span class="added">/includes/modules/pages/checkout_shipping/header_php_checkout_shipping_multiship.php</span></li>
+          <li><span class="added">/includes/modules/pages/checkout_shipping/jscript_checkout_shipping_multiship.php</span></li>
+          <li>/includes/templates/template_default/templates/tpl_account_history_info_multiship.php</li>
+          <li><span class="added">/includes/templates/template_default/templates/tpl_checkout_confirmation_multiship_address.php</span></li>
+          <li>/includes/templates/template_default/templates/tpl_checkout_multiship_default.php</li>
+          <li><span class="added">/includes/templates/template_default/templates/tpl_checkout_shipping_multiship.php</span></li>
+          <li>/includes/templates/template_default/templates/tpl_modules_multiship.php</li>
+          <li><span class="added">/includes/templates/template_default/templates/tpl_modules_order_totals_multiship.php</span></li>
+          <li>/includes/templates/YOUR_TEMPLATE/css/checkout_multiship.css</li>
+          <li><span class="template">/includes/templates/YOUR_TEMPLATE/templates/tpl_account_history_info_default.php</span> <span class="smaller added">(Added)</span></li>
+          <li><span class="template">/includes/templates/YOUR_TEMPLATE/templates/tpl_ajax_checkout_confirmation_default.php</span> <span class="smaller added">(Added)</span></li>
+          <li><span class="template">/includes/templates/YOUR_TEMPLATE/templates/tpl_checkout_confirmation_default.php</span></li>
+          <li><span class="template">/includes/templates/YOUR_TEMPLATE/templates/tpl_checkout_shipping_default.php</span> <span class="added smaller">(Added)</span></li>
+          <li><span class="template">/includes/templates/YOUR_TEMPLATE/templates/tpl_modules_order_totals.php</span> <span class="added smaller">(Added)</span></li>
           <li>/YOUR_ADMIN/includes/classes/class.multiship_admin_observer.php</li>
+          <li>/YOUR_ADMIN/includes/auto_loaders/config.multiship_admin.php</li>
+          <li>/YOUR_ADMIN/includes/classes/observers/class.multiship_admin_observer.php</li>
           <li>/YOUR_ADMIN/includes/init_includes/init_multiship.php</li>
+          <li><span class="added">/YOUR_ADMIN/includes/init_includes/init_multiship_install.php</span></li>
+          <li><span class="added">/YOUR_ADMIN/includes/init_includes/init_multiship_upgrade.php</span></li>
+          <li>/YOUR_ADMIN/includes/languages/english/extra_definitions/multiship_names.php</li>
+          <li><span class="removed">/YOUR_ADMIN/includes/languages/english/orders_multiship.php</span> <span class="smaller">(All constants moved to <code>multiship_names.php</code>)</span></li>
+          <li><span class="added">/YOUR_ADMIN/includes/modules/multiship_orders_products.php</span></li>
+          <li><span class="corefile">/zc155/includes/modules/order_total/ot_shipping.php</span> <span class="smaller added">(Added, for zc155 only)</span></li>
+          <li><span class="corefile">/zc155/YOUR_ADMIN/orders.php</span> <span class="smaller">(For zc155 only, moved from <code>/YOUR_ADMIN/orders.php</code>)</span></li>
+          <li><span class="corefile">/zc156/YOUR_ADMIN/orders.php</span> <span class="smaller added">(Added, for zc156 only)</span></li>
+        </ol></li>
+        <li>The following database changes were made:<ol>
+          <li>Added a configuration-group (and associated settings) and added the display of those settings to the admin menus.</li>
         </ol></li>
       </ul></li>
       <li>v1.2.0, 2017-07-12<ul>
