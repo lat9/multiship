@@ -344,7 +344,7 @@ class multiship extends base
         // Quick return if the order doesn't have multiple ship-to addresses, or if the multi-ship
         // totals and details have not yet been set.
         //
-        if (!$this->selected || !empty($this->initialization_active)) {
+        if (!$this->selected || !isset($this->totals) || !isset($this->details) || !empty($this->initialization_active)) {
             return;
         }
         
@@ -797,8 +797,16 @@ class multiship extends base
                 // Pull in the httpClient class for those shipping methods (like UPS) that require it!
                 //
                 require_once DIR_WS_CLASSES . 'http_client.php'; 
-            
-                $shipping_quote = $GLOBALS['shipping_modules']->quote($shipping_info[1], $shipping_info[0]);
+                
+                // -----
+                // Load the current shipping modules, bringing in the class if it's not already.
+                //
+                if (!class_exists('shipping')) {
+                    require DIR_WS_CLASSES . 'shipping.php';
+                }
+                $shipping_modules = new shipping;
+                
+                $shipping_quote = $shipping_modules->quote($shipping_info[1], $shipping_info[0]);
                 $this->debugLog("Quote received for $address_id: " . json_encode($shipping_info) . ', quote: ' . json_encode($shipping_quote));
                 if (!is_array($shipping_quote) || count($shipping_quote) == 0) {
                     $this->debugLog("No shipping quote for $address_id, redirecting the checkout_multiship");
@@ -1012,16 +1020,16 @@ class multiship extends base
     public function _checkAddProductMessage($prid, $qty, $attributes) 
     {
         global $messageStack;
-        $uprid = zen_get_uprid ($prid, $attributes);
+        $uprid = zen_get_uprid($prid, $attributes);
         if ($this->selected && $qty != 0 && !$_SESSION['cart']->in_cart($uprid)) {
             $products_name = zen_get_products_name($prid);
-            $messageStack->add_session('header', sprintf (MULTISHIP_PRODUCT_ADD_SHIP_PRIMARY, $qty, $products_name), 'caution');
+            $messageStack->add_session('header', sprintf(MULTISHIP_PRODUCT_ADD_SHIP_PRIMARY, $qty, $products_name), 'caution');
           
             if (!isset($this->cart[$_SESSION['customer_default_address_id']])) {
                 $this->cart[$_SESSION['customer_default_address_id']] = array ();
             }
 
-            if (!isset ($this->cart[$_SESSION['customer_default_address_id']][$uprid])) {
+            if (!isset($this->cart[$_SESSION['customer_default_address_id']][$uprid])) {
                 $this->cart[$_SESSION['customer_default_address_id']][$uprid] = $qty;
                 unset($this->details, $this->totals, $this->text_email);
             }
