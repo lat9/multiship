@@ -1,11 +1,13 @@
 #checkoutMultishipDefault select { width: auto; }
-#checkoutMultishipNewAddress, #onetime_charges, #checkoutMultishipShipping { padding-top: 10px; padding-bottom: 5px; }
-#checkoutMultishipShipping { border-bottom: 1px solid #414141; margin-bottom: 5px; }
-#multishipTable { width: 100%; }
+#checkoutMultishipNewAddress, #onetime_charges, #checkoutMultishipShipping { padding-top: 0.5em; padding-bottom: 0.3em; }
+#checkoutMultishipShipping { border-bottom: 1px solid #414141; margin-bottom: 0.3em; padding: 1em 0; }
+#checkoutMultishipInstructions { padding: 1em 0; }
+#multishipTable { width: 100%; padding: 0.3em; }
 #multishipTableHeading { font-weight: bold; }
-#multishipTableHeading > div, .multishipTableItem > div { display: table-cell; padding: 5px; border-bottom: 1px solid #414141; }
+#multishipTableHeading > div, .multishipTableItem > div { display: table-cell; padding: 0.3em; border-bottom: 1px solid #414141; }
 .qty input { width: 1em; }
 #multishipTable tr:nth-child(even) { background-color: #ebebeb; }
 /*#multishipTable tr:nth-child(odd) { background-color: #f0f0f0; } */
 .onetime_charge, #onetime_charges { color: red; }
 .virtual { display: none; }
+td.sendto .fa { color: red; }

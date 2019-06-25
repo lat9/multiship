@@ -116,6 +116,7 @@ class multiship extends base
         $this->selected = false;
         $multiship_values = array();
         $address = false;
+        $this->debugLog('setMultiship: ' . json_encode($address_array) . ', ' . json_encode($prid_array));
         foreach ($address_array as $i => $currentAddress) {
             if ($address === false) {
                 $address = $currentAddress;
@@ -143,7 +144,7 @@ class multiship extends base
         }  // END foreach inspecting each address/prid pair
 
         if (!$this->selected) {
-            unset($this->cart);
+            $this->sessionCleanup();
         } else {
             if ($_SESSION['cart']->get_content_type() != 'mixed') {
                 $this->cart = $multiship_values;
@@ -168,7 +169,7 @@ class multiship extends base
                     if (count($multiship_values) == 1) {
                         $_SESSION['sendto'] = $physical_product_address_id;
                         $this->selected = false;
-                        unset($this->cart);
+                        $this->sessionCleanup();
                     } else {
                         $multiship_values[$physical_product_address_id] = array_merge($multiship_values[$physical_product_address_id], $virtual_products);
                         $this->cart = $multiship_values;
@@ -180,6 +181,50 @@ class multiship extends base
         }
         $this->shipping_method_id = ($this->selected) ? $_SESSION['shipping']['id'] : '';
         return $this->selected;
+    }
+    
+    public function addressValidation($addresses)
+    {
+        global $order;
+        $addresses = array_unique($addresses);
+        $validated = true;
+        if (count($addresses) > 1 || (count($addresses) == 1 && $addresses[0] != $_SESSION['sendto'])) {
+            // -----
+            // Pull in the httpClient class for those shipping methods (like UPS) that require it!
+            //
+            require_once DIR_WS_CLASSES . 'http_client.php';
+            
+            // -----
+            // Pull in the order and shipping classes.
+            //
+            require DIR_WS_CLASSES . 'order.php';
+            require DIR_WS_CLASSES . 'shipping.php';
+            
+            list($module, $method) = explode('_', $_SESSION['shipping']['id']);
+            $saved_sendto = $_SESSION['sendto'];
+            foreach ($addresses as $address_id) {
+                // -----
+                // Let the order class do the "heavy lifting" in the pulling in of the product list and delivery address 
+                // information for the current shipping address.
+                //
+                $_SESSION['sendto'] = $address_id;
+                $order = new order;
+ 
+                // -----
+                // Load the current shipping modules.
+                //
+                $shipping_modules = new shipping;
+                
+                $shipping_quote = $shipping_modules->quote($method, $module);
+                $this->debugLog("addressValidation: Quote received for $address_id: " . var_export($shipping_quote, true));
+                if (!is_array($shipping_quote) || count($shipping_quote) == 0 || isset($shipping_quote[0]['error'])) {
+                    $validated = false;
+                    $this->debugLog("No shipping quote for $address_id.");
+                }
+            }
+            $_SESSION['sendto'] = $saved_sendto;
+        }
+        return $validated;
     }
   
     // -----
@@ -269,7 +314,7 @@ class multiship extends base
     // -----
     // Returns the current multiship "cart" contents.
     //
-    public function get_cart() 
+    public function getCart() 
     {
         return (isset($this->cart)) ? $this->cart : array();
     }
@@ -277,10 +322,9 @@ class multiship extends base
     // -----
     // Returns the image to be associated with an unshippable address.
     //
-    public function get_noship_image($address_id = '') 
+    public function getNoShipIcon($address_id = '') 
     {
-        global $template, $current_page_base;
-        return ($address_id === '' || (isset($this->noship_address_id) && $address_id === $this->noship_address_id)) ? zen_image($template->get_template_dir(ICON_MULTISHIP_NOSHIP, DIR_WS_TEMPLATE, $current_page_base, 'images/icons') . '/' . ICON_MULTISHIP_NOSHIP, ICON_MULTISHIP_NOSHIP_ALT) : '';
+        return ($address_id === '' || isset($this->cart[$address_id]['address-error'])) ? MULTISHIP_ICON_NO_SHIP : '';
     }
     
     // -----
@@ -699,9 +743,16 @@ class multiship extends base
         }
 
         // -----
-        // If the customer has previously selected multiple shipping addresses on the checkout_multiship page ...
+        // If multiple shipping-addresses aren't currently selected, make sure that the session-based information
+        // from a possibly previous collection of multiple shipping addresses are properly cleaned up.
         //
-        if ($this->selected) {
+        if (!$this->selected) {
+            $this->sessionCleanup();
+            
+        // -----
+        // Otherwise, the customer has previously selected multiple shipping addresses on the checkout_multiship page ...
+        //
+        } else {
             // -----
             // Make sure that the currently-selected shipping method is "sane".  The 'id' element must be set and it must contain an
             // underscore, separating the shipping method's class name from the currently-selected method.
@@ -712,12 +763,12 @@ class multiship extends base
                 $session_shipping = false;
             } else {
                 $shipping_info = explode ('_', $_SESSION['shipping']['id']);
+                $session_shipping = $_SESSION['shipping'];
                 if (count($shipping_info) != 2) {
                     $shipping_error = true;
-                    $session_shipping = $_SESSION['shipping'];
                 }
             }
-            if ($shipping_error) {
+            if ($shipping_error || isset($_SESSION['multiship_new_shipping'])) {
                 $this->debugLog('checkoutInitialization: Returning to checkout_shipping, invalid shipping method.' . PHP_EOL . json_encode($session_shipping));
                 return;
             }
@@ -754,12 +805,15 @@ class multiship extends base
             $multiship_info = array();
             $multiship_grand_total = 0;
             $multiship_shipping_total = 0;
+            $invalid_address_found = false;
             foreach ($this->cart as $address_id => $products) {
+                unset($this->cart[$address_id]['address-error']);
+                
                 $multiship_info[$address_id] = array();
                 $multiship_info[$address_id]['address'] = zen_address_label($_SESSION['customer_id'], $address_id, false, '', ', ');
                 $_SESSION['cart']->contents = array();
                 foreach ($products as $prid => $qty) {
-                    if ($prid == 'has_physical') {
+                    if ($prid == 'has_physical' || $prid == 'address-error') {
                         continue;
                     }
                     $_SESSION['cart']->contents[$prid] = array(
@@ -807,13 +861,12 @@ class multiship extends base
                 $shipping_modules = new shipping;
                 
                 $shipping_quote = $shipping_modules->quote($shipping_info[1], $shipping_info[0]);
-                $this->debugLog("Quote received for $address_id: " . json_encode($shipping_info) . ', quote: ' . json_encode($shipping_quote));
-                if (!is_array($shipping_quote) || count($shipping_quote) == 0) {
-                    $this->debugLog("No shipping quote for $address_id, redirecting the checkout_multiship");
-                    $this->restoreOrdersBaseValues();
-                    $this->noship_address_id = $address_id;
-                    unset($this->installation_active);
-                    zen_redirect(zen_href_link(FILENAME_CHECKOUT_MULTISHIP, '', 'SSL'));
+                $this->debugLog("Quote received for $address_id: " . json_encode($shipping_info) . ', quote: ' . var_export($shipping_quote, true));
+                if (!is_array($shipping_quote) || count($shipping_quote) == 0 || isset($shipping_quote[0]['error'])) {
+                    $this->debugLog("No shipping quote for $address_id");
+                    $this->cart[$address_id]['address-error'] = (isset($shipping_quote[0]['error'])) ? isset($shipping_quote[0]['error']) : ERROR_ADDRESS_NOT_VALID_FOR_SHIPPING;
+                    $invalid_address_found = true;
+                    continue;
                 }
                 
                 $shipping_cost = $shipping_quote[0]['methods'][0]['cost'];
@@ -873,7 +926,17 @@ class multiship extends base
             $this->shipping_total = $multiship_shipping_total;
             $order = $saved_order;
         }  // Customer has chosen multiple ship-to addresses
+        
         unset($this->initialization_active);
+        
+        // -----
+        // If any of the multiple ship-to addresses aren't valid for the currently-selected shipping method,
+        // redirect back to the 'checkout_multiship' page so that the customer can make other
+        // selections.
+        //
+        if ($invalid_address_found) {
+            zen_redirect(zen_href_link(FILENAME_CHECKOUT_MULTISHIP, '', 'SSL'));
+        }
     }
     protected function saveOrdersBaseValues()
     {

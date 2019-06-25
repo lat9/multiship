@@ -4,18 +4,18 @@
 // Copyright (C) 2014-2019, Vinos de Frutas Tropicales (lat9)
 // @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
 //
-$zco_notifier->notify('NOTIFY_HEADER_START_CHECKOUT_MULTISHIP', $_SESSION, $_POST);
+$zco_notifier->notify('NOTIFY_HEADER_START_CHECKOUT_MULTISHIP');
 require DIR_WS_MODULES . zen_get_module_directory('require_languages.php');
 
 // -----
 // If there's nothing (left) in the customer's cart, redirect them back to the shopping_cart page.
-// If there's only one item left in the cart, then this cart is not a multiship candidate; redirect
-// the customer back to the checkout_confirmation page.
+// If there's only one item left in the cart (or the multiship class isn't set), then this cart is not 
+// a multiship candidate; redirect the customer back to the checkout_shipping page.
 //
 $cart_contents = $_SESSION['cart']->count_contents();
 if ($cart_contents <= 0) {
     zen_redirect(zen_href_link(FILENAME_SHOPPING_CART));
-} elseif ($cart_contents == 1) {
+} elseif ($cart_contents == 1 || !isset($_SESSION['multiship'])) {
     zen_redirect(zen_href_link(FILENAME_CHECKOUT_SHIPPING));
 }
 
@@ -31,16 +31,6 @@ if (empty($_SESSION['customer_id'])) {
     }
 }
 
-/* ----- 20140723-lat9-Don't need/want this here, results in unwanted return to checkout_shipping when quantities are updated
-// avoid hack attempts during the checkout procedure by checking the internal cartID
-if (isset($_SESSION['cart']->cartID) && $_SESSION['cartID']) {
-  if ($_SESSION['cart']->cartID != $_SESSION['cartID']) {
-    $zco_notifier->notify ('CHECKOUT_MULTISHIP_CARTID_MISMATCH');
-    zen_redirect(zen_href_link(FILENAME_CHECKOUT_SHIPPING, '', 'SSL'));
-  }
-}
-   ----- */
-
 // if no shipping method has been selected, redirect the customer to the shipping method selection page
 if (!isset($_SESSION['shipping'])) {
     $zco_notifier->notify('CHECKOUT_MULTISHIP_SHIPPING_NOT_SELECTED');
@@ -49,6 +39,23 @@ if (!isset($_SESSION['shipping'])) {
 if (isset($_SESSION['shipping']['id']) && $_SESSION['shipping']['id'] == 'free_free' && defined('MODULE_ORDER_TOTAL_SHIPPING_FREE_SHIPPING_OVER') && $_SESSION['cart']->get_content_type() != 'virtual' && $_SESSION['cart']->show_total() < MODULE_ORDER_TOTAL_SHIPPING_FREE_SHIPPING_OVER) {
     $zco_notifier->notify('CHECKOUT_MULTISHIP_FREE_SHIPPING_MISMATCH');
     zen_redirect(zen_href_link(FILENAME_CHECKOUT_SHIPPING, '', 'SSL'));
+}
+
+// -----
+// Addressing a corner-case scenario.  If a customer has entered some multiple ship-to addresses
+// and subsequently changed the shipping-method so that one or more of those previously-entered
+// addresses are no longer valid, we need a way to let the 'checkout_shipping' processing "know"
+// that it should ignore those invalid addresses, from a 'multiship' standpoint, so that the 
+// customer can make their change/correction.
+//
+if (isset($_GET['address_correction'])) {
+    $ms_cart = $_SESSION['multiship']->getCart();
+    foreach ($ms_cart as $address_id => $info) {
+        if (isset($info['address-error'])) {
+            $_SESSION['multiship_new_shipping'] = true;
+            zen_redirect(zen_href_link(FILENAME_CHECKOUT_SHIPPING, '', 'SSL'));
+        }
+    }
 }
 
 // -----
@@ -95,10 +102,19 @@ if (isset($_POST['securityToken'])) {
             }
         }
     }
+    
     // -----
-    // Record the customer's multiship selection in the session variable.
+    // Check to see that the ship-to addresses currently selected are 'compatible' with
+    // the currently-selected shipping method.
     //
-    $_SESSION['multiship']->setMultiship($_POST['address'], $_POST['prid']);
+    if (!$_SESSION['multiship']->addressValidation($_POST['address'])) {
+        $messageStack->add('multiship', ERROR_ADDRESS_NOT_VALID_FOR_SHIPPING, 'error');
+    } else {
+        // -----
+        // Record the customer's multiship selection in the session variable.
+        //
+        $_SESSION['multiship']->setMultiship($_POST['address'], $_POST['prid']);
+    }
 }
 
 $multiship_selected = $_SESSION['multiship']->isSelected();
@@ -176,7 +192,6 @@ for ($i = 0, $productsArray = array(), $n = count($products); $i < $n; $i++) {
                 'value' => $attr_value
             );
             $zco_notifier->notify("CHECKOUT_MULTISHIP_ATTRIBUTES ($option => $value):", $attributes, $attributes_values, $currentProduct, $attr_value);
-      
         }
     }
     for ($j = 0; $j < $products[$i]['quantity']; $j++) {
@@ -188,12 +203,16 @@ for ($i = 0, $productsArray = array(), $n = count($products); $i < $n; $i++) {
 // Now, add the ship-to addresses to be associated with each product, keeping in mind that an instance of the
 // product could have been either added or removed during prior processing.
 //
-$multiship_details = $_SESSION['multiship']->get_cart();
+$multiship_details = $_SESSION['multiship']->getCart();
+$invalid_address_present = false;
 for ($i = 0, $n = count($productsArray); $i < $n; $i++) {
     $productsArray[$i]['sendto'] = $_SESSION['sendto'];
     $prid = $productsArray[$i]['id'];
     $productsArray[$i]['is_physical'] = $_SESSION['multiship']->cartItemIsPhysical($prid);
     foreach ($multiship_details as $address_id => &$currentProducts) {
+        if (isset($currentProducts['address-error'])) {
+            $invalid_address_present = true;
+        }
         if (isset($currentProducts[$prid]) && $currentProducts[$prid] > 0) {
             $productsArray[$i]['sendto'] = $address_id;
             $currentProducts[$prid]--;
@@ -201,6 +220,12 @@ for ($i = 0, $n = count($productsArray); $i < $n; $i++) {
         }
     }
     unset($currentProducts);
+}
+
+$checkout_shipping_link = ($invalid_address_present) ? zen_href_link(FILENAME_CHECKOUT_MULTISHIP, 'address_correction', 'SSL') : zen_href_link(FILENAME_CHECKOUT_SHIPPING, '', 'SSL');
+
+if ($invalid_address_present) {
+    $messageStack->add('multiship', sprintf(ERROR_ADDRESS_INVALID_FOR_SHIPPING_METHOD, MULTISHIP_ICON_NO_SHIP), 'error');
 }
 
 $breadcrumb->add(NAVBAR_TITLE_1, zen_href_link(FILENAME_CHECKOUT_CONFIRMATION, '', 'SSL'));

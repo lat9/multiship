@@ -15,7 +15,7 @@ if ($messageStack->size('multiship') > 0) {
 if ($messageStack->size('shopping_cart') > 0) {
     echo $messageStack->output('shopping_cart'); 
 }
-$checkout_shipping_anchor = '<a href="' . zen_href_link(FILENAME_CHECKOUT_SHIPPING, '', 'SSL') . '">' . SHIP_TO_MULTIPLE_HERE . '</a>';
+$checkout_shipping_anchor = '<a href="' . $checkout_shipping_link . '">' . SHIP_TO_MULTIPLE_HERE . '</a>';
 ?>
     <div id="checkoutMultishipShipping"><?php echo TEXT_CURRENT_SHIPPING_METHOD; ?><strong><?php echo $_SESSION['shipping']['title']; ?></strong>. <?php echo sprintf(TEXT_SHIPPING_METHOD_CHANGE, $checkout_shipping_anchor); ?></div>
     <div id="checkoutMultishipInstructions"><?php echo TEXT_MULTISHIP_INSTRUCTIONS; ?></div>
@@ -52,7 +52,7 @@ foreach ($productsArray as $currentProduct) {
             </td>
             <td class="msipPrice"><?php echo $currentProduct['price']; ?></td>
             <td class="qty"><?php echo zen_draw_input_field('qty[]', 1, 'onchange="notok2leave();"'); ?></td>
-            <td class="sendto"><?php echo zen_draw_pull_down_menu('address[]', $multishipAddresses, $currentProduct['sendto'], 'onchange="ok2leave(); this.form.submit();"') . ' ' . $_SESSION['multiship']->get_noship_image($currentProduct['sendto']); ?></td>
+            <td class="sendto"><?php echo zen_draw_pull_down_menu('address[]', $multishipAddresses, $currentProduct['sendto'], 'onchange="ok2leave(); this.form.submit();"') . ' ' . $_SESSION['multiship']->getNoShipIcon($currentProduct['sendto']); ?></td>
         </tr>
 <?php
 }

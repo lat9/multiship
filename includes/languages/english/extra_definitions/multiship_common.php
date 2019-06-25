@@ -28,3 +28,7 @@ if (!defined('WARNING_PRODUCT_QUANTITY_ADJUSTED')) {
 define('MULTISHIP_PRODUCT_ADD_SHIP_PRIMARY', 'The newly-added product <b>(%u x %s)</b> will ship to your <b>Primary</b> address.  You will have the opportunity to change this during the checkout process.');
 define('MULTISHIP_PRODUCT_INCREASE_SHIP_PRIMARY', 'Additional quantities of the product <b>(%s)</b> will ship to your <b>Primary</b> address.  You will have the opportunity to change this during the checkout process.');
 define('MULTISHIP_PRODUCT_DECREASE_SHIP_PRIMARY', 'All of the product <b>(%s)</b> will ship to your <b>Primary</b> address.  You will have the opportunity to change this during the checkout process.');
+
+define('ERROR_ADDRESS_NOT_VALID_FOR_SHIPPING', 'Address not valid');
+define('MULTISHIP_CHOOSE_DIFFERENT_SHIPPING', 'One or more of your additional shipping addresses cannot be used with the currently-selected shipping method. Either change your shipping method or click the link below to make changes to your additional shipping addresses.');
+define('MULTISHIP_ICON_NO_SHIP', '<i class="fa fa-exclamation-circle fa-lg"></i>');
