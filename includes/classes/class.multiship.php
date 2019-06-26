@@ -934,7 +934,7 @@ class multiship extends base
         // redirect back to the 'checkout_multiship' page so that the customer can make other
         // selections.
         //
-        if ($invalid_address_found) {
+        if (!empty($invalid_address_found)) {
             zen_redirect(zen_href_link(FILENAME_CHECKOUT_MULTISHIP, '', 'SSL'));
         }
     }
