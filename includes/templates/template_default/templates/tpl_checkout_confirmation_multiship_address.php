@@ -6,6 +6,7 @@
 //
 ?>
 <div class="buttonRow forward"><?php echo '<a href="' . $editShippingButtonLink . '">' . zen_image_button(BUTTON_IMAGE_EDIT_SMALL, BUTTON_EDIT_SMALL_ALT) . '</a>'; ?></div>
-<div id="multishipActive"><?php echo SHIPPING_TO_MULTIPLE_ADDRESSES; ?></div>
+<div class="multiLink"><?php echo SHIPPING_TO_MULTIPLE_ADDRESSES; ?></div>
+<br>
 <h3 id="checkoutConfirmDefaultShipment"><?php echo HEADING_SHIPPING_METHOD; ?></h3>
 <h4 id="checkoutConfirmDefaultShipmentTitle"><?php echo $_SESSION['multiship']->get_shipping_method(); ?></h4>
