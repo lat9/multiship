@@ -27,6 +27,7 @@
 <legend><?php echo ADDRESS_BOOK_TITLE; ?></legend>
 <div class="alert forward"><?php echo sprintf(TEXT_MAXIMUM_ENTRIES, MAX_ADDRESS_BOOK_ENTRIES); ?></div>
 <br class="clearBoth" />
+<div id="addAddyWrapper>
 <?php
 /**
  * Used to loop thru and display address book entries
@@ -42,6 +43,7 @@
 <?php
   }
 ?>
+ </div>
 </fieldset>
 
 <?php
