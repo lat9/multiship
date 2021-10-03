@@ -21,7 +21,7 @@ $checkout_shipping_anchor = '<a href="' . $checkout_shipping_link . '">' . SHIP_
     <div id="checkoutMultishipInstructions"><?php echo TEXT_MULTISHIP_INSTRUCTIONS; ?></div>
     <div id="checkoutMultishipNewAddress"><?php echo TEXT_NEED_ANOTHER_ADDRESS; ?><a href="<?php echo zen_href_link(FILENAME_ADDRESS_BOOK, '', 'SSL'); ?>"><?php echo TEXT_ENTER_NEW_ADDRESS; ?></a></div>
     <?php echo zen_draw_form('checkout_multiship', zen_href_link(FILENAME_CHECKOUT_MULTISHIP, '', 'SSL')); ?>
-    <table id="multishipTable">
+    <table id="multishipTable" cellpadding="10">
         <tr>
             <th class="item"><?php echo HEADING_ITEM; ?></th>
             <th class="price"><?php echo HEADING_PRICE; ?></th>
